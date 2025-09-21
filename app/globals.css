@@ -8,8 +8,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* --font-sans: var(--font-geist-sans); */
+  /* --font-mono: var(--font-geist-mono); */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -38,12 +38,16 @@
     @apply px-3 py-2 rounded-full transition-colors duration-200 hover:bg-purple-200;
   }
 
+  .btns {
+    @apply flex flex-col sm:flex-row gap-4 w-full mx-auto justify-center px-4;
+  }
+
   .btn-primary {
-    @apply bg-[var(--color-primary)]  px-6 py-3   rounded-sm text-background  hover:bg-[#230e36] transition-colors duration-200;
+    @apply bg-[var(--color-primary)]  px-6 py-3 w-full sm:w-auto   rounded-sm text-background  hover:bg-[#230e36] transition-colors duration-200;
   }
 
   .btn-secondary {
-    @apply bg-background  px-6 py-3  rounded-sm  hover:bg-[#c6d3f5]  transition-colors duration-200;
+    @apply bg-background  px-6 py-3  rounded-sm w-full sm:w-auto  hover:bg-[#c6d3f5]  transition-colors duration-200;
   }
 
   .card {

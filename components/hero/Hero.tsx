@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Button from "../ui/Button";
 import Image from "next/image";
 
@@ -26,16 +25,7 @@ const Hero = () => {
           Real-time commodity prices from real buyers like you. <br /> Save
           money, shop smarter, and help your community find the best deals.
         </h2>
-        <div className="flex flex-col sm:flex-row gap-4 w-full mx-auto justify-center">
-          <Link href="/comming-soon">
-            <button className="btn-primary w-full sm:w-auto">
-              Submit a Price
-            </button>
-          </Link>
-          <Link href="/comming-soon">
-            <button className=" find-price btn-secondary ">Find Prices</button>
-          </Link>
-        </div>
+        <Button firstBtn="Submit a Price" secondBtn="Find Prices" />
       </div>
     </section>
   );

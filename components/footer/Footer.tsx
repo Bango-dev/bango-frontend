@@ -5,16 +5,16 @@ const Footer = () => {
   return (
     <section className="center h-auto py-10">
       <ul className="nav-list">
-        <Link href="/comming-soon" className="nav-link">
+        <Link href="/coming-soon" className="nav-link">
           <li>About Bango</li>
         </Link>
-        <Link href="/comming-soon" className="nav-link">
+        <Link href="/coming-soon" className="nav-link">
           <li>Privacy & Policy</li>
         </Link>
-        <Link href="/comming-soon" className="nav-link">
+        <Link href="/coming-soon" className="nav-link">
           <li>Contact Us</li>
         </Link>
-        <Link href="/comming-soon" className="nav-link">
+        <Link href="/coming-soon" className="nav-link">
           <li>Download app (Comming Soon)</li>
         </Link>
       </ul>
@@ -28,8 +28,8 @@ const Footer = () => {
           className="w-[263px]  lg:w-[830px] h-auto"
         />
       </div>
-      <div className="flex items-center justify-center gap-10 w-7xl card-border rounded-full py-10 mb-5 ">
-        <Link href="/comming-soon" className="social-link">
+      <div className="flex items-center justify-center gap-10 xl:w-7xl w-full lg:card-border  rounded-full py-10 mb-5 ">
+        <Link href="/coming-soon" className="social-link">
           <Image
             src="/images/footer/x-logo.png"
             alt="The footer logo"
@@ -37,7 +37,7 @@ const Footer = () => {
             height={24}
           />
         </Link>
-        <Link href="/comming-soon" className="social-link">
+        <Link href="/coming-soon" className="social-link">
           <Image
             src="/images/footer/instagram-logo.png"
             alt="The footer logo"
@@ -45,7 +45,7 @@ const Footer = () => {
             height={24}
           />
         </Link>
-        <Link href="/comming-soon" className="social-link">
+        <Link href="/coming-soon" className="social-link">
           <Image
             src="/images/footer/youtube-logo.png"
             alt="The footer logo"
@@ -53,7 +53,7 @@ const Footer = () => {
             height={24}
           />
         </Link>
-        <Link href="/comming-soon" className="social-link">
+        <Link href="/coming-soon" className="social-link">
           <Image
             src="/images/footer/linkedin-logo.png"
             alt="The footer logo"

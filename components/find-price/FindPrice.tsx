@@ -8,7 +8,7 @@ const FindPrice = () => {
         <h3 className=" xl:text-2xl  md:text-xl text-base my-5 text-wrap ">
           free, no account needed. Want to contribute?
         </h3>
-        <button className="btn-primary ">Submit a Price</button>
+        <button className="btn-primary w-fit ">Submit a Price</button>
       </div>
     </section>
   );

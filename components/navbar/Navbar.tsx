@@ -18,14 +18,14 @@ const Navbar = () => {
       </div>
 
       <ul className="hidden md:flex justify-center flex-1 gap-6 list-none">
-        <Link href="/comming-soon" className="nav-link">
+        <Link href="/coming-soon" className="nav-link">
           <li>Submit Price</li>
         </Link>
 
-        <Link href="/comming-soon" className="nav-link">
+        <Link href="/coming-soon" className="nav-link">
           <li>Top Sellers</li>
         </Link>
-        <Link href="/comming-soon" className="nav-link">
+        <Link href="/coming-soon" className="nav-link">
           <li>Find Prices</li>
         </Link>
       </ul>
@@ -59,20 +59,20 @@ const Navbar = () => {
         {/* Menu items */}
         <ul className="flex flex-col items-start gap-6 mt-16 ml-6  list-none">
           <Link
-            href="/comming-soon"
+            href="/coming-soon"
             className="hover:text-purple-600 cursor-pointer"
           >
             <li>Submit Price</li>
           </Link>
 
           <Link
-            href="/comming-soon"
+            href="/coming-soon"
             className="hover:text-purple-600 cursor-pointer"
           >
             <li>Top Sellers</li>
           </Link>
           <Link
-            href="/comming-soon"
+            href="/coming-soon"
             className="hover:text-purple-600 cursor-pointer"
           >
             <li>Find Prices</li>
