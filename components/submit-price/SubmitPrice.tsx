@@ -1,3 +1,5 @@
+import PrimaryButton from "../ui/PrimaryButton";
+
 const FindPrice = () => {
   return (
     <section className="center h-screen">
@@ -8,7 +10,11 @@ const FindPrice = () => {
         <h3 className=" xl:text-2xl  md:text-xl text-base my-5 text-wrap ">
           free, no account needed. Want to contribute?
         </h3>
-        <button className="btn-primary w-fit ">Submit a Price</button>
+        <PrimaryButton
+          href="/form/step-1"
+          text="Submit a Price"
+          className="w-fit"
+        />
       </div>
     </section>
   );

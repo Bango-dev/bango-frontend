@@ -5,7 +5,7 @@ const HowToUse = () => {
     <section className=" relative  center  h-auto py-10">
       <div className="absolute inset-0 lg:flex items-center justify-center -z-10 w-full hidden">
         <Image
-          src="/images/how-to-use/arrow.png"
+          src="/images/how-to-use/arrow.svg"
           alt="An arrow showing the steps"
           width={659}
           height={131}

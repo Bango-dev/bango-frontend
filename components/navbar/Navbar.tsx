@@ -10,7 +10,7 @@ const Navbar = () => {
       <div className="flex-shrink-0 w-[153px]">
         <Image
           className=" justify-self-start border-bottom"
-          src="/images/navbar/navbar-logo.png"
+          src="/images/navbar/navbar-logo.svg"
           alt="The logo at the navigation bar"
           width={153}
           height={32}
@@ -46,7 +46,7 @@ const Navbar = () => {
       <div
         className={`fixed top-0 left-0 h-screen w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        md:hidden z-10 `}
+        md:hidden z-20 `}
       >
         {/* Close button inside menu */}
         <button

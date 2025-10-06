@@ -1,9 +1,9 @@
 import Features from "../components/features/Features";
-import FindPrice from "../components/find-price/FindPrice";
-import Footer from "../components/footer/Footer";
+import SubmitPrice from "../components/submit-price/SubmitPrice";
 import Hero from "../components/hero/Hero";
 import HowToUse from "../components/how-to-use/HowToUse";
 import WhatToExpect from "../components/what-to-expect/WhatToExpect";
+import Footer from "../components/footer/Footer";
 
 export default function Home() {
   return (
@@ -12,7 +12,8 @@ export default function Home() {
       <HowToUse />
       <WhatToExpect />
       <Features />
-      <FindPrice />
+      <SubmitPrice />
+      <Footer />
     </>
   );
 }

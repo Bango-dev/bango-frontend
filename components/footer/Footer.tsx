@@ -20,7 +20,7 @@ const Footer = () => {
       </ul>
       <div className="my-10">
         <Image
-          src="/images/footer/footer-logo.png"
+          src="/images/footer/footer-logo.svg"
           alt="The footer logo"
           width={830}
           height={174}
@@ -31,32 +31,32 @@ const Footer = () => {
       <div className="flex items-center justify-center gap-10 xl:w-7xl w-full lg:card-border  rounded-full py-10 mb-5 ">
         <Link href="/coming-soon" className="social-link">
           <Image
-            src="/images/footer/x-logo.png"
-            alt="The footer logo"
+            src="/images/footer/x-logo.svg"
+            alt="x logo"
             width={24}
             height={24}
           />
         </Link>
         <Link href="/coming-soon" className="social-link">
           <Image
-            src="/images/footer/instagram-logo.png"
-            alt="The footer logo"
+            src="/images/footer/instagram-logo.svg"
+            alt="Instagram logo"
             width={24}
             height={24}
           />
         </Link>
         <Link href="/coming-soon" className="social-link">
           <Image
-            src="/images/footer/youtube-logo.png"
-            alt="The footer logo"
+            src="/images/footer/youtube-logo.svg"
+            alt="youTube logo"
             width={24}
             height={24}
           />
         </Link>
         <Link href="/coming-soon" className="social-link">
           <Image
-            src="/images/footer/linkedin-logo.png"
-            alt="The footer logo"
+            src="/images/footer/linkedin-logo.svg"
+            alt="linkedIn logo"
             width={24}
             height={24}
           />

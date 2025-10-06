@@ -10,7 +10,7 @@ const WhatToExpect = () => {
           <div className="exp-list">
             <div className="icon-background">
               <Image
-                src="/images/what-to-expect/search-icon.png"
+                src="/images/what-to-expect/search-icon.svg"
                 alt="search icon"
                 width={22}
                 height={18}
@@ -28,7 +28,7 @@ const WhatToExpect = () => {
           <div className="exp-list">
             <div className="icon-background">
               <Image
-                src="/images/what-to-expect/horse-icon.png"
+                src="/images/what-to-expect/horse-icon.svg"
                 alt="horse icon"
                 width={22}
                 height={18}
@@ -46,7 +46,7 @@ const WhatToExpect = () => {
           <div className="exp-list">
             <div className="icon-background">
               <Image
-                src="/images/what-to-expect/price-trend-icon.png"
+                src="/images/what-to-expect/chart-timeline.svg"
                 alt="price trend icon"
                 width={22}
                 height={18}
@@ -64,7 +64,7 @@ const WhatToExpect = () => {
           <div className="exp-list">
             <div className="icon-background">
               <Image
-                src="/images/what-to-expect/handshake-icon.png"
+                src="/images/what-to-expect/handshake-icon.svg"
                 alt="hand shake icon"
                 width={22}
                 height={18}
