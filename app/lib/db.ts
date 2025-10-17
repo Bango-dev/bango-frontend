@@ -1,0 +1,29 @@
+import Dexie, { Table } from "dexie";
+
+// Define the shape of your commodity data
+export interface Commodity {
+  id?: number;
+  commodityName: string;
+  price: string;
+  quantity: string;
+  location: string;
+  marketName: string;
+  date: string;
+  sellerName: string;
+  phone: string;
+  image?: string; // we’ll store Base64 string for simulation
+}
+
+export class MyDatabase extends Dexie {
+  commodities!: Table<Commodity>;
+
+  constructor() {
+    super("MyCommodityDB");
+    this.version(1).stores({
+      commodities: "++id, commodityName, location, price, date",
+    });
+  }
+}
+
+// Export a single instance
+export const db = new MyDatabase();

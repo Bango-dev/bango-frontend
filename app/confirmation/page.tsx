@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Button from "../../components/ui/Button";
+import Button from "../components/ui/Button";
 
 const Confirmation = () => {
   return (
@@ -14,7 +14,7 @@ const Confirmation = () => {
       </div>
       <div>
         <h3 className="sub-heading">Awesome!</h3>
-        <h4 className="text-center text-lg text-[#757575] mt-2">
+        <h4 className="text-center sm:text-lg text-base text-[#757575] mt-2">
           Thanks for sharing! Your data helps others plan and save.
         </h4>
       </div>

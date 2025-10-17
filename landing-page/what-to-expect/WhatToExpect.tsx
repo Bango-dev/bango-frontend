@@ -5,8 +5,8 @@ const WhatToExpect = () => {
     <section className="center bg-[#F1ECFF] h-auto py-10">
       <span className=" heading ">Why use Bango</span>
       <h3 className="sub-heading">Here’s what to expect</h3>
-      <div className="flex  lg:flex-row flex-col-reverse xl:gap-30 gap-10 mt-10 mb-20 justify-center">
-        <div>
+      <div className="flex  lg:flex-row flex-col-reverse xl:gap-30 gap-10 mt-10 md:mb-20 justify-center ">
+        <div className=" m-5">
           <div className="exp-list">
             <div className="icon-background">
               <Image
@@ -19,7 +19,7 @@ const WhatToExpect = () => {
             <div>
               <h4 className="card-heading">Transparent</h4>
               <p className=" desc">
-                Prices are crowdsourced, so you see what people <br /> are
+                Prices are crowdsourced, so you see what people  are
                 really paying.
               </p>
             </div>
@@ -37,7 +37,7 @@ const WhatToExpect = () => {
             <div>
               <h4 className="card-heading">Fast</h4>
               <p className=" desc">
-                Find or share a price in under 20 seconds, straight <br />{" "}
+                Find or share a price in under 20 seconds, straight
                 forward and direct.
               </p>
             </div>
@@ -55,7 +55,7 @@ const WhatToExpect = () => {
             <div>
               <h4 className="card-heading">Local & Real</h4>
               <p className=" desc">
-                Search for any commodity and see <br /> recent prices in your
+                Search for any commodity and see  recent prices in your
                 area.
               </p>
             </div>
@@ -73,7 +73,7 @@ const WhatToExpect = () => {
             <div>
               <h4 className="card-heading">Helpful to all</h4>
               <p className=" desc">
-                Your submissions help everyone save <br /> money, while you get
+                Your submissions help everyone save  money, while you get
                 helped too.
               </p>
             </div>

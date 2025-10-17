@@ -34,17 +34,17 @@ const MobileFullDetails = () => {
 
   return (
     <div className="flex flex-col sm:flex-row sm:shadow-none shadow-md p-5 items-center justify-center mx-auto w-full">
-              <Link href="/search-result/grid-view">
-                <div className="flex justify-start items-center mb-6 cursor-pointer gap-2">
-                  <Image
-                    src="/images/form/arrow-left.svg"
-                    alt="Back arrow"
-                    width={24}
-                    height={24}
-                  />
-                  <span>Back</span>
-                </div>
-              </Link>
+      <Link href="/search-result/list-view">
+        <div className="flex justify-start items-center mb-6 cursor-pointer gap-2 w-fit">
+          <Image
+            src="/images/form/arrow-left.svg"
+            alt="Back arrow"
+            width={24}
+            height={24}
+          />
+          <span>Back</span>
+        </div>
+      </Link>
       <div>
         {product.image && (
           <Image

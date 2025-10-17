@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
-import Navbar from "../components/navbar/Navbar";
+import Navbar from "../landing-page/navbar/Navbar";
+import { FormProvider } from "../app/context/FormContext";
 
 export const metadata: Metadata = {
   title: "Bango",
@@ -16,8 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Navbar />
-        {children}
+        <FormProvider>
+          <Navbar />
+          {children}
+        </FormProvider>
       </body>
     </html>
   );

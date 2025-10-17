@@ -1,49 +1,87 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { db, Commodity } from "../lib/db";
 
-type CommodityData = {
-  commodityName?: string;
-  price?: string;
-  quantity?: string;
-  location?: string;
-  marketName?: string;
-  image?: File | null;
-  date?: string;
-};
-
-type SellerData = {
-  sellerName?: string;
-  phone?: string;
-};
-
-type FormDataState = CommodityData & SellerData;
-
-type FormContextType = {
-  data: Partial<FormDataState>;
-  setData: (values: Partial<FormDataState>) => void;
+type ContextType = {
+  data: Commodity;
+  update: (fields: Partial<Commodity>) => void;
   clear: () => void;
+  saveToDB: () => Promise<void>;
 };
 
-const FormContext = createContext<FormContextType | undefined>(undefined);
+const defaultData: Commodity = {
+  commodityName: "",
+  price: "",
+  quantity: "",
+  location: "",
+  marketName: "",
+  date: "",
+  sellerName: "",
+  phone: "",
+  image: "",
+};
 
-export const FormProvider = ({ children }: { children: ReactNode }) => {
-  const [data, setDataState] = useState<Partial<FormDataState>>({});
+const FormContext = createContext<ContextType | undefined>(undefined);
 
-  const setData = (values: Partial<FormDataState>) =>
-    setDataState((prev) => ({ ...prev, ...values }));
+export function FormProvider({ children }: { children: ReactNode }) {
+  const [data, setData] = useState<Commodity>(defaultData);
 
-  const clear = () => setDataState({});
+  // 1. Load saved data (including image) from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("formData");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setData(parsed);
+      } catch (e) {
+        console.error("Error parsing saved form data:", e);
+      }
+    }
+  }, []);
+
+  //  2. Automatically save form data (including image Base64) to localStorage
+  useEffect(() => {
+    localStorage.setItem("formData", JSON.stringify(data));
+  }, [data]);
+
+  //  3. Update specific fields
+  const update = (fields: Partial<Commodity>) => {
+    setData((prev) => ({ ...prev, ...fields }));
+  };
+
+  //  4. Clear both state and localStorage
+  const clear = () => {
+    setData(defaultData);
+    localStorage.removeItem("formData");
+  };
+
+  //  5. Save data into Dexie and clear after saving
+  const saveToDB = async () => {
+    try {
+      await db.commodities.add(data);
+      clear();
+      console.log("Form data saved to Dexie successfully!");
+    } catch (error) {
+      console.error("Error saving to Dexie:", error);
+    }
+  };
 
   return (
-    <FormContext.Provider value={{ data, setData, clear }}>
+    <FormContext.Provider value={{ data, update, clear, saveToDB }}>
       {children}
     </FormContext.Provider>
   );
-};
+}
 
-export const useFormData = () => {
-  const ctx = useContext(FormContext);
-  if (!ctx) throw new Error("useFormData must be used inside FormProvider");
-  return ctx;
-};
+export function useFormData() {
+  const context = useContext(FormContext);
+  if (!context) throw new Error("useFormData must be used inside FormProvider");
+  return context;
+}

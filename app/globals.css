@@ -36,11 +36,11 @@
   }
 
   .features-1-card {
-    @apply p-5 rounded-lg bg-[#F2F2F2] xl:flex-row flex-col  flex;
+    @apply p-5 rounded-lg bg-[#F2F2F2] xl:flex-row flex-col  flex xl:w-1/2 m-5  w-xs  ;
   }
 
   .features-2-card {
-    @apply p-5 rounded-lg bg-[#F2F2F2];
+    @apply p-5 rounded-lg bg-[#F2F2F2] sm:w-sm w-xs mt-5;
   }
 
   .center {
@@ -56,7 +56,7 @@
   }
 
   .form {
-    @apply space-y-4  mx-auto p-6  border border-gray-300 rounded-2xl shadow-md md:w-2xl w-sm;
+    @apply space-y-4  mx-auto p-6  border border-gray-300 rounded-2xl shadow-md md:w-2xl w-full;
   }
 
   .step-indicator {
@@ -78,7 +78,7 @@
   }
 
   .card-heading {
-    @apply text-2xl font-semibold mt-5 mb-2.5;
+    @apply  md:text-2xl text-xl font-semibold mt-5 mb-2.5;
   }
 
   .card-text {

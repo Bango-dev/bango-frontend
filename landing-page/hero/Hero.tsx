@@ -1,4 +1,4 @@
-import Button from "../ui/Button";
+import Button from "../../app/components/ui/Button";
 import Image from "next/image";
 
 const Hero = () => {
@@ -32,7 +32,7 @@ const Hero = () => {
           Commodity
         </h1>
         <h1 className=" hero-heading font-normal ">Price Discovery</h1>
-        <h2 className=" xl:text-3xl lg:text-2xl md:text-1xl sm:text-base text-sm text-wrap  text-[#757575] text-center my-5">
+        <h2 className=" xl:text-3xl lg:text-2xl md:text-1xl sm:text-base text-sm text-wrap mx-5 text-[#757575] text-center my-5">
           Real-time commodity prices from real buyers like you. <br /> Save
           money, shop smarter, and help your community find the best deals.
         </h2>
@@ -40,7 +40,7 @@ const Hero = () => {
           firstBtn="Submit a Price"
           secondBtn="Find Prices"
           firstHref="/form/step-1"
-          secondHref="/coming-soon"
+          secondHref="/find-price"
         />
       </div>
     </section>
