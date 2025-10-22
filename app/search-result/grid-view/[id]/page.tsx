@@ -14,6 +14,18 @@ const MobileFullDetails = () => {
   const [averagePrice, setAveragePrice] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
+  //  Utility to clean and convert price strings to numbers
+  const parsePrice = (price: unknown): number => {
+    if (price === null || price === undefined) return 0;
+    const cleaned = String(price).replace(/[^0-9.]/g, "");
+    const num = parseFloat(cleaned);
+    return isNaN(num) ? 0 : num;
+  };
+
+  //  Normalize strings for case-insensitive comparison
+  const normalize = (str: string | undefined | null) =>
+    (str || "").trim().toLowerCase().replace(/\s+/g, " ");
+
   useEffect(() => {
     const fetchProduct = async () => {
       if (id) {
@@ -21,22 +33,28 @@ const MobileFullDetails = () => {
         setProduct(result || null);
 
         if (result) {
-          // Normalize the current commodity name (to lowercase)
-          const targetName = result.commodityName?.trim().toLowerCase();
-
-          // Get all commodities and filter case-insensitively
           const allCommodities = await db.commodities.toArray();
+
+          // Match commodities by name + quantity (case-insensitive)
+          const targetName = normalize(result.commodityName);
+          const targetQty = normalize(result.quantity);
+
           const similarCommodities = allCommodities.filter(
-            (item) => item.commodityName?.trim().toLowerCase() === targetName
+            (item) =>
+              normalize(item.commodityName) === targetName &&
+              normalize(item.quantity) === targetQty
           );
 
-          // Calculate average price for similar commodities
+          // Compute average price
           if (similarCommodities.length > 0) {
             const total = similarCommodities.reduce(
-              (sum, item) => sum + Number(item.price || 0),
+              (sum, item) => sum + parsePrice(item.price),
               0
             );
-            setAveragePrice(Math.round(total / similarCommodities.length));
+            const avg = Math.round(total / similarCommodities.length);
+            setAveragePrice(avg);
+          } else {
+            setAveragePrice(null);
           }
         }
 
@@ -59,7 +77,7 @@ const MobileFullDetails = () => {
 
   return (
     <div className="flex flex-col sm:flex-row sm:shadow-none shadow-md p-5 w-full">
-      <Link href="/search-result/list-view">
+      <Link href="/search-result/grid-view">
         <div className="flex justify-start items-center mb-6 cursor-pointer gap-2 w-fit">
           <Image
             src="/images/form/arrow-left.svg"
@@ -93,13 +111,12 @@ const MobileFullDetails = () => {
             {product.commodityName}
           </h2>
 
-          {/* 💰 Price Section */}
           <div className="flex-col items-baseline gap-2 sm:flex hidden">
             <p className="text-base font-semibold text-[#4D3594] p-1.5 bg-[#E2D8FF] rounded-md">
               Price
             </p>
             <p className="text-4xl text-[#1E1E1E] font-bold">
-              ₦{Number(product.price).toLocaleString()}
+              ₦{parsePrice(product.price).toLocaleString()}
             </p>
           </div>
 
@@ -126,7 +143,7 @@ const MobileFullDetails = () => {
             <div>
               <p className="submission-key">Price Paid</p>
               <p className="submission-value">
-                ₦{Number(product.price).toLocaleString()}
+                ₦{parsePrice(product.price).toLocaleString()}
               </p>
             </div>
           </div>
@@ -142,13 +159,13 @@ const MobileFullDetails = () => {
             </div>
           </div>
 
-          {/* 📊 Average Price (case-insensitive match) */}
+          {/* Average Price Section (Now Matches Grid/List) */}
           {averagePrice !== null && (
             <div className="items-center justify-between mb-4 flex">
               <div>
                 <p className="submission-key">Average Price</p>
                 <p className="submission-value">
-                  ₦{Number(averagePrice).toLocaleString()}
+                  ₦{averagePrice.toLocaleString()}
                 </p>
               </div>
             </div>

@@ -69,7 +69,7 @@ const FindPrice = () => {
 
         {/* Sorting options */}
         <div className="flex flex-col w-full mb-4">
-          <label className="text-xl font-bold text-[#1E1E1E] mb-2">
+          <label className="text-xs sm:text-xl font-bold text-[#1E1E1E] mb-2">
             Sort By
           </label>
           <div className="flex gap-4">
@@ -85,11 +85,11 @@ const FindPrice = () => {
 
             {/* Price Order */}
             <select
-              className="border border-gray-300 rounded-md px-3 py-2 w-1/2 text-base text-[#757575]"
+              className="border border-gray-300 rounded-md px-2 py-2 w-1/2 text-base text-[#757575]"
               value={sortPrice}
               onChange={(e) => setSortPrice(e.target.value)}
             >
-              <option value="">-- Sort by Price --</option>
+              <option value="">Sort by Price</option>
               <option value="high">Price (High → Low)</option>
               <option value="low">Price (Low → High)</option>
             </select>

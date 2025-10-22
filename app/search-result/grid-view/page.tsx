@@ -13,9 +13,7 @@ const GridView = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [results, setResults] = useState<Commodity[]>([]);
-  const [averagePrices, setAveragePrices] = useState<Record<string, number>>(
-    {}
-  );
+  const [averagePrices, setAveragePrices] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,32 +24,35 @@ const GridView = () => {
   const sortRecent = searchParams.get("sortRecent") || "recent";
   const sortPrice = searchParams.get("sortPrice") || "";
 
-  // Helper: convert a price string (with commas/currency etc) to a number
+  // Helper: clean price strings like ₦1,200 → 1200
   const parsePrice = (p: unknown) => {
-    // coerce to string, remove anything except digits & dot, parseFloat, fallback 0
     const cleaned = String(p ?? "").replace(/[^0-9.]/g, "");
     const n = parseFloat(cleaned);
     return isNaN(n) ? 0 : n;
   };
+
+  // normalize text for safe comparison
+  const normalize = (str: string | undefined | null) =>
+    (str || "").trim().toLowerCase().replace(/\s+/g, " ");
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       let data = await db.commodities.toArray();
 
-      // 🔹 Filter by commodity name (broad match)
+      // Filter by commodity name 
       data = data.filter((item) =>
-        item.commodityName.toLowerCase().includes(commodityName.toLowerCase())
+        normalize(item.commodityName).includes(normalize(commodityName))
       );
 
-      // 🔹 Filter by location (if provided)
+      // Filter by location (if provided)
       if (location.trim()) {
         data = data.filter((item) =>
-          item.location.toLowerCase().includes(location.toLowerCase())
+          normalize(item.location).includes(normalize(location))
         );
       }
 
-      // 🔹 Sort by recency
+      // Sort by recency
       if (sortRecent === "recent") {
         data.sort(
           (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -62,43 +63,45 @@ const GridView = () => {
         );
       }
 
-      // 🔹 Sort by price (use parsePrice)
+      // Sort by price (ensure numeric comparison)
       if (sortPrice === "high") {
-        // highest price first
         data.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
       } else if (sortPrice === "low") {
-        // lowest price first
         data.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
       }
 
       setResults(data);
 
-      // 🟣 Compute average price per unique (commodityName + quantity)
+      // Compute average price per unique (commodityName + quantity)
       const allCommodities = await db.commodities.toArray();
       const averages: Record<string, number> = {};
 
       data.forEach((item) => {
-        const key = `${item.commodityName.trim().toLowerCase()}-${item.quantity
-          ?.trim()
-          .toLowerCase()}`;
+        const nameKey = normalize(item.commodityName);
+        const qtyKey = normalize(item.quantity);
+        const key = `${nameKey}-${qtyKey}`;
 
         if (!averages[key]) {
-          const similarItems = allCommodities.filter(
-            (c) =>
-              c.commodityName.trim().toLowerCase() ===
-                item.commodityName.trim().toLowerCase() &&
-              (c.quantity?.trim().toLowerCase() || "") ===
-                (item.quantity?.trim().toLowerCase() || "")
-          );
+          // Find all items with same name + quantity (+ same location if filter is active)
+          const similarItems = allCommodities.filter((c) => {
+            const sameName = normalize(c.commodityName) === nameKey;
+            const sameQty = normalize(c.quantity) === qtyKey;
+
+            if (location.trim()) {
+              const sameLoc =
+                normalize(c.location) === normalize(item.location);
+              return sameName && sameQty && sameLoc;
+            }
+            return sameName && sameQty;
+          });
 
           if (similarItems.length > 0) {
-            const total = similarItems.reduce((sum, c) => {
-              // ✅ Safely convert any formatted price to number
-              const priceNum = parsePrice(c.price);
-              return sum + priceNum;
-            }, 0);
-
-            averages[key] = Math.round(total / similarItems.length);
+            const total = similarItems.reduce(
+              (sum, c) => sum + parsePrice(c.price),
+              0
+            );
+            const avg = Math.round(total / similarItems.length);
+            averages[key] = avg;
           }
         }
       });
@@ -152,11 +155,11 @@ const GridView = () => {
         </div>
       </div>
 
-      {/* 💻 Desktop View */}
+      {/* Desktop View */}
       {currentItems.map((item, id) => {
-        const avgKey = `${item.commodityName
-          .trim()
-          .toLowerCase()}-${item.quantity?.trim().toLowerCase()}`;
+        const avgKey = `${normalize(item.commodityName)}-${normalize(
+          item.quantity
+        )}`;
         const avgPrice = averagePrices[avgKey];
 
         return (
@@ -228,7 +231,6 @@ const GridView = () => {
                 </div>
               </div>
 
-              {/* 🟣 Average Price per commodity (name + quantity match) */}
               <div className="sm:block hidden">
                 <p className="submission-key">Average Price</p>
                 <p className="submission-value">
@@ -250,11 +252,11 @@ const GridView = () => {
         );
       })}
 
-      {/* 📱 Mobile View */}
+      {/* Mobile View */}
       {currentItems.map((item, id) => {
-        const avgKey = `${item.commodityName
-          .trim()
-          .toLowerCase()}-${item.quantity?.trim().toLowerCase()}`;
+        const avgKey = `${normalize(item.commodityName)}-${normalize(
+          item.quantity
+        )}`;
         const avgPrice = averagePrices[avgKey];
 
         return (
@@ -283,7 +285,6 @@ const GridView = () => {
                   <p className="text-4xl text-[#1E1E1E] font-bold">
                     ₦{parsePrice(item.price).toLocaleString()}
                   </p>
-                  {/* 🟣 Show average on mobile too */}
                   <p className="text-sm text-[#757575] font-medium">
                     Avg: {avgPrice ? `₦${avgPrice.toLocaleString()}` : "N/A"}
                   </p>

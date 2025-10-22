@@ -25,6 +25,16 @@ const ListView = () => {
   const sortRecent = searchParams.get("sortRecent") || "recent";
   const sortPrice = searchParams.get("sortPrice") || "";
 
+  //  Utility functions
+  const parsePrice = (p: unknown) => {
+    const cleaned = String(p ?? "").replace(/[^0-9.]/g, "");
+    const n = parseFloat(cleaned);
+    return isNaN(n) ? 0 : n;
+  };
+
+  const normalize = (str: string | undefined | null) =>
+    (str || "").trim().toLowerCase().replace(/\s+/g, " ");
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -32,13 +42,13 @@ const ListView = () => {
 
       // Filter by commodity name
       data = data.filter((item) =>
-        item.commodityName.toLowerCase().includes(commodityName.toLowerCase())
+        normalize(item.commodityName).includes(normalize(commodityName))
       );
 
       // Filter by location
       if (location.trim()) {
         data = data.filter((item) =>
-          item.location.toLowerCase().includes(location.toLowerCase())
+          normalize(item.location).includes(normalize(location))
         );
       }
 
@@ -53,30 +63,50 @@ const ListView = () => {
         );
       }
 
-      // Sort by price
+      // Sort by price (convert string prices correctly)
       if (sortPrice === "high") {
-        data.sort((a, b) => Number(b.price) - Number(a.price));
+        data.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
       } else if (sortPrice === "low") {
-        data.sort((a, b) => Number(a.price) - Number(b.price));
+        data.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
       }
 
       setResults(data);
 
-      // ✅ Calculate average price per commodity name
-      const grouped: Record<string, number[]> = {};
+      //  Compute average price per (commodityName + quantity)
+      const allCommodities = await db.commodities.toArray();
+      const averages: Record<string, number> = {};
+
       data.forEach((item) => {
-        if (!grouped[item.commodityName]) grouped[item.commodityName] = [];
-        grouped[item.commodityName].push(Number(item.price));
+        const nameKey = normalize(item.commodityName);
+        const qtyKey = normalize(item.quantity);
+        const key = `${nameKey}-${qtyKey}`;
+
+        if (!averages[key]) {
+          // Find all items with same name + quantity (+ same location if filter active)
+          const similarItems = allCommodities.filter((c) => {
+            const sameName = normalize(c.commodityName) === nameKey;
+            const sameQty = normalize(c.quantity) === qtyKey;
+
+            if (location.trim()) {
+              const sameLoc =
+                normalize(c.location) === normalize(item.location);
+              return sameName && sameQty && sameLoc;
+            }
+            return sameName && sameQty;
+          });
+
+          if (similarItems.length > 0) {
+            const total = similarItems.reduce(
+              (sum, c) => sum + parsePrice(c.price),
+              0
+            );
+            const avg = Math.round(total / similarItems.length);
+            averages[key] = avg;
+          }
+        }
       });
 
-      const avgPrices: Record<string, number> = {};
-      for (const [name, prices] of Object.entries(grouped)) {
-        const total = prices.reduce((sum, p) => sum + p, 0);
-        avgPrices[name] = Math.round(total / prices.length);
-      }
-
-      setAveragePrices(avgPrices);
-
+      setAveragePrices(averages);
       setIsLoading(false);
     };
 
@@ -141,86 +171,94 @@ const ListView = () => {
       <hr className="hidden lg:grid" />
 
       {/* Desktop Rows */}
-      {paginatedResults.map((item, id) => (
-        <div key={id} className="grid-cols-8 py-5 hidden lg:grid">
-          {item.image ? (
-            <div>
-              <Image
-                src={item.image}
-                alt="Image of a commodity"
-                width={32}
-                height={32}
-              />
-            </div>
-          ) : (
-            <span>&nbsp;</span>
-          )}
+      {paginatedResults.map((item, id) => {
+        const avgKey = `${normalize(item.commodityName)}-${normalize(
+          item.quantity
+        )}`;
+        const avgPrice = averagePrices[avgKey];
 
-          <p className="submission-value">{item.sellerName}</p>
-          <p className="submission-value">{item.phone}</p>
-          <p className="submission-value">{item.location}</p>
-          <p className="submission-value">
-            ₦{Number(item.price).toLocaleString()}
-          </p>
-          <p className="submission-value">{item.marketName}</p>
-          <p className="submission-value">{item.quantity}</p>
-          <p className="submission-value">
-            {averagePrices[item.commodityName]
-              ? `₦${averagePrices[item.commodityName].toLocaleString()}`
-              : "N/A"}
-          </p>
-        </div>
-      ))}
-
-      {/* Mobile Cards */}
-      {paginatedResults.map((item, id) => (
-        <div
-          key={id}
-          className="lg:shadow-none shadow-md p-5 flex flex-col items-center lg:hidden"
-        >
-          <div className="flex justify-center items-center lg:hidden gap-5">
-            <div>
-              {item.image && (
+        return (
+          <div key={id} className="grid-cols-8 py-5 hidden lg:grid">
+            {item.image ? (
+              <div>
                 <Image
                   src={item.image}
                   alt="Image of a commodity"
-                  width={504}
-                  height={470}
-                  className="object-cover"
-                  priority
+                  width={32}
+                  height={32}
                 />
-              )}
-            </div>
+              </div>
+            ) : (
+              <span>&nbsp;</span>
+            )}
 
-            <div className="bg-white rounded-lg w-full">
-              <h2 className="sm:text-2xl text-base font-bold text-[#1E1E1E]">
-                {item.commodityName}
-              </h2>
-              <div className="flex-col items-baseline gap-2">
-                <p className="text-4xl text-[#1E1E1E] font-bold">
-                  ₦{Number(item.price).toLocaleString()}
+            <p className="submission-value">{item.sellerName}</p>
+            <p className="submission-value">{item.phone}</p>
+            <p className="submission-value">{item.location}</p>
+            <p className="submission-value">
+              ₦{parsePrice(item.price).toLocaleString()}
+            </p>
+            <p className="submission-value">{item.marketName}</p>
+            <p className="submission-value">{item.quantity}</p>
+            <p className="submission-value">
+              {avgPrice ? `₦${avgPrice.toLocaleString()}` : "N/A"}
+            </p>
+          </div>
+        );
+      })}
+
+      {/* Mobile Cards */}
+      {paginatedResults.map((item, id) => {
+        const avgKey = `${normalize(item.commodityName)}-${normalize(
+          item.quantity
+        )}`;
+        const avgPrice = averagePrices[avgKey];
+
+        return (
+          <div
+            key={id}
+            className="lg:shadow-none shadow-md p-5 flex flex-col items-center lg:hidden"
+          >
+            <div className="flex justify-center items-center lg:hidden gap-5">
+              <div>
+                {item.image && (
+                  <Image
+                    src={item.image}
+                    alt="Image of a commodity"
+                    width={504}
+                    height={470}
+                    className="object-cover"
+                    priority
+                  />
+                )}
+              </div>
+
+              <div className="bg-white rounded-lg w-full">
+                <h2 className="sm:text-2xl text-base font-bold text-[#1E1E1E]">
+                  {item.commodityName}
+                </h2>
+                <div className="flex-col items-baseline gap-2">
+                  <p className="text-4xl text-[#1E1E1E] font-bold">
+                    ₦{parsePrice(item.price).toLocaleString()}
+                  </p>
+                  <p className="text-sm text-[#757575] font-semibold mt-2">
+                    Avg: {avgPrice ? `₦${avgPrice.toLocaleString()}` : "N/A"}
+                  </p>
+                </div>
+                <p className="text-xs text-[#757575] font-medium">
+                  Submitted:{" "}
+                  {item.date ? new Date(item.date).toLocaleDateString() : "N/A"}
                 </p>
               </div>
-              <p className="text-xs text-[#757575] font-medium">
-                Submitted:{" "}
-                {item.date ? new Date(item.date).toLocaleDateString() : "N/A"}
-              </p>
-
-              {/* ✅ Show average price below */}
-              {averagePrices[item.commodityName] && (
-                <p className="text-sm text-[#4D3594] font-semibold mt-2">
-                  Avg: ₦{averagePrices[item.commodityName].toLocaleString()}
-                </p>
-              )}
+            </div>
+            <div className="w-full mt-4">
+              <Link href={`/search-result/grid-view/${item.id}`}>
+                <button className="btn-primary w-full">View</button>
+              </Link>
             </div>
           </div>
-          <div className="w-full mt-4">
-            <Link href={`/search-result/grid-view/${item.id}`}>
-              <button className="btn-primary w-full">View</button>
-            </Link>
-          </div>
-        </div>
-      ))}
+        );
+      })}
 
       {/* Pagination Controls */}
       {totalPages > 1 && (
@@ -230,8 +268,8 @@ const ListView = () => {
             disabled={currentPage === 1}
             className={`px-4 py-2 rounded-md ${
               currentPage === 1
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-[#1E1E1E] text-white"
+                ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                : "text-[#4D3594] border-[#4D3594] hover:bg-[#4D3594] hover:text-white"
             }`}
           >
             Previous
@@ -246,8 +284,8 @@ const ListView = () => {
             disabled={currentPage === totalPages}
             className={`px-4 py-2 rounded-md ${
               currentPage === totalPages
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-[#1E1E1E] text-white"
+                ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                : "text-[#4D3594] border-[#4D3594] hover:bg-[#4D3594] hover:text-white"
             }`}
           >
             Next
