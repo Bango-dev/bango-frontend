@@ -23,7 +23,7 @@ const NoResult = () => {
         secondBtn="Try a new search"
         className="mt-6"
         firstHref="/"
-        secondHref="/coming-soon"
+        secondHref="/find-price"
       />
     </section>
   );

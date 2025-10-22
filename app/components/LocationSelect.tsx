@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-// import { IoLocationOutline } from "react-icons/io5";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 
 const states = [
@@ -47,14 +46,49 @@ const states = [
 export default function LocationSelect({
   value,
   onChange,
-  showError,
+  error,
+  required = false,
 }: {
   value: string;
   onChange: (val: string) => void;
-  showError?: boolean;
+  error?: string | null;
+  required?: boolean;
 }) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(value || "");
   const [isOpen, setIsOpen] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
+
+  // Sync external value
+  useEffect(() => {
+    if (value !== query) setQuery(value || "");
+  }, [value]);
+
+  // Close when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+        setHighlightedIndex(-1);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Auto-scroll highlighted item
+  useEffect(() => {
+    if (highlightedIndex >= 0 && itemRefs.current[highlightedIndex]) {
+      itemRefs.current[highlightedIndex]?.scrollIntoView({
+        block: "nearest",
+        behavior: "smooth",
+      });
+    }
+  }, [highlightedIndex]);
 
   const filtered = states.filter((state) =>
     state.toLowerCase().includes(query.toLowerCase())
@@ -63,28 +97,58 @@ export default function LocationSelect({
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   return (
-    <div className="mb-4 relative">
+    <div className="mb-4 relative" ref={dropdownRef}>
       <label className="block text-xs sm:text-xl font-bold text-[#1E1E1E]">
-        Location <span className="text-red-500">*</span>
+        Location {required && <span className="text-red-500">*</span>}
       </label>
 
       <div className="relative">
         <input
           type="text"
           placeholder="Select or type your location"
-          value={query || value}
+          value={query}
           onChange={(e) => {
             setQuery(e.target.value);
             setIsOpen(true);
+            onChange(e.target.value);
           }}
           onFocus={() => setIsOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowDown") {
+              e.preventDefault();
+              setIsOpen(true);
+              setHighlightedIndex((prev) =>
+                prev < filtered.length - 1 ? prev + 1 : 0
+              );
+            } else if (e.key === "ArrowUp") {
+              e.preventDefault();
+              setIsOpen(true);
+              setHighlightedIndex((prev) =>
+                prev > 0 ? prev - 1 : filtered.length - 1
+              );
+            } else if (e.key === "Enter" && highlightedIndex >= 0) {
+              e.preventDefault();
+              const selected = filtered[highlightedIndex];
+              onChange(selected);
+              setQuery(selected);
+              setIsOpen(false);
+            }
+          }}
           className={`w-full border rounded px-3 py-2 pr-10 ${
-            showError ? "border-red-500" : "border-gray-300"
+            error ? "border-red-500" : "border-gray-300"
           } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+          aria-expanded={isOpen}
+          aria-invalid={!!error}
+          aria-activedescendant={
+            highlightedIndex >= 0
+              ? `location-option-${highlightedIndex}`
+              : undefined
+          }
+          role="combobox"
         />
         <Image
           onClick={toggleDropdown}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-600"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-600 cursor-pointer"
           src="/images/form/map-marker-outline.svg"
           alt="icon"
           width={24}
@@ -93,16 +157,26 @@ export default function LocationSelect({
       </div>
 
       {isOpen && (
-        <ul className="absolute z-10 bg-white border border-gray-300 rounded mt-1 w-full max-h-48 overflow-y-auto">
-          {filtered.map((state) => (
+        <ul
+          className="absolute z-10 bg-white border border-gray-300 rounded mt-1 w-full max-h-48 overflow-y-auto"
+          role="listbox"
+        >
+          {filtered.map((state, index) => (
             <li
               key={state}
+              id={`location-option-${index}`}
+              ref={(el) => { itemRefs.current[index] = el }}
               onClick={() => {
                 onChange(state);
                 setQuery(state);
                 setIsOpen(false);
+                setHighlightedIndex(index);
               }}
-              className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+              className={`px-3 py-2 cursor-pointer ${
+                highlightedIndex === index ? "bg-blue-100" : "hover:bg-gray-100"
+              }`}
+              role="option"
+              aria-selected={highlightedIndex === index}
             >
               {state}
             </li>
@@ -113,11 +187,7 @@ export default function LocationSelect({
         </ul>
       )}
 
-      {showError && (
-        <p className="text-red-500 text-sm mt-1">
-          Please select a valid location
-        </p>
-      )}
+      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
     </div>
   );
 }

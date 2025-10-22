@@ -16,6 +16,8 @@ const Step2 = () => {
 
     const validate = () => {
       const newErrors: { [key: string]: string } = {};
+
+
       if (!data.sellerName) newErrors.sellerName = "Seller name is required.";
 
       const phoneRegex = /^0\d{10}$/;
@@ -25,6 +27,10 @@ const Step2 = () => {
           "Enter a valid 11-digit phone number starting with 0.";
 
       setErrors(newErrors);
+
+      if (Object.keys(newErrors).length > 0) {
+        setTimeout(() => setErrors({}), 3000);
+      }
       return Object.keys(newErrors).length === 0;
     };
 

@@ -1,26 +1,30 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { MdGridOn } from "react-icons/md";
-import { FaList, FaFilter } from "react-icons/fa"; // grid & list icons
+import { FaList, FaFilter } from "react-icons/fa";
 import Link from "next/link";
 
 const DisplayIndicator = () => {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Convert current search params back into a query string
+  const queryString = searchParams.toString();
+  const querySuffix = queryString ? `?${queryString}` : "";
+
   return (
     <div>
       {/* Toggle Buttons */}
       <div className="flex gap-2 mb-4">
         {/* Filter Button */}
-        <button
-          onClick={() => alert("Filter clicked!")}
-          className="p-2 rounded-md border transition flex items-center justify-center bg-white text-gray-600 hover:bg-gray-100"
-        >
+        <button className="p-2 rounded-md border transition flex items-center justify-center bg-white text-gray-600 hover:bg-gray-100">
           <FaFilter className="w-5 h-5" />
           <span className="ml-2 hidden sm:inline">Filter</span>
         </button>
 
-        <Link href="/search-result/grid-view">
+        {/* Grid View */}
+        <Link href={`/search-result/grid-view${querySuffix}`}>
           <button
             className={`p-2 rounded-md border transition flex items-center justify-center
               ${
@@ -33,7 +37,8 @@ const DisplayIndicator = () => {
           </button>
         </Link>
 
-        <Link href="/search-result/list-view">
+        {/* List View */}
+        <Link href={`/search-result/list-view${querySuffix}`}>
           <button
             className={`p-2 rounded-md border transition flex items-center justify-center
               ${
@@ -49,4 +54,5 @@ const DisplayIndicator = () => {
     </div>
   );
 };
+
 export default DisplayIndicator;

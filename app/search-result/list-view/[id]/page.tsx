@@ -33,7 +33,7 @@ const MobileFullDetails = () => {
   }
 
   return (
-    <div className="flex flex-col sm:flex-row sm:shadow-none shadow-md p-5 items-center justify-center mx-auto w-full">
+    <div className="flex flex-col sm:flex-row sm:shadow-none shadow-md p-5  w-full">
       <Link href="/search-result/list-view">
         <div className="flex justify-start items-center mb-6 cursor-pointer gap-2 w-fit">
           <Image
@@ -42,69 +42,73 @@ const MobileFullDetails = () => {
             width={24}
             height={24}
           />
-          <span>Back</span>
+          <span className=" z-10 ">Back</span>
         </div>
       </Link>
-      <div>
-        {product.image && (
-          <Image
-            src={
-              typeof product.image === "string"
-                ? product.image
-                : URL.createObjectURL(product.image)
-            }
-            alt="Image of a commodity"
-            width={504}
-            height={470}
-            className="rounded-lg object-cover"
-          />
-        )}
-      </div>
-      <div className="bg-white rounded-lg p-6 space-y-4 w-full">
-        <h2 className="text-2xl font-bold text-[#1E1E1E]">
-          {product.commodityName}
-        </h2>
-        <div className="flex-col items-baseline gap-2 sm:flex hidden">
-          <p className="text-base font-semibold text-[#4D3594] p-1.5 bg-[#E2D8FF] rounded-md">
-            Price
+      <div className="sm:flex items-center justify-center">
+        <div>
+          {product.image && (
+            <Image
+              src={
+                typeof product.image === "string"
+                  ? product.image
+                  : URL.createObjectURL(product.image)
+              }
+              alt="Image of a commodity"
+              width={504}
+              height={470}
+              className="rounded-lg object-cover"
+            />
+          )}
+        </div>
+        <div className="bg-white rounded-lg p-6 space-y-4 w-full lg:w-2xl ">
+          <h2 className="text-2xl font-bold text-[#1E1E1E]">
+            {product.commodityName}
+          </h2>
+          <div className="flex-col items-baseline gap-2 sm:flex hidden">
+            <p className="text-base font-semibold text-[#4D3594] p-1.5 bg-[#E2D8FF] rounded-md">
+              Price
+            </p>
+            <p className="text-4xl text-[#1E1E1E] font-bold">
+              ₦{Number(product.price).toLocaleString()}
+            </p>
+          </div>
+          <p className="text-base text-[#757575] font-medium">
+            Submitted: {product.date}
           </p>
-          <p className="text-4xl text-[#1E1E1E] font-bold">₦{product.price}</p>
+          <div className="items-center justify-between mb-4 flex w-full">
+            <div>
+              <p className="submission-key">Name of Seller</p>
+              <p className="submission-value">{product.sellerName}</p>
+            </div>
+            <div>
+              <p className="submission-key">Seller’s Phone number</p>
+              <p className="submission-value">{product.phone}</p>
+            </div>
+          </div>
+          <div className="items-center justify-between mb-4 flex">
+            <div>
+              <p className="submission-key">Location</p>
+              <p className="submission-value">{product.location}</p>
+            </div>
+            <div>
+              <p className="submission-key">Price Paid</p>
+              <p className="submission-value">₦{product.price}</p>
+            </div>
+          </div>
+          <div className="items-center justify-between mb-4 flex">
+            <div>
+              <p className="submission-key">Market</p>
+              <p className="submission-value">{product.marketName}</p>
+            </div>
+            <div>
+              <p className="submission-key">Quantity</p>
+              <p className="submission-value">{product.quantity}</p>
+            </div>
+          </div>
+
+          <InfoBox />
         </div>
-        <p className="text-base text-[#757575] font-medium">
-          Submitted: {product.date}
-        </p>
-        <div className="items-center justify-between mb-4 flex w-full">
-          <div>
-            <p className="submission-key">Name of Seller</p>
-            <p className="submission-value">{product.sellerName}</p>
-          </div>
-          <div>
-            <p className="submission-key">Seller’s Phone number</p>
-            <p className="submission-value">{product.phone}</p>
-          </div>
-        </div>
-        <div className="items-center justify-between mb-4 flex">
-          <div>
-            <p className="submission-key">Location</p>
-            <p className="submission-value">{product.location}</p>
-          </div>
-          <div>
-            <p className="submission-key">Price Paid</p>
-            <p className="submission-value">₦{product.price}</p>
-          </div>
-        </div>
-        <div className="items-center justify-between mb-4 flex">
-          <div>
-            <p className="submission-key">Market</p>
-            <p className="submission-value">{product.marketName}</p>
-          </div>
-          <div>
-            <p className="submission-key">Quantity</p>
-            <p className="submission-value">{product.quantity}</p>
-          </div>
-        </div>
-        {/* You can add average price or other info here if needed */}
-        <InfoBox />
       </div>
     </div>
   );

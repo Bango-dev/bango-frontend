@@ -90,11 +90,11 @@
   }
 
   .submission-key {
-    @apply font-semibold text-[#757575] text-lg;
+    @apply font-semibold text-[#757575] lg:text-lg md:text-base text-sm ;
   }
 
   .submission-value {
-    @apply font-medium text-[#757575] text-base;
+    @apply font-medium text-[#757575] lg:text-base md:text-sm text-xs ;
   }
 }
 

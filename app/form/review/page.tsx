@@ -84,8 +84,10 @@ const Review = () => {
             />
             <Input
               label="Price Paid (NGN)"
-              type="number"
-              value={data.price}
+              type="text"
+              value={
+                data.price ? `₦${Number(data.price).toLocaleString()}` : ""
+              }
               className="flex-1 min-w-0"
               labelClassName="text-base text-[#1E1E1E] font-normal"
               readOnly

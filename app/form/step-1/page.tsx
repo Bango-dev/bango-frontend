@@ -13,7 +13,7 @@ import { useState } from "react";
 const Step1 = () => {
   const { data, update } = useFormData();
   const router = useRouter();
-  const [errors, setErrors] = useState<{ [key: string]: boolean | string }>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
@@ -31,6 +31,12 @@ const Step1 = () => {
     if (!data.image) newErrors.image = "An image of the commodity is required.";
 
     setErrors(newErrors);
+
+    // Auto-clear errors after 3 seconds
+    if (Object.keys(newErrors).length > 0) {
+      setTimeout(() => setErrors({}), 3000);
+    }
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -73,8 +79,8 @@ const Step1 = () => {
           placeholder="Eg, rice, Airforce 1, sugar"
           description="What’s the name of the item you bought?"
           value={data.commodityName}
-          onChange={(e) => update({ commodityName: e.target.value })}
           showError={!!errors.commodityName}
+          onChange={(e) => update({ commodityName: e.target.value })}
           required
         />
         {errors.commodityName && (
@@ -87,8 +93,8 @@ const Step1 = () => {
           placeholder="Enter price"
           description="How much did you pay the seller?"
           value={data.price}
-          onChange={(e) => update({ price: e.target.value })}
           showError={!!errors.price}
+          onChange={(e) => update({ price: e.target.value })}
           required
         />
         {errors.price && <p className="text-red-500 text-sm">{errors.price}</p>}
@@ -99,8 +105,8 @@ const Step1 = () => {
           placeholder="1 mudu, 1 Kg, I pair, 1 Pack"
           description="Specify the exact way it was bought."
           value={data.quantity}
-          onChange={(e) => update({ quantity: e.target.value })}
           showError={!!errors.quantity}
+          onChange={(e) => update({ quantity: e.target.value })}
           required
         />
         {errors.quantity && (
@@ -110,7 +116,8 @@ const Step1 = () => {
         <LocationSelect
           value={data.location}
           onChange={(val) => update({ location: val })}
-          showError={!!errors.location}
+          error={errors.location || null}
+          required
         />
 
         <Input
@@ -144,11 +151,7 @@ const Step1 = () => {
         />
         {errors.date && <p className="text-red-500 text-sm">{errors.date}</p>}
 
-        <PrimaryButton
-          text="Next"
-          type="button"
-          onClick={handleNext}
-        />
+        <PrimaryButton text="Next" type="button" onClick={handleNext} />
       </form>
     </div>
   );
