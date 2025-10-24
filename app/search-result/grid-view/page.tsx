@@ -1,21 +1,19 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { db, Commodity } from "../../lib/db";
 import DisplayIndicator from "../../components/ui/DisplayIndicator";
 import Link from "next/link";
 import Image from "next/image";
 import InfoBox from "../../components/ui/InfoBox";
-import { useRouter } from "next/navigation";
+import useAveragePrices from "../../components/utils/useAveragePrice";
 
 const GridView = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [results, setResults] = useState<Commodity[]>([]);
-  const [averagePrices, setAveragePrices] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
-
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
 
@@ -24,35 +22,33 @@ const GridView = () => {
   const sortRecent = searchParams.get("sortRecent") || "recent";
   const sortPrice = searchParams.get("sortPrice") || "";
 
-  // Helper: clean price strings like ₦1,200 → 1200
+  // Utility to clean and convert price strings to numbers
   const parsePrice = (p: unknown) => {
     const cleaned = String(p ?? "").replace(/[^0-9.]/g, "");
     const n = parseFloat(cleaned);
     return isNaN(n) ? 0 : n;
   };
 
-  // normalize text for safe comparison
+  // remove extra spaces and make lowercase for comparison
   const normalize = (str: string | undefined | null) =>
     (str || "").trim().toLowerCase().replace(/\s+/g, " ");
 
+  // Fetch and filter data based on search params
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       let data = await db.commodities.toArray();
 
-      // Filter by commodity name 
       data = data.filter((item) =>
         normalize(item.commodityName).includes(normalize(commodityName))
       );
 
-      // Filter by location (if provided)
       if (location.trim()) {
         data = data.filter((item) =>
           normalize(item.location).includes(normalize(location))
         );
       }
 
-      // Sort by recency
       if (sortRecent === "recent") {
         data.sort(
           (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -63,7 +59,6 @@ const GridView = () => {
         );
       }
 
-      // Sort by price (ensure numeric comparison)
       if (sortPrice === "high") {
         data.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
       } else if (sortPrice === "low") {
@@ -71,56 +66,21 @@ const GridView = () => {
       }
 
       setResults(data);
-
-      // Compute average price per unique (commodityName + quantity)
-      const allCommodities = await db.commodities.toArray();
-      const averages: Record<string, number> = {};
-
-      data.forEach((item) => {
-        const nameKey = normalize(item.commodityName);
-        const qtyKey = normalize(item.quantity);
-        const key = `${nameKey}-${qtyKey}`;
-
-        if (!averages[key]) {
-          // Find all items with same name + quantity (+ same location if filter is active)
-          const similarItems = allCommodities.filter((c) => {
-            const sameName = normalize(c.commodityName) === nameKey;
-            const sameQty = normalize(c.quantity) === qtyKey;
-
-            if (location.trim()) {
-              const sameLoc =
-                normalize(c.location) === normalize(item.location);
-              return sameName && sameQty && sameLoc;
-            }
-            return sameName && sameQty;
-          });
-
-          if (similarItems.length > 0) {
-            const total = similarItems.reduce(
-              (sum, c) => sum + parsePrice(c.price),
-              0
-            );
-            const avg = Math.round(total / similarItems.length);
-            averages[key] = avg;
-          }
-        }
-      });
-
-      setAveragePrices(averages);
       setIsLoading(false);
     };
 
     fetchData();
   }, [commodityName, location, sortRecent, sortPrice]);
 
-  // Redirect to "no result" if nothing found
+  // Calculate average prices for the current results
+  const { averagePrices } = useAveragePrices(results, location);
+
   useEffect(() => {
     if (!isLoading && commodityName && results.length === 0) {
       router.push("/no-result");
     }
   }, [isLoading, results.length, commodityName, router]);
 
-  // Pagination logic
   const totalPages = Math.ceil(results.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentItems = results.slice(startIndex, startIndex + ITEMS_PER_PAGE);
@@ -307,7 +267,6 @@ const GridView = () => {
         );
       })}
 
-      {/* Pagination */}
       {results.length > ITEMS_PER_PAGE && (
         <div className="flex justify-center items-center mt-8 gap-4">
           <button
