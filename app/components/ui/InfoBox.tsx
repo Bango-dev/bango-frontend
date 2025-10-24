@@ -16,7 +16,7 @@ export default function InfoBox({ className }: InfoBoxProps) {
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between p-4 text-left font-semibold text-gray-800"
       >
-        <span>Information</span>
+        <span>Note</span>
         {open ? (
           <FaChevronUp className="w-4 h-4 text-gray-600" />
         ) : (

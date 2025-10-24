@@ -63,7 +63,7 @@ export default function LocationSelect({
   // Sync external value
   useEffect(() => {
     if (value !== query) setQuery(value || "");
-  }, [value]);
+  }, [value, query]);
 
   // Close when clicking outside
   useEffect(() => {
@@ -138,12 +138,14 @@ export default function LocationSelect({
             error ? "border-red-500" : "border-gray-300"
           } focus:outline-none focus:ring-2 focus:ring-blue-500`}
           aria-expanded={isOpen}
+          aria-controls="location-listbox"
           aria-invalid={!!error}
           aria-activedescendant={
             highlightedIndex >= 0
               ? `location-option-${highlightedIndex}`
               : undefined
           }
+          aria-autocomplete="list"
           role="combobox"
         />
         <Image
@@ -160,12 +162,15 @@ export default function LocationSelect({
         <ul
           className="absolute z-10 bg-white border border-gray-300 rounded mt-1 w-full max-h-48 overflow-y-auto"
           role="listbox"
+          id="location-listbox"
         >
           {filtered.map((state, index) => (
             <li
               key={state}
               id={`location-option-${index}`}
-              ref={(el) => { itemRefs.current[index] = el }}
+              ref={(el) => {
+                itemRefs.current[index] = el;
+              }}
               onClick={() => {
                 onChange(state);
                 setQuery(state);

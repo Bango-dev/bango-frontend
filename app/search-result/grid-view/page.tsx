@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { db, Commodity } from "../../lib/db";
@@ -9,7 +10,7 @@ import Image from "next/image";
 import InfoBox from "../../components/ui/InfoBox";
 import useAveragePrices from "../../components/utils/useAveragePrice";
 
-const GridView = () => {
+function GridViewContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [results, setResults] = useState<Commodity[]>([]);
@@ -22,18 +23,15 @@ const GridView = () => {
   const sortRecent = searchParams.get("sortRecent") || "recent";
   const sortPrice = searchParams.get("sortPrice") || "";
 
-  // Utility to clean and convert price strings to numbers
   const parsePrice = (p: unknown) => {
     const cleaned = String(p ?? "").replace(/[^0-9.]/g, "");
     const n = parseFloat(cleaned);
     return isNaN(n) ? 0 : n;
   };
 
-  // remove extra spaces and make lowercase for comparison
   const normalize = (str: string | undefined | null) =>
     (str || "").trim().toLowerCase().replace(/\s+/g, " ");
 
-  // Fetch and filter data based on search params
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -72,7 +70,6 @@ const GridView = () => {
     fetchData();
   }, [commodityName, location, sortRecent, sortPrice]);
 
-  // Calculate average prices for the current results
   const { averagePrices } = useAveragePrices(results, location);
 
   useEffect(() => {
@@ -115,7 +112,6 @@ const GridView = () => {
         </div>
       </div>
 
-      {/* Desktop View */}
       {currentItems.map((item, id) => {
         const avgKey = `${normalize(item.commodityName)}-${normalize(
           item.quantity
@@ -212,7 +208,6 @@ const GridView = () => {
         );
       })}
 
-      {/* Mobile View */}
       {currentItems.map((item, id) => {
         const avgKey = `${normalize(item.commodityName)}-${normalize(
           item.quantity
@@ -300,6 +295,12 @@ const GridView = () => {
       )}
     </div>
   );
-};
+}
 
-export default GridView;
+export default function GridView() {
+  return (
+    <Suspense fallback={<div>Loading results...</div>}>
+      <GridViewContent />
+    </Suspense>
+  );
+}

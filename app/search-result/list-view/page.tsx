@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { db, Commodity } from "../../lib/db";
@@ -9,13 +10,12 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import useAveragePrices from "../../components/utils/useAveragePrice";
 
-const ITEMS_PER_PAGE = 10; // number of items per page
+const ITEMS_PER_PAGE = 10;
 
-const ListView = () => {
+function ListViewContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [results, setResults] = useState<Commodity[]>([]);
-  
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -24,18 +24,15 @@ const ListView = () => {
   const sortRecent = searchParams.get("sortRecent") || "recent";
   const sortPrice = searchParams.get("sortPrice") || "";
 
-  // Utility to clean and convert price strings to numbers
   const parsePrice = (p: unknown) => {
     const cleaned = String(p ?? "").replace(/[^0-9.]/g, "");
     const n = parseFloat(cleaned);
     return isNaN(n) ? 0 : n;
   };
 
-  // remove extra spaces and make lowercase for comparison
   const normalize = (str: string | undefined | null) =>
     (str || "").trim().toLowerCase().replace(/\s+/g, " ");
 
-  // Fetch and filter data based on search params
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -74,17 +71,14 @@ const ListView = () => {
     fetchData();
   }, [commodityName, location, sortRecent, sortPrice]);
 
-  // Calculate average prices for the current results
   const { averagePrices } = useAveragePrices(results, location);
 
-  // Redirect if no results
   useEffect(() => {
     if (!isLoading && commodityName && results.length === 0) {
       router.push("/no-result");
     }
   }, [isLoading, results.length, commodityName, router]);
 
-  // Pagination logic
   const totalPages = Math.ceil(results.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedResults = results.slice(
@@ -121,7 +115,7 @@ const ListView = () => {
         </div>
       </div>
 
-      {/* Table Header for Desktop */}
+      {/* Table Header */}
       <div className="grid-cols-8 hidden lg:grid">
         <h3>IMG</h3>
         <h3>Name of Seller</h3>
@@ -140,7 +134,6 @@ const ListView = () => {
           item.quantity
         )}`;
         const avgPrice = averagePrices[avgKey];
-
         return (
           <div key={id} className="grid-cols-8 py-5 hidden lg:grid">
             {item.image ? (
@@ -155,7 +148,6 @@ const ListView = () => {
             ) : (
               <span>&nbsp;</span>
             )}
-
             <p className="submission-value">{item.sellerName}</p>
             <p className="submission-value">{item.phone}</p>
             <p className="submission-value">{item.location}</p>
@@ -177,7 +169,6 @@ const ListView = () => {
           item.quantity
         )}`;
         const avgPrice = averagePrices[avgKey];
-
         return (
           <div
             key={id}
@@ -238,11 +229,9 @@ const ListView = () => {
           >
             Previous
           </button>
-
           <span className="font-medium text-gray-700">
             Page {currentPage} of {totalPages}
           </span>
-
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
@@ -258,6 +247,12 @@ const ListView = () => {
       )}
     </div>
   );
-};
+}
 
-export default ListView;
+export default function ListView() {
+  return (
+    <Suspense fallback={<div className="p-5 text-center">Loading...</div>}>
+      <ListViewContent />
+    </Suspense>
+  );
+}
