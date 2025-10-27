@@ -55,7 +55,7 @@ const Footer = () => {
         </Link>
         <Link href="/coming-soon" className="social-link">
           <Image
-            src="/images/footer/linkedin-logo.svg"
+            src="/images/footer/linkedIn-logo.svg"
             alt="linkedIn logo"
             width={24}
             height={24}

@@ -26,7 +26,7 @@ const Hero = () => {
         />
       </div>
 
-      <div className=" relative z-10 flex flex-col items-center mt-10 ">
+      <div className=" relative z-10 flex flex-col items-center sm:mt-10  ">
         <h1 className=" hero-heading font-normal ">Crowdsourced</h1>
         <h1 className="bg-[var(--color-primary)] hero-heading text-white p-5 my-5  rounded-2xl ">
           Commodity
@@ -41,6 +41,7 @@ const Hero = () => {
           secondBtn="Find Prices"
           firstHref="/form/step-1"
           secondHref="/find-price"
+          className=" w-full  "
         />
       </div>
     </section>

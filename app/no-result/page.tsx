@@ -14,9 +14,9 @@ const NoResult = () => {
       </div>
       <div>
         <h3 className="sub-heading">No results found!</h3>
-        <h4 className="text-center text-lg text-[#757575] mt-2">
+        <p className="text-center text-lg text-[#757575] mt-2">
           We couldn’t find any prices for Rice at the moment
-        </h4>
+        </p>
       </div>
       <Button
         firstBtn="Back to Home"

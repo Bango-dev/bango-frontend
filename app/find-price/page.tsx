@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import PrimaryButton from "../components/ui/PrimaryButton";
 import Input from "../form/Input";
 import LocationSelect from "../components/LocationSelect";
+import Link from "next/link";
+import Image from "next/image";
 
 const FindPrice = () => {
   const [commodityName, setCommodityName] = useState("");
@@ -45,6 +47,17 @@ const FindPrice = () => {
 
   return (
     <div className="flex flex-col min-h-screen pt-5 px-3 sm:px-4 lg:px-4 mx-auto w-full">
+      <Link href="/">
+                <div className="flex items-center mb-6 cursor-pointer gap-2">
+                  <Image
+                    src="/images/form/arrow-left.svg"
+                    alt="Back arrow"
+                    width={24}
+                    height={24}
+                  />
+                  <span>Back</span>
+                </div>
+              </Link>
       <form className="form" onSubmit={handleFindPrice} noValidate>
         <h2 className="font-bold text-2xl leading-4">Find Price</h2>
         <h3 className="text-[#757575] sm:text-base text-sm">
