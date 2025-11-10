@@ -8,14 +8,51 @@ import { useFormData } from "../../context/FormContext";
 import { useRouter } from "next/navigation";
 
 const Review = () => {
-  const { data, saveToDB } = useFormData();
+  const { data } = useFormData();
   const router = useRouter();
 
-  const handleSubmit = async () => {
-    await saveToDB();
-    alert("Form saved locally (Dexie). Later this will be sent to backend!");
-    router.push("/confirmation");
-  };
+ const handleSubmit = async () => {
+   try {
+
+     const payload = {
+       commodityName: data.commodityName,
+       price: data.price,
+       quantity: data.quantity,
+       location: data.location,
+       market: data.marketName,
+       purchaseDate: data.date,
+       image: data.image,
+       phone: data.phone,
+       unit: "bag",
+     };
+
+
+     const response = await fetch("https://api.thebango.com/submissions", {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+       },
+       body: JSON.stringify(payload),
+     });
+
+     if (!response.ok) {
+       const errorData = await response.json();
+       console.error("Error response:", errorData);
+       alert("Failed to submit. Please try again.");
+       return;
+     }
+
+     const result = await response.json();
+     console.log("Submission successful:", result);
+
+     // Navigate to confirmation page
+     router.push("/confirmation");
+   } catch (error) {
+     console.error("Error submitting data:", error);
+     alert("Something went wrong. Please check your connection and try again.");
+   }
+ };
+
   return (
     <div className="p-6  flex  flex-col w-full">
       <div className="flex items-center mb-6 cursor-pointer gap-2">
