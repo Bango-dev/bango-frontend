@@ -103,6 +103,7 @@ const SignUp = () => {
     setLoading(true);
 
     try {
+      console.log("TEST");
       const response = await fetch("https://api.thebango.com/auth/register", {
         method: "POST",
         headers: {
@@ -111,11 +112,13 @@ const SignUp = () => {
         body: JSON.stringify({
           firstName: "BangoUser",
           email: formData.email,
-          phoneNumber: formData.phone,
+          phoneNumber: "+2348012345674",
           password: formData.password,
         }),
         credentials: "include",
       });
+
+      console.log(response);
 
       const data = await response.json();
 
@@ -127,7 +130,6 @@ const SignUp = () => {
           password: "",
           confirmPassword: "",
         });
-
         // redirect after few seconds
         setTimeout(() => router.push("/sign-in"), 2500);
       } else {
@@ -158,7 +160,6 @@ const SignUp = () => {
         <h3 className="text-[#757575] text-center sm:text-base text-sm">
           Crowdsourced prices for all your needs
         </h3>
-
 
         {/* EMAIL */}
         <Input
