@@ -3,12 +3,25 @@
 import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { db, Commodity } from "../../lib/db";
+import api from "../../utils/api";
 import DisplayIndicator from "../../components/ui/DisplayIndicator";
 import Link from "next/link";
 import Image from "next/image";
 import InfoBox from "../../components/ui/InfoBox";
 import useAveragePrices from "../../components/utils/useAveragePrice";
+
+type Commodity = {
+  id: string;
+  commodityName: string;
+  price: number;
+  quantity: number;
+  unit: string;
+  location: string;
+  market: string;
+  photoUrl?: string;
+  purchaseDate?: string;
+  createdAt: string;
+};
 
 function GridViewContent() {
   const searchParams = useSearchParams();
@@ -32,39 +45,23 @@ function GridViewContent() {
   const normalize = (str: string | undefined | null) =>
     (str || "").trim().toLowerCase().replace(/\s+/g, " ");
 
+  // Fetch API data
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
-      let data = await db.commodities.toArray();
+      try {
+        setIsLoading(true);
 
-      data = data.filter((item) =>
-        normalize(item.commodityName).includes(normalize(commodityName))
-      );
+        const res = await api.get("/search", {
+          params: { commodityName },
+        });
 
-      if (location.trim()) {
-        data = data.filter((item) =>
-          normalize(item.location).includes(normalize(location))
-        );
+        setResults(res.data?.data?.data || []);
+      } catch (error) {
+        console.error(error);
+        setResults([]);
+      } finally {
+        setIsLoading(false);
       }
-
-      if (sortRecent === "recent") {
-        data.sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-        );
-      } else if (sortRecent === "oldest") {
-        data.sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-        );
-      }
-
-      if (sortPrice === "high") {
-        data.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
-      } else if (sortPrice === "low") {
-        data.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
-      }
-
-      setResults(data);
-      setIsLoading(false);
     };
 
     fetchData();
@@ -82,22 +79,25 @@ function GridViewContent() {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentItems = results.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  const handleNext = () => {
-    if (currentPage < totalPages) setCurrentPage((p) => p + 1);
-  };
+  const handleNext = () =>
+    currentPage < totalPages && setCurrentPage((p) => p + 1);
+  const handlePrev = () => currentPage > 1 && setCurrentPage((p) => p - 1);
 
-  const handlePrev = () => {
-    if (currentPage > 1) setCurrentPage((p) => p - 1);
-  };
+  if (isLoading) {
+    return (
+      <div className="p-8 text-center text-gray-500">Loading results...</div>
+    );
+  }
 
   return (
     <div className="py-5 px-5">
-      <div className="flex items-center justify-between w-full">
+      {/* Header */}
+      <div className="flex items-center justify-between w-full mb-6">
         <Link href="/find-price">
-          <div className="flex items-center mb-6 cursor-pointer gap-2">
+          <div className="flex items-center cursor-pointer gap-2">
             <Image
               src="/images/form/arrow-left.svg"
-              alt="Back arrow"
+              alt="Back"
               width={24}
               height={24}
             />
@@ -106,28 +106,24 @@ function GridViewContent() {
             </span>
           </div>
         </Link>
-
-        <div className="pointer-events-auto">
-          <DisplayIndicator />
-        </div>
+        <DisplayIndicator />
       </div>
 
-      {currentItems.map((item, id) => {
-        const avgKey = `${normalize(item.commodityName)}-${normalize(
-          item.quantity
-        )}`;
+      {/* Desktop View */}
+      {currentItems.map((item) => {
+        const avgKey = `${normalize(item.commodityName)}-${item.quantity}`;
         const avgPrice = averagePrices[avgKey];
 
         return (
           <div
-            key={id}
+            key={item.id}
             className="sm:shadow-none shadow-md p-5 items-center justify-center mx-auto hidden sm:flex"
           >
-            {item.image && (
+            {item.photoUrl && (
               <div>
                 <Image
-                  src={item.image}
-                  alt="Image of a commodity"
+                  src={item.photoUrl}
+                  alt={item.commodityName}
                   width={504}
                   height={470}
                 />
@@ -142,59 +138,43 @@ function GridViewContent() {
                 <p className="text-base font-semibold text-[#4D3594] p-1.5 bg-[#E2D8FF] rounded-md">
                   Price
                 </p>
-                <p className="text-4xl text-[#1E1E1E] font-bold">
+                <p className="text-4xl font-bold text-[#1E1E1E]">
                   ₦{parsePrice(item.price).toLocaleString()}
                 </p>
               </div>
 
               <p className="text-base text-[#757575] font-medium">
-                Submitted:{" "}
-                {item.date ? new Date(item.date).toLocaleDateString() : "N/A"}
+                Submitted: {new Date(item.createdAt).toLocaleDateString()}
               </p>
 
-              <div className="items-center justify-between mb-4 sm:flex hidden">
+              <div className="flex items-center justify-between mb-4 sm:flex hidden">
                 <div>
-                  <p className="submission-key">Name of Seller</p>
-                  <p className="submission-value">{item.sellerName || "N/A"}</p>
+                  <p className="submission-key">Location</p>
+                  <p className="submission-value">{item.location || "N/A"}</p>
                 </div>
                 <div>
-                  <p className="submission-key">Seller’s Phone number</p>
-                  <p className="submission-value">{item.phone || "N/A"}</p>
+                  <p className="submission-key">Market</p>
+                  <p className="submission-value">{item.market || "N/A"}</p>
                 </div>
               </div>
 
-              <div className="items-center justify-between mb-4 sm:flex hidden">
+              <div className="flex items-center justify-between mb-4 sm:flex hidden">
                 <div>
-                  <p className="submission-key">Location</p>
-                  <p className="submission-value">{item.location}</p>
+                  <p className="submission-key">Quantity</p>
+                  <p className="submission-value">
+                    {item.quantity} {item.unit}
+                  </p>
                 </div>
                 <div>
-                  <p className="submission-key">Price Paid</p>
+                  <p className="submission-key">Average Price</p>
                   <p className="submission-value">
-                    ₦{parsePrice(item.price).toLocaleString()}
+                    {avgPrice ? `₦${avgPrice.toLocaleString()}` : "N/A"}
                   </p>
                 </div>
               </div>
 
-              <div className="items-center justify-between mb-4 sm:flex hidden">
-                <div>
-                  <p className="submission-key">Market</p>
-                  <p className="submission-value">{item.marketName || "N/A"}</p>
-                </div>
-                <div>
-                  <p className="submission-key">Quantity</p>
-                  <p className="submission-value">{item.quantity}</p>
-                </div>
-              </div>
-
-              <div className="sm:block hidden">
-                <p className="submission-key">Average Price</p>
-                <p className="submission-value">
-                  {avgPrice ? `₦${avgPrice.toLocaleString()}` : "N/A"}
-                </p>
-              </div>
-
               <InfoBox className="sm:block hidden" />
+
               <div className="w-full mt-4 flex sm:hidden">
                 <Link
                   href={`/search-result/grid-view/${item.id}`}
@@ -208,36 +188,33 @@ function GridViewContent() {
         );
       })}
 
-      {currentItems.map((item, id) => {
-        const avgKey = `${normalize(item.commodityName)}-${normalize(
-          item.quantity
-        )}`;
+      {/* Mobile View */}
+      {currentItems.map((item) => {
+        const avgKey = `${normalize(item.commodityName)}-${item.quantity}`;
         const avgPrice = averagePrices[avgKey];
 
         return (
           <div
-            key={id}
+            key={item.id}
             className="lg:shadow-none shadow-md p-5 flex flex-col items-center sm:hidden"
           >
             <div className="flex items-center lg:hidden gap-5">
-              {item.image && (
-                <div className="">
-                  <Image
-                    src={item.image}
-                    alt="Image of a commodity"
-                    width={504}
-                    height={470}
-                    className="object-cover"
-                    priority
-                  />
-                </div>
+              {item.photoUrl && (
+                <Image
+                  src={item.photoUrl}
+                  alt={item.commodityName}
+                  width={504}
+                  height={470}
+                  className="object-cover"
+                  priority
+                />
               )}
-              <div className="bg-white rounded-lg w-full">
+              <div className="bg-white rounded-lg w-full p-3">
                 <h2 className="sm:text-2xl text-base font-bold text-[#1E1E1E]">
                   {item.commodityName}
                 </h2>
                 <div className="flex-col items-baseline gap-2">
-                  <p className="text-4xl text-[#1E1E1E] font-bold">
+                  <p className="text-4xl font-bold text-[#1E1E1E]">
                     ₦{parsePrice(item.price).toLocaleString()}
                   </p>
                   <p className="text-sm text-[#757575] font-medium">
@@ -245,8 +222,10 @@ function GridViewContent() {
                   </p>
                 </div>
                 <p className="text-xs text-[#757575] font-medium">
-                  Submitted:{" "}
-                  {item.date ? new Date(item.date).toLocaleDateString() : "N/A"}
+                  Submitted: {new Date(item.createdAt).toLocaleDateString()}
+                </p>
+                <p className="text-xs text-[#757575] font-medium">
+                  {item.location} • {item.market}
                 </p>
               </div>
             </div>
@@ -262,7 +241,8 @@ function GridViewContent() {
         );
       })}
 
-      {results.length > ITEMS_PER_PAGE && (
+      {/* Pagination */}
+      {totalPages > 1 && (
         <div className="flex justify-center items-center mt-8 gap-4">
           <button
             onClick={handlePrev}
@@ -275,11 +255,9 @@ function GridViewContent() {
           >
             Previous
           </button>
-
           <span className="text-[#757575] font-medium">
             Page {currentPage} of {totalPages}
           </span>
-
           <button
             onClick={handleNext}
             disabled={currentPage === totalPages}
