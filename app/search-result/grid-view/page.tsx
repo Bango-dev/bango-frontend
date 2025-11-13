@@ -55,6 +55,7 @@ function GridViewContent() {
           params: { commodityName },
         });
 
+        console.log(res.data);
         setResults(res.data?.data?.data || []);
       } catch (error) {
         console.error(error);
