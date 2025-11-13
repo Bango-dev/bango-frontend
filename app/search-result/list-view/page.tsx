@@ -3,12 +3,13 @@
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { db, Commodity } from "../../lib/db";
+import { Commodity } from "../../lib/types/commodities";
 import DisplayIndicator from "../../components/ui/DisplayIndicator";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import useAveragePrices from "../../components/utils/useAveragePrice";
+import api from "../../utils/api";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -35,37 +36,21 @@ function ListViewContent() {
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
-      let data = await db.commodities.toArray();
+      try {
+        setIsLoading(true);
 
-      data = data.filter((item) =>
-        normalize(item.commodityName).includes(normalize(commodityName))
-      );
+        const res = await api.get("/search", {
+          params: { commodityName },
+        });
 
-      if (location.trim()) {
-        data = data.filter((item) =>
-          normalize(item.location).includes(normalize(location))
-        );
+        console.log(res.data);
+        setResults(res.data?.data?.data || []);
+      } catch (error) {
+        console.error(error);
+        setResults([]);
+      } finally {
+        setIsLoading(false);
       }
-
-      if (sortRecent === "recent") {
-        data.sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-        );
-      } else if (sortRecent === "oldest") {
-        data.sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-        );
-      }
-
-      if (sortPrice === "high") {
-        data.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
-      } else if (sortPrice === "low") {
-        data.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
-      }
-
-      setResults(data);
-      setIsLoading(false);
     };
 
     fetchData();
@@ -136,10 +121,10 @@ function ListViewContent() {
         const avgPrice = averagePrices[avgKey];
         return (
           <div key={id} className="grid-cols-8 py-5 hidden lg:grid">
-            {item.image ? (
+            {item.photoUrl ? (
               <div>
                 <Image
-                  src={item.image}
+                  src={item.photoUrl}
                   alt="Image of a commodity"
                   width={32}
                   height={32}
@@ -154,7 +139,7 @@ function ListViewContent() {
             <p className="submission-value">
               ₦{parsePrice(item.price).toLocaleString()}
             </p>
-            <p className="submission-value">{item.marketName}</p>
+            <p className="submission-value">{item.market}</p>
             <p className="submission-value">{item.quantity}</p>
             <p className="submission-value">
               {avgPrice ? `₦${avgPrice.toLocaleString()}` : "N/A"}
@@ -176,9 +161,9 @@ function ListViewContent() {
           >
             <div className="flex justify-center items-center lg:hidden gap-5">
               <div>
-                {item.image && (
+                {item.photoUrl && (
                   <Image
-                    src={item.image}
+                    src={item.photoUrl}
                     alt="Image of a commodity"
                     width={504}
                     height={470}
@@ -202,7 +187,9 @@ function ListViewContent() {
                 </div>
                 <p className="text-xs text-[#757575] font-medium">
                   Submitted:{" "}
-                  {item.date ? new Date(item.date).toLocaleDateString() : "N/A"}
+                  {item.createdAt
+                    ? new Date(item.createdAt).toLocaleDateString()
+                    : "N/A"}
                 </p>
               </div>
             </div>

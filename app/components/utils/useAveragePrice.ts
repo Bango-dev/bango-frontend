@@ -2,22 +2,9 @@
 
 import { useEffect, useState } from "react";
 import api from "../../utils/api"; // 👈 your axios instance
+import { Commodity } from "../../lib/types/commodities";
 
-// Match backend response structure
-export type ApiCommodity = {
-  id: string;
-  commodityName: string;
-  price: number;
-  quantity: number;
-  unit: string;
-  location: string;
-  market: string;
-  photoUrl?: string;
-  purchaseDate?: string;
-  createdAt: string;
-};
-
-const useAveragePrices = (data: ApiCommodity[], location: string) => {
+const useAveragePrices = (data: Commodity[], location: string) => {
   const [averagePrices, setAveragePrices] = useState<Record<string, number>>(
     {}
   );
@@ -53,7 +40,7 @@ const useAveragePrices = (data: ApiCommodity[], location: string) => {
           },
         });
 
-        const allCommodities: ApiCommodity[] = res.data?.data?.data || [];
+        const allCommodities: Commodity[] = res.data?.data?.data || [];
         const averages: Record<string, number> = {};
 
         data.forEach((item) => {

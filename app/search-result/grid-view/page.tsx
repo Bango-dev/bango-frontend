@@ -9,19 +9,7 @@ import Link from "next/link";
 import Image from "next/image";
 import InfoBox from "../../components/ui/InfoBox";
 import useAveragePrices from "../../components/utils/useAveragePrice";
-
-type Commodity = {
-  id: string;
-  commodityName: string;
-  price: number;
-  quantity: number;
-  unit: string;
-  location: string;
-  market: string;
-  photoUrl?: string;
-  purchaseDate?: string;
-  createdAt: string;
-};
+import { Commodity } from "../../lib/types/commodities";
 
 function GridViewContent() {
   const searchParams = useSearchParams();
