@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Figtree, Poppins } from "next/font/google";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import api from "../utils/api";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -20,7 +21,6 @@ const poppins = Poppins({
 const SignUp = () => {
   const router = useRouter();
 
-  //  Form state
   const [formData, setFormData] = useState({
     email: "",
     phone: "",
@@ -84,60 +84,45 @@ const SignUp = () => {
     return isValid;
   };
 
-  //  Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrorMessages((prev) => ({ ...prev, [name]: "" })); // clear field-specific error as user types
   };
 
-  //  Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    //  run validation before sending request
     if (!validateForm()) return;
 
     setLoading(true);
 
     try {
       console.log("TEST");
-      const response = await fetch("https://api.thebango.com/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          firstName: "BangoUser",
-          email: formData.email,
-          phoneNumber: "+2348012345674",
-          password: formData.password,
-        }),
-        credentials: "include",
+
+      const response = await api.post("/auth/register", {
+        firstName: "BangoUser",
+        email: formData.email,
+        phoneNumber: "+2348012345674",
+        password: formData.password,
       });
 
-      console.log(response);
+      console.log(response.data);
 
-      const data = await response.json();
+      setSuccess("Signup successful!");
+      setFormData({
+        email: "",
+        phone: "",
+        password: "",
+        confirmPassword: "",
+      });
 
-      if (response.ok) {
-        setSuccess("Signup successful!");
-        setFormData({
-          email: "",
-          phone: "",
-          password: "",
-          confirmPassword: "",
-        });
-        // redirect after few seconds
-        setTimeout(() => router.push("/sign-in"), 2500);
-      } else {
-        setError(data.message || "Signup failed. Please try again.");
-      }
+      setTimeout(() => router.push("/sign-in"), 2500);
     } catch (err) {
       console.error("Signup error:", err);
-      setError("Network error. Please check your connection.");
+      setError(err.message || "Signup failed. Please try again.");
     } finally {
       setLoading(false);
     }
