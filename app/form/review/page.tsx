@@ -6,83 +6,77 @@ import Input from "../Input";
 import PrimaryButton from "../../components/ui/PrimaryButton";
 import { useFormData } from "../../context/FormContext";
 import { useRouter } from "next/navigation";
+import api from "../../utils/api";
+import { uploadToCloudinary } from "../../utils/upload-to-cloudinary";
+import { useState } from "react";
 
 const Review = () => {
   const { data } = useFormData();
   const router = useRouter();
+  const [loading, setLoading] = useState(false); // ✅ loading state
 
- const handleSubmit = async () => {
-   try {
+  const handleSubmit = async () => {
+    setLoading(true); // start loading
+    try {
+      let imageUrl = null;
 
-     const payload = {
-       commodityName: data.commodityName,
-       price: data.price,
-       quantity: data.quantity,
-       location: data.location,
-       market: data.marketName,
-       purchaseDate: data.date,
-       image: data.image,
-       phone: data.phone,
-       unit: "bag",
-     };
+      if (data.image) {
+        const res = await fetch(data.image as string);
+        const blob = await res.blob();
+        const file = new File([blob], "upload.jpg", { type: blob.type });
 
+        const upload = await uploadToCloudinary(file);
+        imageUrl = upload.secure_url;
+      }
 
-     const response = await fetch("https://api.thebango.com/submissions", {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json",
-       },
-       body: JSON.stringify(payload),
-     });
+      const payload = {
+        commodityName: data.commodityName,
+        price: data.price,
+        quantity: data.quantity,
+        location: data.location,
+        market: data.marketName,
+        photoUrl: imageUrl,
+        purchaseDate: data.date,
+        sellerPhoneNumber: data.phone,
+        sellerName: data.sellerName,
+      };
 
-     if (!response.ok) {
-       const errorData = await response.json();
-       console.error("Error response:", errorData);
-       alert("Failed to submit. Please try again.");
-       return;
-     }
-
-     const result = await response.json();
-     console.log("Submission successful:", result);
-
-     // Navigate to confirmation page
-     router.push("/confirmation");
-   } catch (error) {
-     console.error("Error submitting data:", error);
-     alert("Something went wrong. Please check your connection and try again.");
-   }
- };
+      await api.post("/submissions", payload);
+      router.push("/confirmation");
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong. Try again.");
+    } finally {
+      setLoading(false); // stop loading
+    }
+  };
 
   return (
-    <div className="p-6  flex  flex-col w-full">
+    <div className="p-6 flex flex-col w-full">
+      {/* Header */}
       <div className="flex items-center mb-6 cursor-pointer gap-2">
-        <span>
-          <Link href="/form/step-2">
-            <div className="flex items-center mb-6 cursor-pointer gap-2">
-              <Image
-                src="/images/form/arrow-left.svg"
-                alt="Back arrow"
-                width={24}
-                height={24}
-              />
-              <span className="font-bold sm:text-4xl text-xl  ">
-                Review Submission
-              </span>
-            </div>
-          </Link>
-        </span>
+        <Link href="/form/step-2" className="flex items-center gap-2">
+          <Image
+            src="/images/form/arrow-left.svg"
+            alt="Back arrow"
+            width={24}
+            height={24}
+          />
+          <span className="font-bold sm:text-4xl text-xl">
+            Review Submission
+          </span>
+        </Link>
       </div>
 
       <div className="flex md:flex-row flex-col items-center justify-center mx-auto gap-6">
+        {/* Image preview */}
         <div className="w-full md:w-1/3">
-          {/* Render the uploaded image (data URL) if present */}
           {data.image ? (
-            <div className="mb-4 rounded-md overflow-hidden ">
-              {/* Use plain <img> because data URLs are safest with <img> */}
+            <div className="mb-4 rounded-md overflow-hidden">
               <img
                 src={data.image as string}
                 alt={data.commodityName || "Commodity image"}
-                className=" object-cover"
+                className="object-cover"
                 width={504}
                 height={470}
               />
@@ -91,7 +85,9 @@ const Review = () => {
             <div className="mb-4 text-gray-500">No image uploaded</div>
           )}
         </div>
-        <form className="form border border-none shadow-none md:w-2xl w-full ">
+
+        {/* Form */}
+        <form className="form border-none shadow-none md:w-2xl w-full">
           <div className="flex gap-4 mb-4">
             <Input
               label="Name of Seller"
@@ -110,6 +106,7 @@ const Review = () => {
               readOnly
             />
           </div>
+
           <div className="flex gap-4 mb-4">
             <Input
               label="Name of Commodity"
@@ -130,6 +127,7 @@ const Review = () => {
               readOnly
             />
           </div>
+
           <div className="flex gap-4 mb-4">
             <Input
               label="Location"
@@ -149,20 +147,30 @@ const Review = () => {
               readOnly
             />
           </div>
+
           <Input
             label="Market Name"
             type="text"
             value={data.marketName}
             rightIcon="/images/form/map-marker-outline.svg"
-            className="w-full "
+            className="w-full"
             labelClassName="text-base text-[#1E1E1E] font-normal"
             readOnly
           />
+
           <p className="text-lg text-[#757575]">Submitted: {data.date}</p>
-          <PrimaryButton text="Submit" onClick={handleSubmit} />
+
+          {/* Submit button with loading state */}
+          <PrimaryButton
+            text={loading ? "Submitting..." : "Submit"}
+            onClick={handleSubmit}
+            disabled={loading} // disable while loading
+            // icon={loading ? "/images/spinner.svg" : undefined} // optional spinner icon
+          />
         </form>
       </div>
     </div>
   );
 };
+
 export default Review;
