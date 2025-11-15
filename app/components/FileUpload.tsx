@@ -8,41 +8,38 @@ type Props = {
   onFileSelect: (fileBase64: string | null) => void;
   initial?: string | File | null;
   readonly?: boolean;
+  error?: string | null; // new prop to show validation errors
+  label?: string; // customizable label
+  description?: string; // optional description
 };
 
 export default function FileUpload({
   onFileSelect,
   initial = null,
   readonly = false,
+  error = null,
+  label = "Image",
+  description = "You can add a picture of the item you bought to help others identify it.",
 }: Props) {
-  // preview holds a data URL (string) used directly in <img src={preview} />
   const [preview, setPreview] = useState<string | null>(null);
 
-  // Helper: convert File -> base64 data URL
-  const fileToBase64 = (file: File): Promise<string> =>
-    new Promise((resolve, reject) => {
+  // Convert File -> base64
+  const fileToBase64 = (file: File) =>
+    new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (err) => reject(err);
+      reader.onerror = reject;
       reader.readAsDataURL(file);
     });
 
+  // Initialize preview from `initial`
   useEffect(() => {
-    // Normalize `initial` into a data URL preview if possible
     let mounted = true;
     (async () => {
-      if (!initial) {
-        if (mounted) setPreview(null);
-        return;
-      }
+      if (!initial) return setPreview(null);
 
-      // If initial is a string that looks like a data URL, use directly
-      if (typeof initial === "string") {
-        if (mounted) setPreview(initial);
-        return;
-      }
+      if (typeof initial === "string") return setPreview(initial);
 
-      // If initial is a File, convert to base64 and set preview
       if (initial instanceof File) {
         try {
           const b64 = await fileToBase64(initial);
@@ -61,19 +58,18 @@ export default function FileUpload({
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
     if (!file) {
-      onFileSelect(null);
       setPreview(null);
+      onFileSelect(null);
       return;
     }
 
     try {
       const base64 = await fileToBase64(file);
-      // Send base64 string to parent (serializable, safe for storage)
-      onFileSelect(base64);
       setPreview(base64);
+      onFileSelect(base64);
     } catch {
-      onFileSelect(null);
       setPreview(null);
+      onFileSelect(null);
     }
   };
 
@@ -84,17 +80,24 @@ export default function FileUpload({
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      {/* Label and description */}
-      <label className="text-xs sm:text-xl font-bold text-[#1E1E1E]">
-        Image
+      {/* Label */}
+      <label className="text-xs sm:text-sm font-bold text-[#1E1E1E] flex items-center gap-1">
+        {label}
+        {error && <span className="text-red-500">*</span>}
       </label>
-      <p className="sm;text-base text-xs text-[#757575] mb-1">
-        You can add a picture of the item you bought to help others identify it.
-      </p>
+      {/* Description */}
+      {description && (
+        <p className="sm:text-sm text-xs text-[#757575] mb-1">{description}</p>
+      )}
 
       {/* Upload box */}
       {!readonly && (
-        <label className="flex flex-col items-center justify-center border-2 border-dotted border-gray-400 rounded-md h-48 w-full cursor-pointer hover:border-gray-600 transition relative">
+        <label
+          className={`flex flex-col items-center justify-center border-2 border-dotted rounded-md h-48 w-full cursor-pointer transition relative
+          ${
+            error ? "border-red-500" : "border-gray-400 hover:border-gray-600"
+          }`}
+        >
           {preview ? (
             <div className="relative w-full h-full">
               <img
@@ -102,7 +105,6 @@ export default function FileUpload({
                 alt="preview"
                 className="w-full h-full object-cover rounded-md"
               />
-              {/* Remove button */}
               <button
                 type="button"
                 onClick={(e) => {
@@ -131,7 +133,7 @@ export default function FileUpload({
         </label>
       )}
 
-      {/* readonly mode: show preview only */}
+      {/* readonly mode */}
       {readonly && preview && (
         <div className="w-full rounded-md overflow-hidden">
           <img
@@ -141,6 +143,9 @@ export default function FileUpload({
           />
         </div>
       )}
+
+      {/* Error message */}
+      {error && !readonly && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
 }

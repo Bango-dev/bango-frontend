@@ -2,78 +2,42 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { db, Commodity } from "../../../lib/db";
 import Image from "next/image";
 import InfoBox from "../../../components/ui/InfoBox";
 import Link from "next/link";
+import api from "../../../utils/api";
 
 const MobileFullDetails = () => {
-  const params = useParams();
-  const id = params.id;
-  const [product, setProduct] = useState<Commodity | null>(null);
-  const [averagePrice, setAveragePrice] = useState<number | null>(null);
+  const { id } = useParams();
+  const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  //  Utility to clean and convert price strings to numbers
-  const parsePrice = (price: unknown): number => {
-    if (price === null || price === undefined) return 0;
-    const cleaned = String(price).replace(/[^0-9.]/g, "");
-    const num = parseFloat(cleaned);
-    return isNaN(num) ? 0 : num;
-  };
-
-  //  Normalize strings for case-insensitive comparison
-  const normalize = (str: string | undefined | null) =>
-    (str || "").trim().toLowerCase().replace(/\s+/g, " ");
-
   useEffect(() => {
-    const fetchProduct = async () => {
-      if (id) {
-        const result = await db.commodities.get(Number(id));
-        setProduct(result || null);
+    const fetchData = async () => {
+      try {
+        if (!id) return;
 
-        if (result) {
-          const allCommodities = await db.commodities.toArray();
+        setLoading(true);
 
-          // Match commodities by name + quantity (case-insensitive)
-          const targetName = normalize(result.commodityName);
-          const targetQty = normalize(result.quantity);
+        // Fetch single submission
+        const res = await api.get(`/submissions/${id}`);
+        const submission = res.data?.data;
 
-          const similarCommodities = allCommodities.filter(
-            (item) =>
-              normalize(item.commodityName) === targetName &&
-              normalize(item.quantity) === targetQty
-          );
-
-          // Compute average price
-          if (similarCommodities.length > 0) {
-            const total = similarCommodities.reduce(
-              (sum, item) => sum + parsePrice(item.price),
-              0
-            );
-            const avg = Math.round(total / similarCommodities.length);
-            setAveragePrice(avg);
-          } else {
-            setAveragePrice(null);
-          }
-        }
-
-        setLoading(false);
-      } else {
+        setProduct(submission || null);
+      } catch (err) {
+        console.error(err);
+        setProduct(null);
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchProduct();
+    fetchData();
   }, [id]);
 
-  if (loading) {
-    return <div className="p-6">Loading...</div>;
-  }
+  if (loading) return <div className="p-6">Loading...</div>;
 
-  if (!product) {
-    return <div className="p-6">Product not found.</div>;
-  }
+  if (!product) return <div className="p-6">Submission not found.</div>;
 
   return (
     <div className="flex flex-col sm:flex-row sm:shadow-none shadow-md p-5 w-full">
@@ -85,20 +49,17 @@ const MobileFullDetails = () => {
             width={24}
             height={24}
           />
-          <span className="z-10">Back</span>
+          <span>Back</span>
         </div>
       </Link>
 
       <div className="sm:flex items-center justify-center">
         <div>
-          {product.image && (
+          {/* Photo */}
+          {product.photoUrl && (
             <Image
-              src={
-                typeof product.image === "string"
-                  ? product.image
-                  : URL.createObjectURL(product.image)
-              }
-              alt="Image of a commodity"
+              src={product.photoUrl}
+              alt={product.commodityName}
               width={504}
               height={470}
               className="rounded-lg object-cover"
@@ -111,27 +72,31 @@ const MobileFullDetails = () => {
             {product.commodityName}
           </h2>
 
+          {/* Price */}
           <div className="flex-col items-baseline gap-2 sm:flex hidden">
             <p className="text-base font-semibold text-[#4D3594] p-1.5 bg-[#E2D8FF] rounded-md">
               Price
             </p>
             <p className="text-4xl text-[#1E1E1E] font-bold">
-              ₦{parsePrice(product.price).toLocaleString()}
+              ₦{Number(product.price).toLocaleString()}
             </p>
           </div>
 
+          {/* Dates */}
           <p className="text-base text-[#757575] font-medium">
-            Submitted: {product.date}
+            Submitted: {new Date(product.createdAt).toLocaleDateString()}
           </p>
 
           <div className="items-center justify-between mb-4 flex w-full">
             <div>
               <p className="submission-key">Name of Seller</p>
-              <p className="submission-value">{product.sellerName}</p>
+              <p className="submission-value">{product.sellerName || "—"}</p>
             </div>
             <div>
-              <p className="submission-key">Seller’s Phone number</p>
-              <p className="submission-value">{product.phone}</p>
+              <p className="submission-key">Seller’s Phone Number</p>
+              <p className="submission-value">
+                {product.sellerPhoneNumber || "—"}
+              </p>
             </div>
           </div>
 
@@ -143,7 +108,7 @@ const MobileFullDetails = () => {
             <div>
               <p className="submission-key">Price Paid</p>
               <p className="submission-value">
-                ₦{parsePrice(product.price).toLocaleString()}
+                ₦{Number(product.price).toLocaleString()}
               </p>
             </div>
           </div>
@@ -151,7 +116,7 @@ const MobileFullDetails = () => {
           <div className="items-center justify-between mb-4 flex">
             <div>
               <p className="submission-key">Market</p>
-              <p className="submission-value">{product.marketName}</p>
+              <p className="submission-value">{product.market}</p>
             </div>
             <div>
               <p className="submission-key">Quantity</p>
@@ -159,17 +124,13 @@ const MobileFullDetails = () => {
             </div>
           </div>
 
-          {/* Average Price Section (Now Matches Grid/List) */}
-          {averagePrice !== null && (
-            <div className="items-center justify-between mb-4 flex">
-              <div>
-                <p className="submission-key">Average Price</p>
-                <p className="submission-value">
-                  ₦{averagePrice.toLocaleString()}
-                </p>
-              </div>
+          {/* Average Price (temporarily N/A) */}
+          <div className="items-center justify-between mb-4 flex">
+            <div>
+              <p className="submission-key">Average Price</p>
+              <p className="submission-value">N/A</p>
             </div>
-          )}
+          </div>
 
           <InfoBox />
         </div>

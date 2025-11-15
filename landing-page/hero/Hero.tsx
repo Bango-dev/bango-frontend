@@ -27,7 +27,7 @@ const Hero = () => {
       </div>
 
       <div className=" relative z-10 flex flex-col items-center sm:mt-10 ">
-        <h1 className=" hero-heading font-normal ">Crowdsourced</h1>
+        <h1 className=" hero-heading font-normal ">Community Driven</h1>
         <h1 className="bg-[var(--color-primary)] hero-heading text-white p-5 my-5  rounded-2xl ">
           Commodity
         </h1>

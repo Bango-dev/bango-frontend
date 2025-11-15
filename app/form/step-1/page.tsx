@@ -41,7 +41,6 @@ const Step1 = () => {
   };
 
   const handleNext = () => {
-
     if (validate()) router.push("/form/step-2");
   };
 
@@ -138,6 +137,7 @@ const Step1 = () => {
           <FileUpload
             initial={data.image ?? null}
             onFileSelect={(file) => update({ image: file })}
+            error={errors.image} // <-- pass the validation error
           />
         </div>
 
@@ -151,7 +151,12 @@ const Step1 = () => {
         />
         {errors.date && <p className="text-red-500 text-sm">{errors.date}</p>}
 
-        <PrimaryButton text="Next" type="button" onClick={handleNext} className="w-full" />
+        <PrimaryButton
+          text="Next"
+          type="button"
+          onClick={handleNext}
+          className="w-full"
+        />
       </form>
     </div>
   );

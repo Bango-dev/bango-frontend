@@ -13,7 +13,7 @@ const Confirmation = () => {
         />
       </div>
       <div>
-        <h3 className="sub-heading">Awesome!</h3>
+        <h3 className="sub-heading">Awesome! You Just Bango'd!</h3>
         <h4 className="text-center sm:text-lg text-base text-[#757575] mt-2">
           Thanks for sharing! Your data helps others plan and save.
         </h4>
