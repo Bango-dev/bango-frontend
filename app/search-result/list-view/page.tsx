@@ -22,6 +22,7 @@ function ListViewContent() {
 
   const commodityName = searchParams.get("commodityName") || "";
   const location = searchParams.get("location") || "";
+    const market = searchParams.get("market") || "";
   const sortRecent = searchParams.get("sortRecent") || "recent";
   const sortPrice = searchParams.get("sortPrice") || "";
 
@@ -56,7 +57,7 @@ function ListViewContent() {
     fetchData();
   }, [commodityName, location, sortRecent, sortPrice]);
 
-  const { averagePrices } = useAveragePrices(results, location);
+  const { averagePrices } = useAveragePrices(results, location, market);
 
   useEffect(() => {
     if (!isLoading && commodityName && results.length === 0) {

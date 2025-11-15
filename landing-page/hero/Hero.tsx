@@ -2,18 +2,58 @@ import Button from "../../app/components/ui/Button";
 import Image from "next/image";
 
 const Hero = () => {
+  // Array of background images
+  const bgImages = [
+    "/images/hero/bg1.png",
+    "/images/hero/bg2.png",
+    "/images/hero/bg3.png",
+    "/images/hero/bg4.png",
+    "/images/hero/bg5.png",
+    "/images/hero/bg6.png",
+    "/images/hero/bg7.png",
+    "/images/hero/bg8.png",
+    "/images/hero/bg9.png",
+  ];
+
+  // Predefined random positions (or you can generate dynamically)
+  const positions = [
+    { top: "10%", left: "5%" },
+    { top: "20%", right: "10%" },
+    { top: "75%", left: "5%" },
+    { top: "0", left: "15%" },
+    { bottom: "20%", right: "5%" },
+    { top: "0", left: "50%" },
+    { top: "0", right: "20%" },
+    { top: "30%", left: "5%" },
+    { top: "35%", right: "0" },
+  ];
   return (
     <section className="relative  flex flex-col  sm:bg-cover sm:bg-center  items-center pt-5 h-screen ">
       {/* Desktop background image */}
-      <div className="hidden sm:block absolute inset-0 -z-10">
+      {/* <div className="hidden sm:block absolute inset-0 -z-10">
         <Image
           src="/images/hero/hero-background-image.png"
           alt="Hero Background"
           fill
           priority
-          className="object-cover"
+          className="object-contain"
         />
-      </div>
+      </div> */}
+
+      {/* Random decorative background images */}
+      {bgImages.map((src, index) => (
+        <div
+          key={index}
+          className="absolute -z-10 hidden sm:block"
+          style={{
+            top: positions[index].top,
+            left: positions[index].left,
+            right: positions[index].right,
+          }}
+        >
+          <Image src={src} alt={`bg-${index}`} width={68} height={68} />
+        </div>
+      ))}
 
       {/* Mobile-only image */}
       <div className="sm:hidden mb-2 ">

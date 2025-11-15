@@ -50,7 +50,7 @@ const FindPrice = () => {
         <PrimaryButton
           onClick={handleSubmitPrice}
           text="Submit a Price"
-          className="w-lg"
+          className="w-36 h-12 text-xs md:w-48 md:h-14 md:text-sm"
         />
       </div>
     </section>

@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import api from "../../utils/api"; // 👈 your axios instance
 import { Commodity } from "../../lib/types/commodities";
 
-const useAveragePrices = (data: Commodity[], location: string) => {
+const useAveragePrices = (
+  data: Commodity[],
+  location: string,
+  market: string
+) => {
   const [averagePrices, setAveragePrices] = useState<Record<string, number>>(
     {}
   );
@@ -32,7 +36,7 @@ const useAveragePrices = (data: Commodity[], location: string) => {
           return;
         }
 
-        // ✅ Fetch all data from backend instead of local DB
+        // Fetch all data from backend instead of local DB
         const res = await api.get("/search", {
           params: {
             sortBy: "recent",
@@ -59,6 +63,10 @@ const useAveragePrices = (data: Commodity[], location: string) => {
                   normalize(c.location) === normalize(item.location);
                 return sameName && sameQty && sameLoc;
               }
+              if (market.trim()) {
+                const sameMkt = normalize(c.market) === normalize(item.market);
+                return sameName && sameQty && sameMkt;
+              }
               return sameName && sameQty;
             });
 
@@ -82,7 +90,7 @@ const useAveragePrices = (data: Commodity[], location: string) => {
     };
 
     calculateAverages();
-  }, [data, location]);
+  }, [data, location, market]);
 
   return { averagePrices, isLoading };
 };

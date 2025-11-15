@@ -11,6 +11,7 @@ import Image from "next/image";
 const FindPrice = () => {
   const [commodityName, setCommodityName] = useState("");
   const [location, setLocation] = useState("");
+  const [market, setMarket] = useState("");
   const [sortRecent, setSortRecent] = useState("recent");
   const [sortPrice, setSortPrice] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -38,6 +39,7 @@ const FindPrice = () => {
     const query = new URLSearchParams({
       commodityName,
       location,
+      market,
       sortRecent,
       sortPrice,
     }).toString();
@@ -48,16 +50,16 @@ const FindPrice = () => {
   return (
     <div className="flex flex-col min-h-screen pt-5 px-3 sm:px-4 lg:px-4 mx-auto w-full">
       <Link href="/">
-                <div className="flex items-center mb-6 cursor-pointer gap-2">
-                  <Image
-                    src="/images/form/arrow-left.svg"
-                    alt="Back arrow"
-                    width={24}
-                    height={24}
-                  />
-                  <span>Back</span>
-                </div>
-              </Link>
+        <div className="flex items-center mb-6 cursor-pointer gap-2">
+          <Image
+            src="/images/form/arrow-left.svg"
+            alt="Back arrow"
+            width={24}
+            height={24}
+          />
+          <span>Back</span>
+        </div>
+      </Link>
       <form className="form" onSubmit={handleFindPrice} noValidate>
         <h2 className="font-bold text-2xl leading-4">Find Price</h2>
         <h3 className="text-[#757575] sm:text-base text-sm">
@@ -79,7 +81,14 @@ const FindPrice = () => {
         )}
 
         <LocationSelect value={location} onChange={setLocation} />
-
+        <Input
+          label="Market Name"
+          type="text"
+          placeholder="Wuse Market"
+          value={market}
+          onChange={(e) => setMarket(e.target.value)}
+          rightIcon="/images/form/map-marker-outline.svg"
+        />
         {/* Sorting options */}
         <div className="flex flex-col w-full mb-4">
           <label className="text-xs sm:text-xl font-bold text-[#1E1E1E] mb-2">

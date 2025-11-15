@@ -164,6 +164,7 @@ const Review = () => {
           <PrimaryButton
             text={loading ? "Submitting..." : "Submit"}
             onClick={handleSubmit}
+            className="w-full"
             disabled={loading} // disable while loading
             // icon={loading ? "/images/spinner.svg" : undefined} // optional spinner icon
           />
