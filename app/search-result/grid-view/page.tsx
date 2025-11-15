@@ -106,18 +106,26 @@ function GridViewContent() {
         return (
           <div
             key={item.id}
-            className="sm:shadow-none shadow-md p-5 items-center justify-center mx-auto hidden sm:flex"
+            className="sm:shadow-none shadow-md p-5 items-center justify-center  mx-auto hidden sm:flex"
           >
-            {item.photoUrl && (
-              <div>
+            {/* IMAGE (left) - reserve the same width even if image missing */}
+            <div className="w-40 sm:w-48 md:w-72 flex-shrink-0 mr-6">
+              {item.photoUrl ? (
                 <Image
                   src={item.photoUrl}
                   alt={item.commodityName}
-                  width={504}
+                  width={504} // intrinsic size — kept for Next/Image optimization
                   height={470}
+                  className="object-contain w-full h-auto rounded-md"
                 />
-              </div>
-            )}
+              ) : (
+                // placeholder keeps the text aligned to the right
+                <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-72 md:h-72 bg-gray-100 rounded-md flex items-center justify-center">
+                  <span className="md:text-lg sm:text-base text-sm  text-gray-400">No image</span>
+                </div>
+              )}
+            </div>
+
             <div className="bg-white rounded-lg p-6 space-y-4 w-xl">
               <h2 className="text-2xl font-bold text-[#1E1E1E]">
                 {item.commodityName}
@@ -188,17 +196,24 @@ function GridViewContent() {
             className="lg:shadow-none shadow-md p-5 flex flex-col items-center sm:hidden"
           >
             <div className="flex items-center lg:hidden gap-5">
-              {item.photoUrl && (
-                <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48">
+              <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48">
+                {item.photoUrl ? (
                   <Image
                     src={item.photoUrl}
                     alt={item.commodityName}
                     fill
-                    className="object-cover rounded-md"
+                    className="object-contain rounded-md"
                     priority
                   />
-                </div>
-              )}
+                ) : (
+                  // placeholder keeps the text aligned to the right
+                  <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-gray-100 rounded-md flex items-center justify-center">
+                    <span className=" sm:text-base text-sm  text-gray-400">
+                      No image
+                    </span>
+                  </div>
+                )}
+              </div>
               <div className="bg-white rounded-lg w-full p-3">
                 <h2 className="sm:text-2xl text-base font-bold text-[#1E1E1E]">
                   {item.commodityName}

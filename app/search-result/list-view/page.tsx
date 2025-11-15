@@ -160,17 +160,22 @@ function ListViewContent() {
             className="lg:shadow-none shadow-md p-5 flex flex-col items-center lg:hidden"
           >
             <div className="flex justify-center items-center lg:hidden gap-5">
-              <div>
-                {item.photoUrl && (
-                  <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48">
-                                    <Image
-                                      src={item.photoUrl}
-                                      alt={item.commodityName}
-                                      fill
-                                      className="object-cover rounded-md"
-                                      priority
-                                    />
-                                  </div>
+              <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48">
+                {item.photoUrl ? (
+                  <Image
+                    src={item.photoUrl}
+                    alt={item.commodityName}
+                    fill
+                    className="object-contain rounded-md"
+                    priority
+                  />
+                ) : (
+                  // placeholder keeps the text aligned to the right
+                  <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-gray-100 rounded-md flex items-center justify-center">
+                    <span className=" sm:text-base text-sm  text-gray-400">
+                      No image
+                    </span>
+                  </div>
                 )}
               </div>
 
