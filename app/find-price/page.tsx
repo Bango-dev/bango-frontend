@@ -109,7 +109,7 @@ const FindPrice = () => {
           </div>
         </div>
 
-        <PrimaryButton type="submit" text="Find Price" />
+        <PrimaryButton type="submit" text="Find Price" className="w-full" />
       </form>
     </div>
   );

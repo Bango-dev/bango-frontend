@@ -229,7 +229,7 @@ const SignUp = () => {
         <p className="text-center text-[#757575] text-sm mt-2">
           Already have an account?
           <Link
-            href="/sign-in"
+            href="/login"
             className="ml-2 text-[var(--color-primary)] font-bold"
           >
             Sign in

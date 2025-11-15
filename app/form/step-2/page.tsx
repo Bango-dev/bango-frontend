@@ -91,7 +91,7 @@ const Step2 = () => {
         />
         {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
 
-        <PrimaryButton type="button" text="Review Submission" onClick={handleNext} />
+        <PrimaryButton type="button" text="Review Submission" onClick={handleNext} className="w-full" />
       </form>
     </div>
   );

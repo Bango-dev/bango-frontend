@@ -136,7 +136,7 @@ function GridViewContent() {
                 Submitted: {new Date(item.createdAt).toLocaleDateString()}
               </p>
 
-              <div className="flex items-center justify-between mb-4 sm:flex hidden">
+              <div className=" items-center justify-between mb-4 sm:flex hidden">
                 <div>
                   <p className="submission-key">Location</p>
                   <p className="submission-value">{item.location || "N/A"}</p>
@@ -147,7 +147,7 @@ function GridViewContent() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between mb-4 sm:flex hidden">
+              <div className=" items-center justify-between mb-4 sm:flex hidden">
                 <div>
                   <p className="submission-key">Quantity</p>
                   <p className="submission-value">
@@ -189,14 +189,15 @@ function GridViewContent() {
           >
             <div className="flex items-center lg:hidden gap-5">
               {item.photoUrl && (
-                <Image
-                  src={item.photoUrl}
-                  alt={item.commodityName}
-                  width={504}
-                  height={470}
-                  className="object-cover"
-                  priority
-                />
+                <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48">
+                  <Image
+                    src={item.photoUrl}
+                    alt={item.commodityName}
+                    fill
+                    className="object-cover rounded-md"
+                    priority
+                  />
+                </div>
               )}
               <div className="bg-white rounded-lg w-full p-3">
                 <h2 className="sm:text-2xl text-base font-bold text-[#1E1E1E]">

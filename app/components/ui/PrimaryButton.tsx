@@ -19,9 +19,9 @@ const PrimaryButton = ({
 
   return (
     <button
-      className={`btn-primary w-full flex items-center justify-center gap-2 ${
+      className={`${className} btn-primary  flex items-center justify-center gap-2  ${
         isDisabled ? "cursor-not-allowed opacity-70" : ""
-      } ${className}`}
+      } `}
       onClick={onClick}
       type={type}
       disabled={isDisabled}

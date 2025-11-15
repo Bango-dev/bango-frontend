@@ -162,14 +162,15 @@ function ListViewContent() {
             <div className="flex justify-center items-center lg:hidden gap-5">
               <div>
                 {item.photoUrl && (
-                  <Image
-                    src={item.photoUrl}
-                    alt="Image of a commodity"
-                    width={504}
-                    height={470}
-                    className="object-cover"
-                    priority
-                  />
+                  <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48">
+                                    <Image
+                                      src={item.photoUrl}
+                                      alt={item.commodityName}
+                                      fill
+                                      className="object-cover rounded-md"
+                                      priority
+                                    />
+                                  </div>
                 )}
               </div>
 

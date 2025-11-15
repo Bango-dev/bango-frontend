@@ -151,7 +151,7 @@ const Step1 = () => {
         />
         {errors.date && <p className="text-red-500 text-sm">{errors.date}</p>}
 
-        <PrimaryButton text="Next" type="button" onClick={handleNext} />
+        <PrimaryButton text="Next" type="button" onClick={handleNext} className="w-full" />
       </form>
     </div>
   );

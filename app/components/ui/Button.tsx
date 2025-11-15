@@ -10,6 +10,7 @@ type ButtonProps = {
   src?: string;
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
+
 };
 
 const Button = ({
@@ -20,16 +21,21 @@ const Button = ({
   firstHref,
   src,
   type,
+  onClick,
 }: ButtonProps) => {
   const router = useRouter();
 
+
+
   // handle click for first button
   const handleFirstClick = () => {
+  if (onClick) onClick();
     if (firstHref) router.push(firstHref);
   };
 
   // handle click for second button
   const handleSecondClick = () => {
+   if (onClick) onClick();
     if (secondHref) router.push(secondHref);
   };
   return (

@@ -53,8 +53,8 @@ const Navbar = () => {
         <Button
           firstBtn="Login"
           secondBtn="Register"
-          firstHref="/sign-in"
-          secondHref="/sign-up"
+          firstHref="/login"
+          secondHref="/register"
           className="hidden md:flex"
         />
       </div>
