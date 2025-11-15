@@ -6,10 +6,11 @@ import Image from "next/image";
 import InfoBox from "../../../components/ui/InfoBox";
 import Link from "next/link";
 import api from "../../../utils/api";
+import { Commodity } from "../../../lib/types/commodities";
 
 const MobileFullDetails = () => {
   const { id } = useParams();
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Commodity>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -94,9 +95,7 @@ const MobileFullDetails = () => {
             </div>
             <div>
               <p className="submission-key">Seller’s Phone Number</p>
-              <p className="submission-value">
-                {product.sellerPhoneNumber || "—"}
-              </p>
+              <p className="submission-value">{product.phone || "—"}</p>
             </div>
           </div>
 
