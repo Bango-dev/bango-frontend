@@ -63,18 +63,17 @@ export function FormProvider({ children }: { children: ReactNode }) {
   };
 
   //  5. Save data into Dexie and clear after saving
-  const saveToDB = async () => {
-    try {
-      await db.commodities.add(data);
-      clear();
-      console.log("Form data saved to Dexie successfully!");
-    } catch (error) {
-      console.error("Error saving to Dexie:", error);
-    }
-  };
+  // const saveToDB = async () => {
+  //   try {
+  //     clear();
+  //     console.log("Form data saved to Dexie successfully!");
+  //   } catch (error) {
+  //     console.error("Error saving to Dexie:", error);
+  //   }
+  // };
 
   return (
-    <FormContext.Provider value={{ data, update, clear, saveToDB }}>
+    <FormContext.Provider value={{ data, update, clear }}>
       {children}
     </FormContext.Provider>
   );

@@ -1,5 +1,7 @@
 "use client";
 
+
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
@@ -7,11 +9,13 @@ import InfoBox from "../../../components/ui/InfoBox";
 import Link from "next/link";
 import api from "../../../utils/api";
 import { Commodity } from "../../../lib/types/commodities";
+import PrimaryButton from "../../../components/ui/PrimaryButton";
 
 const MobileFullDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState<Commodity>(null);
   const [loading, setLoading] = useState(true);
+    const pathname = usePathname();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,20 +44,35 @@ const MobileFullDetails = () => {
 
   if (!product) return <div className="p-6">Submission not found.</div>;
 
-  return (
-    <div className="flex flex-col sm:flex-row sm:shadow-none shadow-md p-5 w-full">
-      <Link href="/search-result/grid-view">
-        <div className="flex justify-start items-center mb-6 cursor-pointer gap-2 w-fit">
-          <Image
-            src="/images/form/arrow-left.svg"
-            alt="Back arrow"
-            width={24}
-            height={24}
-          />
-          <span>Back</span>
-        </div>
-      </Link>
 
+
+  const handleCopy = async () => {
+    const fullUrl = `${window.location.origin}${pathname}`;
+
+    await navigator.clipboard.writeText(fullUrl);
+    alert("Link copied!");
+  };
+  return (
+    <div className="flex flex-col sm:flex-row sm:shadow-none shadow-md p-5 w-full ">
+      <div className=" w-full flex justify-between items-center mb-5 ">
+        <Link href="/search-result/grid-view">
+          <div className="flex justify-start items-center  cursor-pointer gap-2 w-fit">
+            <Image
+              src="/images/form/arrow-left.svg"
+              alt="Back arrow"
+              width={24}
+              height={24}
+            />
+            <span>Back</span>
+          </div>
+        </Link>
+
+        <PrimaryButton
+          text="Copy url"
+          className=" w-28 bg-transparent text-(--secondary-color) border border-(--secondary-color) hover:bg-[#E2D8FF] rounded-2xl h-5 text-xs "
+          onClick={handleCopy}
+        />
+      </div>
       <div className="sm:flex items-center justify-center">
         <div>
           {/* Photo */}

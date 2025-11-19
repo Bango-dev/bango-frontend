@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import Input from "../Input";
@@ -11,9 +10,9 @@ import { uploadToCloudinary } from "../../utils/upload-to-cloudinary";
 import { useState } from "react";
 
 const Review = () => {
-  const { data } = useFormData();
+  const { data, clear } = useFormData();
   const router = useRouter();
-  const [loading, setLoading] = useState(false); // ✅ loading state
+  const [loading, setLoading] = useState(false); //  loading state
 
   const handleSubmit = async () => {
     setLoading(true); // start loading
@@ -43,6 +42,7 @@ const Review = () => {
 
       await api.post("/submissions", payload);
       router.push("/confirmation");
+            clear();
     } catch (error) {
       console.error(error);
       alert("Something went wrong. Try again.");

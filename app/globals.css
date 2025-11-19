@@ -97,7 +97,40 @@
   .submission-value {
     @apply font-medium text-[#757575] lg:text-base md:text-sm text-xs ;
   }
+
+  @keyframes fade-sequence {
+  0% { opacity: 0; }
+  /* Animation goes from 0 to 1, then back to 0 for each image */
+  10% { opacity: 1; }
+  /* At 100%, the image must be invisible to loop correctly */
+  100% { opacity: 0; }
 }
+
+.animate-fade-sequence {
+  animation-name: fade-sequence;
+  animation-duration: 9s; /* Total duration for one full cycle */
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  /* Keep images hidden initially until their turn comes */
+  opacity: 0;
+}
+
+/* Stagger the start times */
+.img-1 { animation-delay: 0s; }
+.img-2 { animation-delay: 1s; }
+.img-3 { animation-delay: 2s; }
+.img-4 { animation-delay: 3s; }
+.img-5 { animation-delay: 4s; }
+.img-6 { animation-delay: 5s; }
+.img-7 { animation-delay: 6s; }
+.img-8 { animation-delay: 7s; }
+.img-9 { animation-delay: 8s; }
+
+
+}
+
+
+
 
 
 

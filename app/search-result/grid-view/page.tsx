@@ -122,7 +122,9 @@ function GridViewContent() {
               ) : (
                 // placeholder keeps the text aligned to the right
                 <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-72 md:h-72 bg-gray-100 rounded-md flex items-center justify-center">
-                  <span className="md:text-lg sm:text-base text-sm  text-gray-400">No image</span>
+                  <span className="md:text-lg sm:text-base text-sm  text-gray-400">
+                    No image
+                  </span>
                 </div>
               )}
             </div>
@@ -147,28 +149,43 @@ function GridViewContent() {
 
               <div className=" items-center justify-between mb-4 sm:flex hidden">
                 <div>
-                  <p className="submission-key">Location</p>
-                  <p className="submission-value">{item.location || "N/A"}</p>
+                  <p className="submission-key">Name of Seller</p>
+                  <p className="submission-value">{item.sellerName || "N/A"}</p>
                 </div>
                 <div>
-                  <p className="submission-key">Market</p>
-                  <p className="submission-value">{item.market || "N/A"}</p>
+                  <p className="submission-key">Seller&apos;s Phone number</p>
+                  <p className="submission-value">{item.phone || "N/A"}</p>
                 </div>
               </div>
 
               <div className=" items-center justify-between mb-4 sm:flex hidden">
+                <div>
+                  <p className="submission-key">Location</p>
+                  <p className="submission-value">{item.location || "N/A"}</p>
+                </div>
+                <div>
+                  <p className="submission-key">Price Paid</p>
+                  <p className="submission-value">{item.price || "N/A"}</p>
+                </div>
+              </div>
+
+              <div className=" items-center justify-between mb-4 sm:flex hidden">
+                <div>
+                  <p className="submission-key">Market</p>
+                  <p className="submission-value">{item.market}</p>
+                </div>
                 <div>
                   <p className="submission-key">Quantity</p>
                   <p className="submission-value">
                     {item.quantity} {item.unit}
                   </p>
                 </div>
-                <div>
-                  <p className="submission-key">Average Price</p>
-                  <p className="submission-value">
-                    {avgPrice ? `₦${avgPrice.toLocaleString()}` : "N/A"}
-                  </p>
-                </div>
+              </div>
+              <div>
+                <p className="submission-key">Average Price</p>
+                <p className="submission-value">
+                  {avgPrice ? `₦${avgPrice.toLocaleString()}` : "N/A"}
+                </p>
               </div>
 
               <InfoBox className="sm:block hidden" />
