@@ -1,6 +1,8 @@
 "use client";
+
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+
 type ButtonProps = {
   firstBtn: React.ReactNode;
   secondBtn: React.ReactNode;
@@ -10,62 +12,47 @@ type ButtonProps = {
   src?: string;
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
-
 };
 
 const Button = ({
   firstBtn,
   secondBtn,
-  className,
+  className = "",
   secondHref,
   firstHref,
   src,
-  type,
+  type = "button",
   onClick,
 }: ButtonProps) => {
   const router = useRouter();
 
-
-
-  // handle click for first button
-  const handleFirstClick = () => {
-  if (onClick) onClick();
-    if (firstHref) router.push(firstHref);
+  const handleClick = (href?: string) => {
+    if (onClick) onClick();
+    if (href) router.push(href);
   };
 
-  // handle click for second button
-  const handleSecondClick = () => {
-   if (onClick) onClick();
-    if (secondHref) router.push(secondHref);
-  };
   return (
-    <div className={`btns ${className}`}>
-
+    <div className={`btns flex flex-col gap-4 w-full ${className}`}>
+      {/* First Button */}
       <button
-        className={`btn-primary ${className}`}
-        onClick={handleFirstClick}
         type={type}
+        onClick={() => handleClick(firstHref)}
+        className="btn-primary w-full flex justify-center items-center text-center"
       >
         {firstBtn}
       </button>
 
+      {/* Second Button */}
       <button
-        className={`find-price btn-secondary flex flex-row justify-center items-center gap-2   ${className}`}
-        onClick={handleSecondClick}
+        type={type}
+        onClick={() => handleClick(secondHref)}
+        className="find-price btn-secondary w-full flex justify-center items-center gap-2 text-center"
       >
-        {src && (
-          <Image
-            src={src}
-            alt="icon"
-            width={24}
-            height={24}
-            className="inline-block"
-          />
-        )}
+        {src && <Image src={src} alt="icon" width={24} height={24} />}
         <span>{secondBtn}</span>
       </button>
-
     </div>
   );
 };
+
 export default Button;
