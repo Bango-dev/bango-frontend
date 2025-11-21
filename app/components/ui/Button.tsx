@@ -38,7 +38,7 @@ const Button = ({
   return (
     <div className={`btns ${className}`}>
       <button
-        className={`btn-primary ${className}`}
+        className="btn-primary w-full flex justify-center items-center text-center"
         onClick={handleFirstClick}
         type={type}
       >
