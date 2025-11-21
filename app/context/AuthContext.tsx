@@ -7,10 +7,18 @@ export const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  // Load token/user from localStorage on first render
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) setUser(JSON.parse(storedUser));
+    const stored = localStorage.getItem("user");
+    if (!stored || stored === "undefined" || stored === "null") {
+      localStorage.removeItem("user");
+      return;
+    }
+
+    try {
+      setUser(JSON.parse(stored));
+    } catch {
+      localStorage.removeItem("user");
+    }
   }, []);
 
   const login = (userData) => {
