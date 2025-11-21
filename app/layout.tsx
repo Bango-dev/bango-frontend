@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "../landing-page/navbar/Navbar";
 import { FormProvider } from "../app/context/FormContext";
 import { Figtree, Poppins, Lexend } from "next/font/google";
+import { AuthProvider } from "./context/AuthContext";
 
 const lexend = Lexend({
   subsets: ["latin"],
@@ -16,7 +17,6 @@ const figtree = Figtree({
   weight: ["400", "600"],
   variable: "--font-figtree",
 });
-
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -35,12 +35,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${poppins.variable} ${figtree.variable} ${lexend.variable} `}>
+    <html
+      lang="en"
+      className={`${poppins.variable} ${figtree.variable} ${lexend.variable} `}
+    >
       <body>
-        <FormProvider>
-          <Navbar />
-          {children}
-        </FormProvider>
+        <AuthProvider>
+          <FormProvider>
+            <Navbar />
+            {children}
+          </FormProvider>
+        </AuthProvider>
       </body>
     </html>
   );

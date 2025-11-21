@@ -1,14 +1,20 @@
 "use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import Button from "../../app/components/ui/Button";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
+import { AuthContext } from "../../app/context/AuthContext";
+import PrimaryButton from "../../app/components/ui/PrimaryButton";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  //  Close when clicking outside the menu
+  const { user, logout } = useContext(AuthContext);
+  console.log("Navbar user:", user);
+
+  //  Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -23,12 +29,13 @@ const Navbar = () => {
     }
 
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen, setIsOpen]);
+  }, [isOpen]);
+
   return (
-    <nav className=" w-full flex   items-center justify-between   bg-[var(--color-secondary)] py-4 cursor-pointer">
+    <nav className="w-full flex items-center justify-between bg-[var(--color-secondary)] py-4 cursor-pointer">
       <div>
         <Image
-          className=" pl-4"
+          className="pl-4"
           src="/images/navbar/navbar-logo.svg"
           alt="The logo at the navigation bar"
           width={153}
@@ -36,7 +43,7 @@ const Navbar = () => {
         />
       </div>
 
-      <ul className="hidden md:flex   list-none ">
+      <ul className="hidden md:flex list-none">
         <Link href="/form/step-1" className="nav-link">
           <li>Submit Price</li>
         </Link>
@@ -44,23 +51,36 @@ const Navbar = () => {
         <Link href="/coming-soon" className="nav-link">
           <li>Top Sellers</li>
         </Link>
+
         <Link href="/find-price" className="nav-link">
           <li>Find Prices</li>
         </Link>
       </ul>
 
-      <div>
-        <Button
-          firstBtn="Login"
-          secondBtn="Register"
-          firstHref="/login"
-          secondHref="/register"
-          className="hidden md:flex"
+      {/* DESKTOP: If user NOT logged in → show Login/Register */}
+      {!user && (
+        <div>
+          <Button
+            firstBtn="Login"
+            secondBtn="Register"
+            firstHref="/login"
+            secondHref="/register"
+            className="hidden md:flex"
+          />
+        </div>
+      )}
+
+      {/* DESKTOP: If logged in → Show logout */}
+      {user && (
+        <PrimaryButton
+          text="Logout"
+          onClick={logout}
+          className="hidden md:flex px-4 py-2 mx-4"
         />
-      </div>
+      )}
 
       {/* Right: Hamburger menu (Mobile only) */}
-      <div className="flex-shrink-0  flex  justify-end md:hidden">
+      <div className="flex-shrink-0 flex justify-end md:hidden">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="flex flex-col gap-1.5 mr-4"
@@ -75,10 +95,10 @@ const Navbar = () => {
       <div
         ref={menuRef}
         className={`fixed top-0 left-0 h-screen w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out
-    ${isOpen ? "translate-x-0" : "-translate-x-full"}
-  md:hidden z-20 `}
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}
+        md:hidden z-20`}
       >
-        {/* Close button inside menu */}
+        {/* Close button */}
         <button
           onClick={() => setIsOpen(false)}
           className="absolute top-4 right-4 text-xl font-bold"
@@ -87,7 +107,7 @@ const Navbar = () => {
         </button>
 
         {/* Menu items */}
-        <ul className="flex flex-col items-start gap-6 mt-16 ml-6 list-none">
+        <ul className="flex flex-col gap-6 mt-16 list-none px-4">
           <Link
             href="/form/step-1"
             className="hover:text-purple-600 cursor-pointer"
@@ -95,7 +115,6 @@ const Navbar = () => {
           >
             <li>Submit Price</li>
           </Link>
-
           <Link
             href="/coming-soon"
             className="hover:text-purple-600 cursor-pointer"
@@ -103,7 +122,6 @@ const Navbar = () => {
           >
             <li>Top Sellers</li>
           </Link>
-
           <Link
             href="/find-price"
             className="hover:text-purple-600 cursor-pointer"
@@ -111,17 +129,31 @@ const Navbar = () => {
           >
             <li>Find Prices</li>
           </Link>
-          <Button
-            firstBtn="Login"
-            secondBtn="Register"
-            firstHref="/login"
-            secondHref="/register"
-            onClick={() => setIsOpen(false)}
-          />
+
+          {!user && (
+            <Button
+              firstBtn="Login"
+              secondBtn="Register"
+              firstHref="/login"
+              secondHref="/register"
+              onClick={() => setIsOpen(false)}
+            />
+          )}
+
+          {user && (
+            <PrimaryButton
+              text="Logout"
+              className="mt-6 w-full"
+              onClick={() => {
+                logout();
+                setIsOpen(false);
+              }}
+            />
+          )}
         </ul>
       </div>
 
-      {/* Dark overlay behind the menu */}
+      {/* Dark overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-opacity-40 md:hidden"
@@ -131,4 +163,5 @@ const Navbar = () => {
     </nav>
   );
 };
+
 export default Navbar;

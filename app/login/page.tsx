@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import Input from "../form/Input";
 import Image from "next/image";
 import Button from "../components/ui/Button";
 import Link from "next/link";
 import api from "../utils/api";
+import { AuthContext } from "../context/AuthContext";
 
 const SignIn = () => {
   const router = useRouter();
@@ -24,6 +25,8 @@ const SignIn = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const { login } = useContext(AuthContext);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -37,6 +40,7 @@ const SignIn = () => {
       });
 
       console.log("Login response:", response.data);
+      login(response.data.user);
 
       setSuccess("Login successful!");
 
