@@ -1,8 +1,6 @@
 "use client";
-
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-
 type ButtonProps = {
   firstBtn: React.ReactNode;
   secondBtn: React.ReactNode;
@@ -17,42 +15,52 @@ type ButtonProps = {
 const Button = ({
   firstBtn,
   secondBtn,
-  className = "",
+  className,
   secondHref,
   firstHref,
   src,
-  type = "button",
+  type,
   onClick,
 }: ButtonProps) => {
   const router = useRouter();
 
-  const handleClick = (href?: string) => {
+  // handle click for first button
+  const handleFirstClick = () => {
     if (onClick) onClick();
-    if (href) router.push(href);
+    if (firstHref) router.push(firstHref);
   };
 
+  // handle click for second button
+  const handleSecondClick = () => {
+    if (onClick) onClick();
+    if (secondHref) router.push(secondHref);
+  };
   return (
-    <div className={`btns flex flex-col gap-4 w-full ${className}`}>
-      {/* First Button */}
+    <div className={`btns ${className}`}>
       <button
+        className={`btn-primary ${className}`}
+        onClick={handleFirstClick}
         type={type}
-        onClick={() => handleClick(firstHref)}
-        className="btn-primary w-full flex justify-center items-center text-center"
       >
         {firstBtn}
       </button>
 
-      {/* Second Button */}
       <button
-        type={type}
-        onClick={() => handleClick(secondHref)}
-        className="find-price btn-secondary w-full flex justify-center items-center gap-2 text-center"
+        className={`find-price btn-secondary flex flex-row justify-center items-center gap-2   ${className}`}
+        onClick={handleSecondClick}
       >
-        {src && <Image src={src} alt="icon" width={24} height={24} />}
+        {src && (
+          <Image
+            src={src}
+            alt="icon"
+            width={24}
+            height={24}
+            className="inline-block"
+          />
+        )}
         <span>{secondBtn}</span>
       </button>
     </div>
   );
 };
-
 export default Button;
