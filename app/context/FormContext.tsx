@@ -13,7 +13,6 @@ type ContextType = {
   data: Commodity;
   update: (fields: Partial<Commodity>) => void;
   clear: () => void;
-  saveToDB: () => Promise<void>;
 };
 
 const defaultData: Commodity = {
