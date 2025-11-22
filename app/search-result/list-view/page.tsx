@@ -22,7 +22,7 @@ function ListViewContent() {
 
   const commodityName = searchParams.get("commodityName") || "";
   const location = searchParams.get("location") || "";
-    const market = searchParams.get("market") || "";
+  const market = searchParams.get("market") || "";
   const sortRecent = searchParams.get("sortRecent") || "recent";
   const sortPrice = searchParams.get("sortPrice") || "";
 
@@ -135,7 +135,7 @@ function ListViewContent() {
               <span>&nbsp;</span>
             )}
             <p className="submission-value">{item.sellerName}</p>
-            <p className="submission-value">{item.phone}</p>
+            <p className="submission-value">{item.sellerPhoneNumber}</p>
             <p className="submission-value">{item.location}</p>
             <p className="submission-value">
               ₦{parsePrice(item.price).toLocaleString()}
@@ -193,7 +193,7 @@ function ListViewContent() {
                   </p>
                 </div>
                 <p className="text-xs text-[#757575] font-medium">
-                  Submitted:{" "}
+                  Submitted: by {"John Doe"} on
                   {item.createdAt
                     ? new Date(item.createdAt).toLocaleDateString()
                     : "N/A"}

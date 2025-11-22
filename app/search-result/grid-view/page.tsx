@@ -34,7 +34,6 @@ function GridViewContent() {
   const normalize = (str: string | undefined | null) =>
     (str || "").trim().toLowerCase().replace(/\s+/g, " ");
 
-  // Fetch API data
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -154,7 +153,9 @@ function GridViewContent() {
                 </div>
                 <div>
                   <p className="submission-key">Seller&apos;s Phone number</p>
-                  <p className="submission-value">{item.phone || "N/A"}</p>
+                  <p className="submission-value">
+                    {item.sellerPhoneNumber || "N/A"}
+                  </p>
                 </div>
               </div>
 

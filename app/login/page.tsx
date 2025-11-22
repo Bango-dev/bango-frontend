@@ -20,12 +20,12 @@ const SignIn = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const { login } = useContext(AuthContext);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
-  const { login } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,7 +40,19 @@ const SignIn = () => {
       });
 
       console.log("Login response:", response.data);
-      login(response.data.user);
+
+      console.log(response.data.access_token);
+
+      // Extract user and token from response
+      const { user, access_token } = response.data;
+
+      if (!access_token) {
+        throw new Error("No access token received from server");
+      }
+
+      // Pass both user and token to login function
+      console.log(access_token);
+      login(user, access_token);
 
       setSuccess("Login successful!");
 

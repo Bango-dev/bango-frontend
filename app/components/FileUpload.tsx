@@ -8,9 +8,9 @@ type Props = {
   onFileSelect: (fileBase64: string | null) => void;
   initial?: string | File | null;
   readonly?: boolean;
-  error?: string | null; // new prop to show validation errors
-  label?: string; // customizable label
-  description?: string; // optional description
+  error?: string | null;
+  label?: string;
+  description?: string;
 };
 
 export default function FileUpload({
@@ -23,7 +23,6 @@ export default function FileUpload({
 }: Props) {
   const [preview, setPreview] = useState<string | null>(null);
 
-  // Convert File -> base64
   const fileToBase64 = (file: File) =>
     new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
@@ -32,7 +31,6 @@ export default function FileUpload({
       reader.readAsDataURL(file);
     });
 
-  // Initialize preview from `initial`
   useEffect(() => {
     let mounted = true;
     (async () => {

@@ -9,7 +9,6 @@ const DisplayIndicator = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Convert current search params back into a query string
   const queryString = searchParams.toString();
   const querySuffix = queryString ? `?${queryString}` : "";
 

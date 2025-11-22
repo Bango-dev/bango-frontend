@@ -9,6 +9,6 @@ export type Commodity = {
   photoUrl?: string;
   purchaseDate?: string;
   sellerName: string;
-  phone: string;
+  sellerPhoneNumber: string;
   createdAt: string;
 };
