@@ -1,6 +1,5 @@
 "use client";
 
-
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
@@ -15,7 +14,7 @@ const MobileFullDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState<Commodity>(null);
   const [loading, setLoading] = useState(true);
-    const pathname = usePathname();
+  const pathname = usePathname();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,8 +42,6 @@ const MobileFullDetails = () => {
   if (loading) return <div className="p-6">Loading...</div>;
 
   if (!product) return <div className="p-6">Submission not found.</div>;
-
-
 
   const handleCopy = async () => {
     const fullUrl = `${window.location.origin}${pathname}`;
@@ -114,7 +111,9 @@ const MobileFullDetails = () => {
             </div>
             <div>
               <p className="submission-key">Seller’s Phone Number</p>
-              <p className="submission-value">{product.phone || "—"}</p>
+              <p className="submission-value">
+                {product.sellerPhoneNumber || "—"}
+              </p>
             </div>
           </div>
 
