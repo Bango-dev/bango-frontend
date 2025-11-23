@@ -108,7 +108,7 @@
 
 .animate-fade-sequence {
   animation-name: fade-sequence;
-  animation-duration: 9s; /* Total duration for one full cycle */
+  animation-duration: 14s; /* Total duration for one full cycle */
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
   /* Keep images hidden initially until their turn comes */
