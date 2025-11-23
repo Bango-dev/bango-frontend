@@ -33,15 +33,17 @@ const Navbar = () => {
 
   return (
     <nav className="w-full flex items-center justify-between bg-[var(--color-secondary)] py-4 cursor-pointer">
-      <div>
-        <Image
-          className="pl-4"
-          src="/images/navbar/navbar-logo.svg"
-          alt="The logo at the navigation bar"
-          width={153}
-          height={32}
-        />
-      </div>
+      <Link href="/" >
+        <div>
+          <Image
+            className="pl-4"
+            src="/images/navbar/navbar-logo.svg"
+            alt="The logo at the navigation bar"
+            width={153}
+            height={32}
+          />
+        </div>
+      </Link>
 
       <ul className="hidden md:flex list-none">
         <Link href="/form/step-1" className="nav-link">
