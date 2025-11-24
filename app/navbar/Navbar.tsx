@@ -2,10 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import Button from "../../app/components/ui/Button";
+import Button from "../components/ui/Button";
 import { useState, useRef, useEffect, useContext } from "react";
-import { AuthContext } from "../../app/context/AuthContext";
-import PrimaryButton from "../../app/components/ui/PrimaryButton";
+import { AuthContext } from "../context/AuthContext";
+import PrimaryButton from "../components/ui/PrimaryButton";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,7 +33,7 @@ const Navbar = () => {
 
   return (
     <nav className="w-full flex items-center justify-between bg-[var(--color-secondary)] py-4 cursor-pointer">
-      <Link href="/" >
+      <Link href="/">
         <div>
           <Image
             className="pl-4"

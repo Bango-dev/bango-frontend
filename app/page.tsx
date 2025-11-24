@@ -1,19 +1,11 @@
-import Features from "../landing-page/features/Features";
-import SubmitPrice from "../landing-page/submit-price/SubmitPrice";
-import Hero from "../landing-page/hero/Hero";
-import HowToUse from "../landing-page/how-to-use/HowToUse";
-import WhatToExpect from "../landing-page/what-to-expect/WhatToExpect";
-import Footer from "../landing-page/footer/Footer";
+import LandingPage from "../landing-page/LandingPage";
+import Footer from "./footer/Footer";
 
 export default function Home() {
   return (
     <>
-      <Hero />
-      <HowToUse />
-      <WhatToExpect />
-      <Features />
-      <SubmitPrice />
+      <LandingPage />
       <Footer />
-    </>
+      </>
   );
 }

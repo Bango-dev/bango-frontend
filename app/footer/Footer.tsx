@@ -15,7 +15,7 @@ const Footer = () => {
           <li>Contact Us</li>
         </Link>
         <Link href="/coming-soon" className="nav-link">
-          <li>Download app (Comming Soon)</li>
+          <li>Download app (Coming Soon)</li>
         </Link>
       </ul>
       <div className="my-10">

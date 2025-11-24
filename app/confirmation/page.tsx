@@ -21,7 +21,7 @@ const Confirmation = () => {
       <Button
         firstBtn="Back to Home"
         secondBtn="Submit a New Price"
-        className="mt-6"
+        className="mt-6 h-0 "
         firstHref="/"
         secondHref="/form/step-1"
       />
