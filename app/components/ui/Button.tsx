@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+
 type ButtonProps = {
   firstBtn: React.ReactNode;
   secondBtn: React.ReactNode;
@@ -24,17 +25,16 @@ const Button = ({
 }: ButtonProps) => {
   const router = useRouter();
 
-  // handle click for first button
   const handleFirstClick = () => {
     if (onClick) onClick();
     if (firstHref) router.push(firstHref);
   };
 
-  // handle click for second button
   const handleSecondClick = () => {
     if (onClick) onClick();
     if (secondHref) router.push(secondHref);
   };
+
   return (
     <div className={`btns ${className}`}>
       <button
@@ -46,7 +46,7 @@ const Button = ({
       </button>
 
       <button
-        className={`find-price btn-secondary flex flex-row justify-center items-center gap-2   ${className}`}
+        className="find-price btn-secondary flex flex-row justify-center items-center gap-2"
         onClick={handleSecondClick}
       >
         {src && (
@@ -63,4 +63,5 @@ const Button = ({
     </div>
   );
 };
+
 export default Button;

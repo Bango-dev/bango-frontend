@@ -119,7 +119,7 @@ const SignUp = () => {
         confirmPassword: "",
       });
 
-      setTimeout(() => router.push("/sign-in"), 2500);
+      setTimeout(() => router.push("/login"), 2500);
     } catch (err) {
       console.error("Signup error:", err);
       setError(err.message || "Signup failed. Please try again.");

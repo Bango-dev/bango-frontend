@@ -157,7 +157,7 @@ const SignIn = () => {
         <p className="text-center text-sm text-[#757575] mt-4">
           Don&apos;t have an account?
           <Link
-            href="/sign-up"
+            href="/register"
             className="ml-2 text-[var(--color-primary)] font-bold"
           >
             Sign up
