@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { ImCancelCircle } from "react-icons/im";
 import { LuUpload } from "react-icons/lu";
-import heic2any from "heic2any";
 
 type Props = {
   onFileSelect: (fileBase64: string | null) => void;
@@ -30,6 +29,7 @@ export default function FileUpload({
 
     // Convert HEIC/HEIF to JPEG
     if (file.type === "image/heic" || file.type === "image/heif") {
+      const heic2any = (await import("heic2any")).default;
       processedBlob = (await heic2any({
         blob: file,
         toType: "image/jpeg",
