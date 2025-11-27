@@ -11,7 +11,7 @@ export interface Commodity {
   date: string;
   sellerName: string;
   phone: string;
-  image?: string; // we’ll store Base64 string for simulation
+  image?: Blob | string | null;
 }
 
 export class MyDatabase extends Dexie {

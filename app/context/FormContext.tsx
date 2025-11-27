@@ -24,7 +24,7 @@ const defaultData: Commodity = {
   date: "",
   sellerName: "",
   phone: "",
-  image: "",
+  image: null,
 };
 
 const FormContext = createContext<ContextType | undefined>(undefined);

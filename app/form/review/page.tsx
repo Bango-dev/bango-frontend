@@ -20,9 +20,19 @@ const Review = () => {
       let imageUrl = null;
 
       if (data.image) {
-        const res = await fetch(data.image as string);
-        const blob = await res.blob();
-        const file = new File([blob], "upload.jpg", { type: blob.type });
+        let file: File;
+
+        if (data.image instanceof Blob) {
+          // image is a Blob stored in Dexie / state
+          file = new File([data.image], "upload.jpg", {
+            type: data.image.type,
+          });
+        } else {
+          // image is a URL string (from Cloudinary or somewhere else)
+          const res = await fetch(data.image);
+          const blob = await res.blob();
+          file = new File([blob], "upload.jpg", { type: blob.type });
+        }
 
         const upload = await uploadToCloudinary(file);
         imageUrl = upload.secure_url;
@@ -42,7 +52,7 @@ const Review = () => {
 
       await api.post("/submissions", payload);
       router.push("/confirmation");
-            clear();
+      clear();
     } catch (error) {
       console.error(error);
       alert("Something went wrong. Try again.");
@@ -74,7 +84,11 @@ const Review = () => {
           {data.image ? (
             <div className="mb-4 rounded-md overflow-hidden">
               <img
-                src={data.image as string}
+                src={
+                  data.image instanceof Blob
+                    ? URL.createObjectURL(data.image)
+                    : (data.image as string)
+                }
                 alt={data.commodityName || "Commodity image"}
                 className="object-cover"
                 width={504}
