@@ -143,7 +143,8 @@ function GridViewContent() {
               </div>
 
               <p className="text-base text-[#757575] font-medium">
-                Submitted: {new Date(item.createdAt).toLocaleDateString()}
+                Submitted by {item.BuyerName} on{" "}
+                {new Date(item.createdAt).toLocaleDateString()}
               </p>
 
               <div className=" items-center justify-between mb-4 sm:flex hidden">
@@ -246,7 +247,8 @@ function GridViewContent() {
                   </p>
                 </div>
                 <p className="text-xs text-[#757575] font-medium">
-                  Submitted: {new Date(item.createdAt).toLocaleDateString()}
+                  Submitted by {item.BuyerName} on{" "}
+                  {new Date(item.createdAt).toLocaleDateString()}
                 </p>
                 <p className="text-xs text-[#757575] font-medium">
                   {item.location} • {item.market}

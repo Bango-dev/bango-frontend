@@ -101,7 +101,8 @@ const MobileFullDetails = () => {
 
           {/* Dates */}
           <p className="text-base text-[#757575] font-medium">
-            Submitted: {new Date(product.createdAt).toLocaleDateString()}
+            Submitted by {product.BuyerName} on{" "}
+            {new Date(product.createdAt).toLocaleDateString()}
           </p>
 
           <div className="items-center justify-between mb-4 flex w-full">

@@ -23,7 +23,7 @@ const SignUp = () => {
 
   const [formData, setFormData] = useState({
     email: "",
-    phone: "",
+    firstName: "",
     password: "",
     confirmPassword: "",
   });
@@ -31,7 +31,7 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessages, setErrorMessages] = useState({
     email: "",
-    phone: "",
+    firstName: "",
     password: "",
     confirmPassword: "",
   });
@@ -43,24 +43,21 @@ const SignUp = () => {
     let isValid = true;
     const errors = {
       email: "",
-      phone: "",
+      firstName: "",
       password: "",
       confirmPassword: "",
     };
+
+    if (!formData.firstName.trim()) {
+      errors.firstName = "First name is required.";
+      isValid = false;
+    }
 
     if (!formData.email.trim()) {
       errors.email = "Email is required.";
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = "Please enter a valid email address.";
-      isValid = false;
-    }
-
-    if (!formData.phone.trim()) {
-      errors.phone = "Phone number is required.";
-      isValid = false;
-    } else if (!/^\d{10,15}$/.test(formData.phone)) {
-      errors.phone = "Please enter a valid phone number.";
       isValid = false;
     }
 
@@ -87,7 +84,7 @@ const SignUp = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrorMessages((prev) => ({ ...prev, [name]: "" })); // clear field-specific error as user types
+    setErrorMessages((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleSubmit = async (e) => {
@@ -100,12 +97,9 @@ const SignUp = () => {
     setLoading(true);
 
     try {
-      console.log("TEST");
-
       const response = await api.post("/auth/register", {
-        firstName: "BangoUser",
+        firstName: formData.firstName,
         email: formData.email,
-        phoneNumber: "+2348012345674",
         password: formData.password,
       });
 
@@ -114,7 +108,7 @@ const SignUp = () => {
       setSuccess("Signup successful!");
       setFormData({
         email: "",
-        phone: "",
+        firstName: "",
         password: "",
         confirmPassword: "",
       });
@@ -122,7 +116,9 @@ const SignUp = () => {
       setTimeout(() => router.push("/login"), 2500);
     } catch (err) {
       console.error("Signup error:", err);
-      setError(err.message || "Signup failed. Please try again.");
+      setError(
+        err.response?.data?.message || "Signup failed. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -146,6 +142,22 @@ const SignUp = () => {
           Crowdsourced prices for all your needs
         </h3>
 
+        {/* FIRST NAME */}
+        <Input
+          label="First Name"
+          type="text"
+          placeholder="John"
+          name="firstName"
+          required
+          value={formData.firstName}
+          onChange={handleChange}
+        />
+        {errorMessages.firstName && (
+          <p className="text-red-500 text-sm mt-[-10px] mb-2">
+            {errorMessages.firstName}
+          </p>
+        )}
+
         {/* EMAIL */}
         <Input
           label="Email"
@@ -163,28 +175,11 @@ const SignUp = () => {
           </p>
         )}
 
-        {/* PHONE */}
-        <Input
-          label="Phone Number"
-          type="tel"
-          placeholder="08134534543"
-          name="phone"
-          autoComplete="tel"
-          required
-          value={formData.phone}
-          onChange={handleChange}
-        />
-        {errorMessages.phone && (
-          <p className="text-red-500 text-sm mt-[-10px] mb-2">
-            {errorMessages.phone}
-          </p>
-        )}
-
         {/* PASSWORD */}
         <Input
           label="Password"
           type="password"
-          placeholder="XXXXXXXXX"
+          placeholder="********"
           name="password"
           required
           value={formData.password}
@@ -200,7 +195,7 @@ const SignUp = () => {
         <Input
           label="Confirm Password"
           type="password"
-          placeholder="XXXXXXXXX"
+          placeholder="********"
           name="confirmPassword"
           required
           value={formData.confirmPassword}
@@ -213,42 +208,13 @@ const SignUp = () => {
         )}
 
         <Button
-          firstBtn={
-            loading ? (
-              <>
-                <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Signing Up...
-              </>
-            ) : (
-              "Sign Up"
-            )
-          }
+          firstBtn={loading ? "Signing up..." : "Sign Up"}
           secondBtn="Sign Up with Google"
           className="px-0 w-full flex flex-col"
           src="/images/on-boarding/google-icon.svg"
           type="submit"
         />
 
-        {/*  General feedback messages */}
         {error && <p className="text-red-500 text-center text-sm">{error}</p>}
         {success && (
           <p className="text-green-600 text-center text-sm">{success}</p>

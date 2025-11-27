@@ -193,7 +193,7 @@ function ListViewContent() {
                   </p>
                 </div>
                 <p className="text-xs text-[#757575] font-medium">
-                  Submitted: by {"John Doe"} on
+                  Submitted by {item.BuyerName} on{" "}
                   {item.createdAt
                     ? new Date(item.createdAt).toLocaleDateString()
                     : "N/A"}

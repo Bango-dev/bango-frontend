@@ -8,6 +8,7 @@ export type Commodity = {
   market: string;
   photoUrl?: string;
   purchaseDate?: string;
+  BuyerName: string;
   sellerName: string;
   sellerPhoneNumber: string;
   createdAt: string;
