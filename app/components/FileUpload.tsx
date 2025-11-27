@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ImCancelCircle } from "react-icons/im";
 import { LuUpload } from "react-icons/lu";
 
@@ -23,17 +23,18 @@ export default function FileUpload({
 }: Props) {
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fileToBase64 = async (file: File) => {
     let processedBlob: Blob = file;
+    const { isHeic, heicTo } = await import("heic-to");
 
-    // Convert HEIC/HEIF to JPEG
-    if (file.type === "image/heic" || file.type === "image/heif") {
-      const heic2any = (await import("heic2any")).default;
-      processedBlob = (await heic2any({
+    if (await isHeic(file)) {
+      processedBlob = await heicTo({
         blob: file,
-        toType: "image/jpeg",
-      })) as Blob;
+        type: "image/jpeg",
+        quality: 0.8,
+      });
     }
 
     return new Promise<string>((resolve, reject) => {
@@ -48,7 +49,6 @@ export default function FileUpload({
     let mounted = true;
     (async () => {
       if (!initial) return setPreview(null);
-
       if (typeof initial === "string") return setPreview(initial);
 
       if (initial instanceof File) {
@@ -63,7 +63,6 @@ export default function FileUpload({
         }
       }
     })();
-
     return () => {
       mounted = false;
     };
@@ -76,7 +75,6 @@ export default function FileUpload({
       onFileSelect(null);
       return;
     }
-
     try {
       setLoading(true);
       const base64 = await fileToBase64(file);
@@ -93,6 +91,7 @@ export default function FileUpload({
   const handleRemove = () => {
     setPreview(null);
     onFileSelect(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   return (
@@ -108,13 +107,38 @@ export default function FileUpload({
         <p className="sm:text-sm text-xs text-[#757575] mb-1">{description}</p>
       )}
 
+      {/* Preview */}
+      {preview && (
+        <div className="relative w-full h-48 rounded-md overflow-hidden">
+          <img
+            src={preview}
+            alt="preview"
+            className="w-full h-full object-cover rounded-md"
+          />
+          {!readonly && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleRemove();
+              }}
+              className="absolute top-2 right-2 bg-white rounded-full shadow p-1 hover:bg-gray-100 cursor-pointer"
+              aria-label="Remove image"
+            >
+              <ImCancelCircle className="w-4 h-4 text-gray-600" />
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Upload box */}
-      {!readonly && (
+      {!readonly && !preview && (
         <label
-          className={`flex flex-col items-center justify-center border-2 border-dotted rounded-md h-48 w-full cursor-pointer transition relative
-          ${
-            error ? "border-red-500" : "border-gray-400 hover:border-gray-600"
-          }`}
+          className={`flex flex-col items-center justify-center border-2 border-dotted rounded-md h-48 w-full cursor-pointer transition
+            ${
+              error ? "border-red-500" : "border-gray-400 hover:border-gray-600"
+            }`}
         >
           {loading ? (
             <div className="flex flex-col items-center justify-center w-full h-full gap-2">
@@ -123,26 +147,6 @@ export default function FileUpload({
                 style={{ borderTopColor: "var(--color-primary)" }}
               ></div>
               <span className="text-gray-500 text-sm">Uploading image...</span>
-            </div>
-          ) : preview ? (
-            <div className="relative w-full h-full">
-              <img
-                src={preview}
-                alt="preview"
-                className="w-full h-full object-cover rounded-md"
-              />
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleRemove();
-                }}
-                className="absolute top-2 right-2 bg-white rounded-full shadow p-1 hover:bg-gray-100"
-                aria-label="Remove image"
-              >
-                <ImCancelCircle className="w-4 h-4 text-gray-600" />
-              </button>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2 text-gray-500">
@@ -155,19 +159,9 @@ export default function FileUpload({
             accept="image/*"
             onChange={handleFileChange}
             className="hidden"
+            ref={fileInputRef}
           />
         </label>
-      )}
-
-      {/* readonly mode */}
-      {readonly && preview && (
-        <div className="w-full rounded-md overflow-hidden">
-          <img
-            src={preview}
-            alt="preview"
-            className="w-full h-auto object-cover rounded-md"
-          />
-        </div>
       )}
 
       {/* Error message */}
