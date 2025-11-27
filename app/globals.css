@@ -3,7 +3,7 @@
 @layer base {
   :root {
     --color-primary: #4d3594;
-
+    --color-light: #b8aae2;
   }
 }
 
@@ -29,7 +29,7 @@
   }
 
   .btn-secondary {
-    @apply bg-white  px-6 py-3  rounded-sm w-full sm:w-auto  hover:bg-[#c6d3f5]  transition-colors duration-200 ;
+    @apply bg-white px-6 py-3 rounded-sm w-full sm:w-auto hover:bg-[#c6d3f5] transition-colors duration-200 border border-[#c3c6d4];
   }
 
   .card {
@@ -37,7 +37,7 @@
   }
 
   .features-1-card {
-    @apply p-5 rounded-lg bg-[#F2F2F2] xl:flex-row flex-col  flex xl:w-1/2 m-5  w-xs  ;
+    @apply p-5 rounded-lg bg-[#F2F2F2] xl:flex-row flex-col  flex xl:w-1/2 m-5  w-xs;
   }
 
   .features-2-card {
@@ -79,7 +79,7 @@
   }
 
   .card-heading {
-    @apply  md:text-2xl text-xl font-semibold mt-5 mb-2.5;
+    @apply md:text-2xl text-xl font-semibold mt-5 mb-2.5;
   }
 
   .card-text {
@@ -91,67 +91,84 @@
   }
 
   .submission-key {
-    @apply font-semibold text-[#757575] lg:text-lg md:text-base text-sm ;
+    @apply font-semibold text-[#757575] lg:text-lg md:text-base text-sm;
   }
 
   .submission-value {
-    @apply font-medium text-[#757575] lg:text-base md:text-sm text-xs ;
+    @apply font-medium text-[#757575] lg:text-base md:text-sm text-xs;
   }
 
   @keyframes fade-sequence {
-  0% { opacity: 0; }
-  /* Animation goes from 0 to 1, then back to 0 for each image */
-  10% { opacity: 1; }
-  /* At 100%, the image must be invisible to loop correctly */
-  100% { opacity: 0; }
+    0% {
+      opacity: 0;
+    }
+    /* Animation goes from 0 to 1, then back to 0 for each image */
+    10% {
+      opacity: 1;
+    }
+    /* At 100%, the image must be invisible to loop correctly */
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .animate-fade-sequence {
+    animation-name: fade-sequence;
+    animation-duration: 14s; /* Total duration for one full cycle */
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    /* Keep images hidden initially until their turn comes */
+    opacity: 0;
+  }
+
+  /* Stagger the start times */
+  .img-1 {
+    animation-delay: 0s;
+  }
+  .img-2 {
+    animation-delay: 1s;
+  }
+  .img-3 {
+    animation-delay: 2s;
+  }
+  .img-4 {
+    animation-delay: 3s;
+  }
+  .img-5 {
+    animation-delay: 4s;
+  }
+  .img-6 {
+    animation-delay: 5s;
+  }
+  .img-7 {
+    animation-delay: 6s;
+  }
+  .img-8 {
+    animation-delay: 7s;
+  }
+  .img-9 {
+    animation-delay: 8s;
+  }
 }
-
-.animate-fade-sequence {
-  animation-name: fade-sequence;
-  animation-duration: 14s; /* Total duration for one full cycle */
-  animation-iteration-count: infinite;
-  animation-timing-function: ease-in-out;
-  /* Keep images hidden initially until their turn comes */
-  opacity: 0;
-}
-
-/* Stagger the start times */
-.img-1 { animation-delay: 0s; }
-.img-2 { animation-delay: 1s; }
-.img-3 { animation-delay: 2s; }
-.img-4 { animation-delay: 3s; }
-.img-5 { animation-delay: 4s; }
-.img-6 { animation-delay: 5s; }
-.img-7 { animation-delay: 6s; }
-.img-8 { animation-delay: 7s; }
-.img-9 { animation-delay: 8s; }
-
-
-}
-
-
-
-
-
 
 body {
   font-family: var(--font-poppins), sans-serif;
 }
-span,p {
+span,
+p {
   font-family: var(--font-figtree), sans-serif;
 }
 h1 {
   font-family: var(--font-lexend), sans-serif;
 }
 
-
 nav {
   border-bottom: 1px solid var(--Border-Default-Default, #d9d9d9);
 }
 
-.find-price {
+/* .find-price {
   border: 1px solid var(--ui-border-color, #c3c6d4);
-}
+} */
 
 .card-border {
   border: 1px solid var(--Border-Default-Default, #d9d9d9);

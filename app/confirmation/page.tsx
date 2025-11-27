@@ -1,9 +1,14 @@
+"use client";
 import Image from "next/image";
-import Button from "../components/ui/Button";
+import PrimaryButton from "../components/ui/PrimaryButton";
+import SecondaryButton from "../components/ui/SecondaryButton";
+import { useRouter } from "next/navigation";
 
 const Confirmation = () => {
+  const router = useRouter();
+
   return (
-    <section className="center h-screen  ">
+    <section className="center h-screen">
       <div className="mb-6">
         <Image
           src="/images/confirmation/confirmation-illustration.svg"
@@ -18,14 +23,20 @@ const Confirmation = () => {
           Thanks for sharing! Your data helps others plan and save.
         </h4>
       </div>
-      <Button
-        firstBtn="Back to Home"
-        secondBtn="Submit a New Price"
-        className=""
-        firstHref="/"
-        secondHref="/form/step-1"
-      />
+      <div className="flex flex-col sm:flex-row gap-4 w-full px-4 justify-center">
+        <PrimaryButton
+          text="Back to Home"
+          onClick={() => router.push("/")}
+          className="sm:w-auto"
+        />
+        <SecondaryButton
+          text="Submit a New Price"
+          onClick={() => router.push("/form/step-1")}
+          className="sm:w-auto"
+        />
+      </div>
     </section>
   );
 };
+
 export default Confirmation;
