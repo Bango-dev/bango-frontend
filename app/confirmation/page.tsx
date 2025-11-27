@@ -14,14 +14,14 @@ const Confirmation = () => {
       </div>
       <div>
         <h3 className="sub-heading">Awesome! You Just Bango&apos;d!</h3>
-        <h4 className="text-center sm:text-lg text-base text-[#757575] mt-2">
+        <h4 className="text-center sm:text-lg text-base text-[#757575] mt-2 py-4">
           Thanks for sharing! Your data helps others plan and save.
         </h4>
       </div>
       <Button
         firstBtn="Back to Home"
         secondBtn="Submit a New Price"
-        className="mt-6 h-0 "
+        className=""
         firstHref="/"
         secondHref="/form/step-1"
       />
