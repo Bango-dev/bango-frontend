@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import useAveragePrices from "../../components/utils/useAveragePrice";
 import api from "../../utils/api";
 
+
 const ITEMS_PER_PAGE = 10;
 
 function ListViewContent() {
@@ -100,6 +101,31 @@ function ListViewContent() {
           <DisplayIndicator />
         </div>
       </div>
+
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <svg
+            className="animate-spin h-15 w-15 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            ></path>
+          </svg>
+        </div>
+      )}
 
       {/* Table Header */}
       <div className="grid-cols-8 hidden lg:grid">
@@ -198,6 +224,9 @@ function ListViewContent() {
                     ? new Date(item.createdAt).toLocaleDateString()
                     : "N/A"}
                 </p>
+                <p className="text-xs text-[#757575] font-medium">
+                  {item.location} • {item.market}
+                </p>
               </div>
             </div>
             <div className="w-full mt-4">
@@ -245,7 +274,32 @@ function ListViewContent() {
 
 export default function ListView() {
   return (
-    <Suspense fallback={<div className="p-5 text-center">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <svg
+            className="animate-spin h-15 w-15 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            ></path>
+          </svg>
+        </div>
+      }
+    >
       <ListViewContent />
     </Suspense>
   );

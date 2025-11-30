@@ -7,11 +7,11 @@ export interface Commodity {
   price: string;
   quantity: string;
   location: string;
-  marketName: string;
+  market: string;
   date: string;
   sellerName: string;
-  phone: string;
-  image?: string; // we’ll store Base64 string for simulation
+  sellerPhoneNumber: string;
+  image?: string;
 }
 
 export class MyDatabase extends Dexie {

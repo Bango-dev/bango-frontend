@@ -1,4 +1,5 @@
 "use client";
+import { MdEdit, MdSave, MdCancel } from "react-icons/md";
 import Image from "next/image";
 import Link from "next/link";
 import Input from "../Input";
@@ -8,13 +9,69 @@ import { useRouter } from "next/navigation";
 import api from "../../utils/api";
 import { uploadToCloudinary } from "../../utils/upload-to-cloudinary";
 import { useState } from "react";
+import LocationSelect from "../../components/LocationSelect";
+import SuggestionInput from "../../components/ui/SuggestionInput";
+// import type {Commodity} from "../../lib/types/commodities"
 
 const Review = () => {
-  const { data, clear } = useFormData();
+  const { data, update, clear } = useFormData();
   const router = useRouter();
   const [loading, setLoading] = useState(false); //  loading state
+  const [isEditing, setIsEditing] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [originalData, setOriginalData] = useState(null);
+
+
+  // Price formatting
+  const formatNumber = (value: string) => {
+    const numericValue = value.replace(/\D/g, "");
+    return numericValue ? Number(numericValue).toLocaleString() : "";
+  };
+
+
+
+  const clearError = (field: string) => {
+  setErrors((prev) => {
+    const updated = { ...prev };
+    delete updated[field];
+    return updated;
+  });
+};
+
+
+  const validate = () => {
+    const newErrors: { [key: string]: string } = {};
+    if (!data.commodityName)
+      newErrors.commodityName = "Commodity name is required.";
+    if (!data.price) newErrors.price = "Price is required.";
+    else if (
+      isNaN(Number(data.price.replace(/,/g, ""))) ||
+      Number(data.price.replace(/,/g, "")) <= 0
+    )
+      newErrors.price = "Enter a valid price.";
+    if (!data.quantity) newErrors.quantity = "Quantity is required.";
+    if (!data.sellerName) newErrors.sellerName = "Seller's Name is required.";
+      const phoneRegex = /^0\d{10}$/;
+      if (!data.sellerPhoneNumber)
+        newErrors.phone = "Phone number is required.";
+      else if (!phoneRegex.test(data.sellerPhoneNumber))
+        newErrors.phone =
+          "Enter a valid 11-digit phone number starting with 0.";
+    if (!data.location) newErrors.location = "Please select your location.";
+    if (!data.market) newErrors.marketName = "Market name is required.";
+    if (!data.date) newErrors.date = "Please select a date.";
+
+
+    // Auto-clear errors after 3 seconds
+    if (Object.keys(newErrors).length > 0) {
+      setTimeout(() => setErrors({}), 3000);
+    }
+
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async () => {
+     if (!validate()) return;
     setLoading(true); // start loading
     try {
       let imageUrl = null;
@@ -33,16 +90,16 @@ const Review = () => {
         price: data.price,
         quantity: data.quantity,
         location: data.location,
-        market: data.marketName,
+        market: data.market,
         photoUrl: imageUrl,
         purchaseDate: data.date,
-        sellerPhoneNumber: data.phone,
+        sellerPhoneNumber: data.sellerPhoneNumber,
         sellerName: data.sellerName,
       };
 
       await api.post("/submissions", payload);
       router.push("/confirmation");
-            clear();
+      clear();
     } catch (error) {
       console.error(error);
       alert("Something went wrong. Try again.");
@@ -54,7 +111,7 @@ const Review = () => {
   return (
     <div className="p-6 flex flex-col w-full">
       {/* Header */}
-      <div className="flex items-center mb-6 cursor-pointer gap-2">
+      <div className="flex items-center justify-between mb-6 cursor-pointer gap-2">
         <Link href="/form/step-2" className="flex items-center gap-2">
           <Image
             src="/images/form/arrow-left.svg"
@@ -66,6 +123,37 @@ const Review = () => {
             Review Submission
           </span>
         </Link>
+        {/* Edit / Save / Cancel buttons */}
+        {isEditing ? (
+          <div className="flex gap-2">
+            <MdSave
+              className="h-8 w-8 cursor-pointer"
+              onClick={() => {
+                setIsEditing(false);
+                setOriginalData(null); // clear backup
+              }}
+              title="Stop Editing"
+            />
+            <MdCancel
+              className="h-8 w-8 cursor-pointer"
+              onClick={() => {
+                update(originalData); // restore old values
+                setIsEditing(false);
+                setOriginalData(null); // clear backup
+              }}
+              title="Cancel"
+            />
+          </div>
+        ) : (
+          <MdEdit
+            className="h-8 w-8 cursor-pointer"
+            onClick={() => {
+              setOriginalData({ ...data }); // store a copy
+              setIsEditing(true);
+            }}
+            title="Edit Submission"
+          />
+        )}
       </div>
 
       <div className="flex md:flex-row flex-col items-center justify-center mx-auto gap-6">
@@ -89,74 +177,140 @@ const Review = () => {
         {/* Form */}
         <form className="form border-none shadow-none md:w-2xl w-full">
           <div className="flex gap-4 mb-4">
-            <Input
-              label="Name of Seller"
-              type="text"
-              value={data.sellerName}
-              className="flex-1 min-w-0"
-              labelClassName="text-base text-[#1E1E1E] font-normal"
-              readOnly
-            />
-            <Input
-              label="Seller’s Phone No"
-              type="text"
-              value={data.phone}
-              className="flex-1 min-w-0"
-              labelClassName="text-base text-[#1E1E1E] font-normal"
-              readOnly
-            />
+            <div className="flex-1 min-w-0">
+              <SuggestionInput
+                label="Seller's Name"
+                type="text"
+                placeholder="Wuse Market"
+                value={data.sellerName}
+                field="sellerName"
+                onChange={(val) => update({ sellerName: val })}
+                className="flex-1 min-w-0"
+                description="Where did you buy it?"
+                showError={!!errors.sellerName}
+                readOnly={!isEditing}
+                required
+              />
+              {errors.sellerName && (
+                <p className="text-red-500 text-sm">{errors.sellerName}</p>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <SuggestionInput
+                label="Seller’s Phone No"
+                type="tel"
+                placeholder="08000000000"
+                value={data.sellerPhoneNumber}
+                field="sellerPhoneNumber"
+                onChange={(val) => update({ sellerPhoneNumber: val })}
+                className="flex-1 min-w-0"
+                description="Phone Number"
+                showError={!!errors.sellerPhoneNumber}
+                readOnly={!isEditing}
+                required
+              />
+              {errors.sellerPhoneNumber && (
+                <p className="text-red-500 text-sm">
+                  {errors.sellerPhoneNumber}
+                </p>
+              )}
+            </div>
           </div>
 
           <div className="flex gap-4 mb-4">
-            <Input
-              label="Name of Commodity"
-              type="text"
-              value={data.commodityName}
-              className="flex-1 min-w-0"
-              labelClassName="text-base text-[#1E1E1E] font-normal"
-              readOnly
-            />
-            <Input
-              label="Price Paid (NGN)"
-              type="text"
-              value={
-                data.price ? `₦${Number(data.price).toLocaleString()}` : ""
-              }
-              className="flex-1 min-w-0"
-              labelClassName="text-base text-[#1E1E1E] font-normal"
-              readOnly
-            />
+            <div className="flex-1 min-w-0">
+              <SuggestionInput
+                label="Name of Commodity"
+                type="text"
+                placeholder="Eg, rice, Airforce 1, sugar"
+                value={data.commodityName}
+                field="commodityName"
+                onChange={(val) => update({ commodityName: val })}
+                className="flex-1 min-w-0"
+                description="What’s the name of the item you bought?"
+                showError={!!errors.commodityName}
+                readOnly={!isEditing}
+                required
+              />
+              {errors.commodityName && (
+                <p className="text-red-500 text-sm">{errors.commodityName}</p>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <Input
+                label="Price Paid (NGN)"
+                type="text"
+                value={
+                  data.price
+                    ? `₦${Number(
+                        data.price.replace(/,/g, "")
+                      ).toLocaleString()}`
+                    : ""
+                }
+                onChange={(e) => {
+                  update({ price: formatNumber(e.target.value) });
+                  clearError("price");
+                }}
+                className="flex-1 min-w-0"
+                labelClassName="text-base text-[#1E1E1E] font-normal"
+                readOnly={!isEditing}
+                required
+              />
+              {errors.price && (
+                <p className="text-red-500 text-sm">{errors.price}</p>
+              )}
+            </div>
           </div>
 
           <div className="flex gap-4 mb-4">
-            <Input
-              label="Location"
-              type="text"
-              value={data.location}
-              className="flex-1 min-w-0"
-              rightIcon="/images/form/map-marker-outline.svg"
-              labelClassName="text-base text-[#1E1E1E] font-normal"
-              readOnly
+            {/* Location */}
+            <LocationSelect
+              value={data.location || ""}
+              onChange={(val) => {
+                update({ location: val });
+                clearError("location");
+              }}
+              error={errors.location}
+              required
             />
-            <Input
-              label="Quantity"
-              type="text"
-              value={data.quantity}
-              className="flex-1 min-w-0"
-              labelClassName="text-base text-[#1E1E1E] font-normal"
-              readOnly
-            />
+            <div className="flex-1 min-w-0">
+              <SuggestionInput
+                label="Quantity"
+                type="text"
+                placeholder="1 mudu, 1 Kg, I pair, 1 Pack"
+                value={data.quantity}
+                field="quantity"
+                onChange={(val) => update({ quantity: val })}
+                className="flex-1 min-w-0"
+                description="Specify the exact way it was bought."
+                showError={!!errors.quantity}
+                readOnly={!isEditing}
+                required
+              />
+              {errors.market && (
+                <p className="text-red-500 text-sm">{errors.market}</p>
+              )}
+            </div>
           </div>
+          <div>
 
-          <Input
-            label="Market Name"
-            type="text"
-            value={data.marketName}
-            rightIcon="/images/form/map-marker-outline.svg"
-            className="w-full"
-            labelClassName="text-base text-[#1E1E1E] font-normal"
-            readOnly
-          />
+            <SuggestionInput
+              label="Market Name"
+              type="text"
+              placeholder="Wuse Market"
+              value={data.market}
+              field="market"
+              onChange={(val) => update({ market: val })}
+              className="w-full"
+              description="Where did you buy it?"
+              showError={!!errors.marketName}
+              readOnly={!isEditing}
+              required
+            />
+            {errors.market && (
+              <p className="text-red-500 text-sm">{errors.market}</p>
+            )}
+          </div>
 
           <p className="text-lg text-[#757575]">Submitted: {data.date}</p>
 
@@ -193,7 +347,7 @@ const Review = () => {
             }
             onClick={handleSubmit}
             className="w-full"
-            disabled={loading} // disable while loading
+            disabled={loading || isEditing} // disable while loading or editing
             // icon={loading ? "/images/spinner.svg" : undefined} // optional spinner icon
           />
         </form>

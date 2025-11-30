@@ -8,7 +8,6 @@ type Props = {
   onFileSelect: (fileBase64: string | null) => void;
   initial?: string | File | null;
   readonly?: boolean;
-  error?: string | null;
   label?: string;
   description?: string;
 };
@@ -17,7 +16,6 @@ export default function FileUpload({
   onFileSelect,
   initial = null,
   readonly = false,
-  error = null,
   label = "Image",
   description = "You can add a picture of the item you bought to help others identify it.",
 }: Props) {
@@ -79,22 +77,22 @@ export default function FileUpload({
   return (
     <div className="flex flex-col gap-2 w-full">
       {/* Label */}
-      <label className="text-xs sm:text-sm font-bold text-[#1E1E1E] flex items-center gap-1">
+      <label className="text-xs sm:text-xl font-bold text-[#1E1E1E]">
         {label}
-        {error && <span className="text-red-500">*</span>}
+        {/* {error && <span className="text-red-500">*</span>} */}
       </label>
       {/* Description */}
       {description && (
-        <p className="sm:text-sm text-xs text-[#757575] mb-1">{description}</p>
+        <p className="sm:text-base text-xs text-[#757575] mb-1">
+          {description}
+        </p>
       )}
 
       {/* Upload box */}
       {!readonly && (
         <label
           className={`flex flex-col items-center justify-center border-2 border-dotted rounded-md h-48 w-full cursor-pointer transition relative
-          ${
-            error ? "border-red-500" : "border-gray-400 hover:border-gray-600"
-          }`}
+        `}
         >
           {preview ? (
             <div className="relative w-full h-full">
@@ -141,9 +139,6 @@ export default function FileUpload({
           />
         </div>
       )}
-
-      {/* Error message */}
-      {error && !readonly && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
 }

@@ -10,11 +10,23 @@ import { useRouter } from "next/navigation";
 import { useFormData } from "../../context/FormContext";
 import { useState } from "react";
 import ProtectedRoute from "../../components/protectedRoute";
+import SuggestionInput from "../../components/ui/SuggestionInput";
 
 const Step1 = () => {
   const { data, update } = useFormData();
   const router = useRouter();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [loading, setLoading] = useState(false);
+
+  const formatNumber = (value: string) => {
+    // Remove everything except digits
+    const numericValue = value.replace(/\D/g, "");
+
+    if (!numericValue) return "";
+
+    // Format with commas
+    return Number(numericValue).toLocaleString();
+  };
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
@@ -22,14 +34,15 @@ const Step1 = () => {
     if (!data.commodityName)
       newErrors.commodityName = "Commodity name is required.";
     if (!data.price) newErrors.price = "Price is required.";
-    else if (isNaN(Number(data.price)) || Number(data.price) <= 0)
-      newErrors.price = "Enter a valid price.";
-
-    if (!data.quantity) newErrors.quantity = "Quantity is required.";
+    else if (
+      isNaN(Number(data.price.replace(/,/g, ""))) ||
+      Number(data.price.replace(/,/g, "")) <= 0
+    )
+      if (!data.quantity) newErrors.quantity = "Quantity is required.";
     if (!data.location) newErrors.location = "Please select your location.";
-    if (!data.marketName) newErrors.marketName = "Market name is required.";
+    if (!data.market) newErrors.market = "Market name is required.";
     if (!data.date) newErrors.date = "Please select a date.";
-    if (!data.image) newErrors.image = "An image of the commodity is required.";
+
 
     setErrors(newErrors);
 
@@ -42,7 +55,19 @@ const Step1 = () => {
   };
 
   const handleNext = () => {
-    if (validate()) router.push("/form/step-2");
+    setLoading(true);
+
+    const isValid = validate();
+
+    if (!isValid) {
+      setLoading(false);
+      return;
+    }
+
+    // Allow the overlay to show briefly before navigation
+    setTimeout(() => {
+      router.push("/form/step-2");
+    }, 600);
   };
 
   return (
@@ -67,6 +92,33 @@ const Step1 = () => {
             </div>
           </div>
         </div>
+
+        {/* spinner */}
+        {loading && (
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+            <svg
+              className="animate-spin h-15 w-15 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              ></path>
+            </svg>
+          </div>
+        )}
+
         <form className="form ">
           <h2 className=" font-bold text-2xl leading-4  ">Submit Price</h2>
           <h3 className="text-[#757575] sm:text-base text-sm  ">
@@ -74,14 +126,15 @@ const Step1 = () => {
             price range
           </h3>
 
-          <Input
+          <SuggestionInput
             label="Name of Commodity"
             type="text"
             placeholder="Eg, rice, Airforce 1, sugar"
-            description="What’s the name of the item you bought?"
             value={data.commodityName}
+            field="commodityName"
+            onChange={(val) => update({ commodityName: val })}
+            description="What’s the name of the item you bought?"
             showError={!!errors.commodityName}
-            onChange={(e) => update({ commodityName: e.target.value })}
             required
           />
           {errors.commodityName && (
@@ -90,30 +143,35 @@ const Step1 = () => {
 
           <Input
             label="Price Paid (NGN)"
-            type="number"
+            type="text"
+            inputMode="numeric"
             placeholder="Enter price"
             description="How much did you pay the seller?"
             value={data.price}
             showError={!!errors.price}
-            onChange={(e) => update({ price: e.target.value })}
+            onChange={(e) => {
+              const formatted = formatNumber(e.target.value);
+              update({ price: formatted });
+            }}
             required
           />
           {errors.price && (
             <p className="text-red-500 text-sm">{errors.price}</p>
           )}
 
-          <Input
+          <SuggestionInput
             label="Quantity"
             type="text"
             placeholder="1 mudu, 1 Kg, I pair, 1 Pack"
-            description="Specify the exact way it was bought."
             value={data.quantity}
+            field="quantity"
+            onChange={(val) => update({ quantity: val })}
+            description="Specify the exact way it was bought."
             showError={!!errors.quantity}
-            onChange={(e) => update({ quantity: e.target.value })}
             required
           />
-          {errors.quantity && (
-            <p className="text-red-500 text-sm">{errors.quantity}</p>
+          {errors.market && (
+            <p className="text-red-500 text-sm">{errors.market}</p>
           )}
 
           <LocationSelect
@@ -123,25 +181,26 @@ const Step1 = () => {
             required
           />
 
-          <Input
+          <SuggestionInput
             label="Market Name"
             type="text"
             placeholder="Wuse Market"
-            rightIcon="/images/form/map-marker-outline.svg"
-            value={data.marketName}
-            onChange={(e) => update({ marketName: e.target.value })}
+            value={data.market}
+            field="market"
+            onChange={(val) => update({ market: val })}
+            description="Where did you buy it?"
             showError={!!errors.marketName}
             required
           />
-          {errors.marketName && (
-            <p className="text-red-500 text-sm">{errors.marketName}</p>
+          {errors.market && (
+            <p className="text-red-500 text-sm">{errors.market}</p>
           )}
 
           <div className="mb-4">
             <FileUpload
               initial={data.image ?? null}
               onFileSelect={(file) => update({ image: file })}
-              error={errors.image} // <-- pass the validation error
+              // error={errors.image}
             />
           </div>
 
@@ -156,8 +215,9 @@ const Step1 = () => {
           {errors.date && <p className="text-red-500 text-sm">{errors.date}</p>}
 
           <PrimaryButton
-            text="Next"
+            text={loading ? "Loading..." : "Next"}
             type="button"
+            disabled={loading}
             onClick={handleNext}
             className="w-full"
           />

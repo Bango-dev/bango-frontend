@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import api from "../../utils/api"; // 👈 your axios instance
+import api from "../../utils/api";
 import { Commodity } from "../../lib/types/commodities";
 
 const useAveragePrices = (
@@ -14,82 +14,77 @@ const useAveragePrices = (
   );
   const [isLoading, setIsLoading] = useState(true);
 
+  const normalize = (value: unknown): string =>
+    String(value ?? "")
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, " ");
+
   const parsePrice = (p: unknown) => {
     const cleaned = String(p ?? "").replace(/[^0-9.]/g, "");
     const n = parseFloat(cleaned);
     return isNaN(n) ? 0 : n;
   };
 
-  const normalize = (value: unknown): string => {
-    if (value == null) return "";
-    return String(value).trim().toLowerCase().replace(/\s+/g, " ");
-  };
-
   useEffect(() => {
-    const calculateAverages = async () => {
+    const calculate = async () => {
       try {
         setIsLoading(true);
 
-        if (!data.length) {
+        if (data.length === 0) {
           setAveragePrices({});
           setIsLoading(false);
           return;
         }
 
-        // Fetch all data from backend instead of local DB
         const res = await api.get("/search", {
-          params: {
-            sortBy: "recent",
-            limit: 1000, // you can adjust this to cover enough samples
-          },
+          params: { sortBy: "recent", limit: 1000 },
         });
 
-        const allCommodities: Commodity[] = res.data?.data?.data || [];
+        const all: Commodity[] = res.data?.data?.data || [];
         const averages: Record<string, number> = {};
 
         data.forEach((item) => {
-          const nameKey = normalize(item.commodityName);
-          const qtyKey = normalize(item.quantity);
-          const key = `${nameKey}-${qtyKey}`;
+          const name = normalize(item.commodityName);
+          const qty = normalize(item.quantity);
+          const key = `${name}-${qty}`;
 
-          if (!averages[key]) {
-            // Find all similar commodities
-            const similarItems = allCommodities.filter((c) => {
-              const sameName = normalize(c.commodityName) === nameKey;
-              const sameQty = normalize(c.quantity) === qtyKey;
+          if (averages[key]) return;
 
-              if (location.trim()) {
-                const sameLoc =
-                  normalize(c.location) === normalize(item.location);
-                return sameName && sameQty && sameLoc;
-              }
-              if (market.trim()) {
-                const sameMkt = normalize(c.market) === normalize(item.market);
-                return sameName && sameQty && sameMkt;
-              }
-              return sameName && sameQty;
-            });
+          const filtered = all.filter((c) => {
+            const matchName = normalize(c.commodityName) === name;
+            const matchQty = normalize(c.quantity) === qty;
 
-            if (similarItems.length > 0) {
-              const total = similarItems.reduce(
-                (sum, c) => sum + parsePrice(c.price),
-                0
-              );
-              const avg = Math.round(total / similarItems.length);
-              averages[key] = avg;
+            if (!matchName || !matchQty) return false;
+
+            if (location) {
+              return normalize(c.location) === normalize(location);
             }
+            if (market) {
+              return normalize(c.market) === normalize(market);
+            }
+
+            return true;
+          });
+
+          if (filtered.length > 0) {
+            const total = filtered.reduce(
+              (sum, c) => sum + parsePrice(c.price),
+              0
+            );
+            averages[key] = Math.round(total / filtered.length);
           }
         });
 
         setAveragePrices(averages);
-      } catch (error) {
-        console.error("Error fetching or calculating averages:", error);
+      } catch (err) {
+        console.error("Error calculating averages:", err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    calculateAverages();
+    calculate();
   }, [data, location, market]);
 
   return { averagePrices, isLoading };

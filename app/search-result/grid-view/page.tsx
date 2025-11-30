@@ -43,7 +43,7 @@ function GridViewContent() {
           params: { commodityName },
         });
 
-        console.log(res.data);
+        console.log(res.data?.data?.data);
         setResults(res.data?.data?.data || []);
       } catch (error) {
         console.error(error);
@@ -72,11 +72,7 @@ function GridViewContent() {
     currentPage < totalPages && setCurrentPage((p) => p + 1);
   const handlePrev = () => currentPage > 1 && setCurrentPage((p) => p - 1);
 
-  if (isLoading) {
-    return (
-      <div className="p-8 text-center text-gray-500">Loading results...</div>
-    );
-  }
+
 
   return (
     <div className="py-5 px-5">
@@ -97,6 +93,31 @@ function GridViewContent() {
         </Link>
         <DisplayIndicator />
       </div>
+
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <svg
+            className="animate-spin h-15 w-15 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            ></path>
+          </svg>
+        </div>
+      )}
 
       {/* Desktop View */}
       {currentItems.map((item) => {
@@ -189,6 +210,7 @@ function GridViewContent() {
                   {avgPrice ? `₦${avgPrice.toLocaleString()}` : "N/A"}
                 </p>
               </div>
+
 
               <InfoBox className="sm:block hidden" />
 
@@ -303,7 +325,32 @@ function GridViewContent() {
 
 export default function GridView() {
   return (
-    <Suspense fallback={<div>Loading results...</div>}>
+    <Suspense
+      fallback={
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <svg
+            className="animate-spin h-15 w-15 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            ></path>
+          </svg>
+        </div>
+      }
+    >
       <GridViewContent />
     </Suspense>
   );
