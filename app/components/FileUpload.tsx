@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { ImCancelCircle } from "react-icons/im";
 import { LuUpload } from "react-icons/lu";
 
 type Props = {
-  onFileSelect: (fileBase64: string | null) => void;
-  initial?: string | File | null;
+  onFileSelect: (file: Blob | null) => void;
+  initial?: string | File | Blob | null;
   readonly?: boolean;
   label?: string;
   description?: string;
@@ -19,69 +19,91 @@ export default function FileUpload({
   label = "Image",
   description = "You can add a picture of the item you bought to help others identify it.",
 }: Props) {
-  const [preview, setPreview] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const fileToBase64 = (file: File) =>
-    new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
+  /** Convert HEIC to JPEG if needed */
+  const processFile = async (file: File): Promise<Blob> => {
+    const { isHeic, heicTo } = await import("heic-to");
 
+    if (await isHeic(file)) {
+      return heicTo({
+        blob: file,
+        type: "image/jpeg",
+        quality: 0.8,
+      });
+    }
+
+    return file; // already fine
+  };
+
+  /** Load initial value (string URL or File/Blob) */
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      if (!initial) return setPreview(null);
+    if (!initial) return setPreviewUrl(null);
 
-      if (typeof initial === "string") return setPreview(initial);
+    // Clean old URL
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
 
-      if (initial instanceof File) {
-        try {
-          const b64 = await fileToBase64(initial);
-          if (mounted) setPreview(b64);
-        } catch {
-          if (mounted) setPreview(null);
-        }
-      }
-    })();
+    if (typeof initial === "string") {
+      setPreviewUrl(initial);
+      return;
+    }
 
-    return () => {
-      mounted = false;
-    };
+    if (initial instanceof File || initial instanceof Blob) {
+      const url = URL.createObjectURL(initial);
+      setPreviewUrl(url);
+    }
   }, [initial]);
 
+  /** Handle user selecting a file */
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
+
     if (!file) {
-      setPreview(null);
+      setPreviewUrl(null);
       onFileSelect(null);
       return;
     }
 
     try {
-      const base64 = await fileToBase64(file);
-      setPreview(base64);
-      onFileSelect(base64);
-    } catch {
-      setPreview(null);
+      setLoading(true);
+
+      const processedBlob = await processFile(file);
+
+      // Clean old preview
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+
+      const url = URL.createObjectURL(processedBlob);
+      setPreviewUrl(url);
+
+      onFileSelect(processedBlob); // send Blob, not base64
+    } catch (err) {
+      console.error("Image processing error:", err);
+      setPreviewUrl(null);
       onFileSelect(null);
+    } finally {
+      setLoading(false);
     }
   };
 
+  /** Remove file */
   const handleRemove = () => {
-    setPreview(null);
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
     onFileSelect(null);
+
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   return (
     <div className="flex flex-col gap-2 w-full">
       {/* Label */}
-      <label className="text-xs sm:text-xl font-bold text-[#1E1E1E]">
+      <label className="text-xs sm:text-sm font-bold text-[#1E1E1E] flex items-center gap-1">
         {label}
         {/* {error && <span className="text-red-500">*</span>} */}
       </label>
-      {/* Description */}
+
       {description && (
         <p className="sm:text-base text-xs text-[#757575] mb-1">
           {description}
@@ -92,7 +114,9 @@ export default function FileUpload({
       {!readonly && (
         <label
           className={`flex flex-col items-center justify-center border-2 border-dotted rounded-md h-48 w-full cursor-pointer transition relative
-        `}
+          ${
+            error ? "border-red-500" : "border-gray-400 hover:border-gray-600"
+          }`}
         >
           {preview ? (
             <div className="relative w-full h-full">
@@ -124,6 +148,7 @@ export default function FileUpload({
             type="file"
             accept="image/*"
             onChange={handleFileChange}
+            ref={fileInputRef}
             className="hidden"
           />
         </label>
@@ -139,6 +164,9 @@ export default function FileUpload({
           />
         </div>
       )}
+
+      {/* Error message */}
+      {error && !readonly && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
 }

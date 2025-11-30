@@ -8,6 +8,7 @@ import PrimaryButton from "../components/ui/PrimaryButton";
 import LocationSelect from "../components/LocationSelect";
 import Link from "next/link";
 import Image from "next/image";
+import ProtectedRoute from "../components/protectedRoute";
 
 const FindPrice = () => {
   const [commodityName, setCommodityName] = useState("");
@@ -124,18 +125,18 @@ const FindPrice = () => {
               <option value="oldest">Oldest</option>
             </select>
 
-            {/* Price Order */}
-            <select
-              className="border border-gray-300 rounded-md px-2 py-2 w-1/2 text-base text-[#757575]"
-              value={sortPrice}
-              onChange={(e) => setSortPrice(e.target.value)}
-            >
-              <option value="">Sort by Price</option>
-              <option value="high">Price (High → Low)</option>
-              <option value="low">Price (Low → High)</option>
-            </select>
+              {/* Price Order */}
+              <select
+                className="border border-gray-300 rounded-md px-2 py-2 w-1/2 text-base text-[#757575]"
+                value={sortPrice}
+                onChange={(e) => setSortPrice(e.target.value)}
+              >
+                <option value="">Sort by Price</option>
+                <option value="high">Price (High → Low)</option>
+                <option value="low">Price (Low → High)</option>
+              </select>
+            </div>
           </div>
-        </div>
 
 
         {/* Submit button with loading state */}

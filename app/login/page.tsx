@@ -4,7 +4,8 @@ import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import Input from "../form/Input";
 import Image from "next/image";
-import Button from "../components/ui/Button";
+import PrimaryButton from "../components/ui/PrimaryButton";
+import SecondaryButton from "../components/ui/SecondaryButton";
 import Link from "next/link";
 import api from "../utils/api";
 import { AuthContext } from "../context/AuthContext";
@@ -65,6 +66,11 @@ const SignIn = () => {
     }
   };
 
+  const handleGoogleSignIn = () => {
+    // Add your Google sign-in logic here
+    console.log("Google sign-in clicked");
+  };
+
   return (
     <div className="flex justify-around min-h-screen mx-auto w-full">
       <form
@@ -113,42 +119,22 @@ const SignIn = () => {
           </Link>
         </div>
 
-        <Button
-          firstBtn={
-            loading ? (
-              <>
-                <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Signing In...
-              </>
-            ) : (
-              "Sign In"
-            )
-          }
-          secondBtn="Sign In with Google"
-          firstHref="#"
-          secondHref="#"
-          className="sm:w-full w-full flex flex-col px-0"
-          src="/images/on-boarding/google-icon.svg"
-        />
+        <div className="flex flex-col gap-4 w-full px-0">
+          <PrimaryButton
+            text="Sign In"
+            type="submit"
+            loading={loading}
+            loadingText="Signing In..."
+            className="w-full"
+          />
+
+          <SecondaryButton
+            text="Sign In with Google"
+            onClick={handleGoogleSignIn}
+            iconSrc="/images/on-boarding/google-icon.svg"
+            className="w-full"
+          />
+        </div>
 
         {error && <p className="text-red-500 text-center mt-2">{error}</p>}
         {success && (

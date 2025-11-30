@@ -1,3 +1,8 @@
+"use client";
+
+import Image from "next/image";
+import React from "react";
+
 type ButtonProps = {
   text: React.ReactNode;
   onClick?: () => void;
@@ -5,28 +10,34 @@ type ButtonProps = {
   className?: string;
   loading?: boolean;
   disabled?: boolean;
+  iconSrc?: string;
   loadingText?: string; // new prop
 };
 
-const PrimaryButton = ({
+const SecondaryButton = ({
   text,
   className,
   onClick,
   type = "button",
   loading = false,
   disabled = false,
+  iconSrc,
   loadingText = "Submitting...", // default value
 }: ButtonProps) => {
   const isDisabled = disabled || loading;
 
   return (
     <button
-      className={`${className} btn-primary flex items-center justify-center gap-2 ${
-        isDisabled ? "cursor-not-allowed opacity-70" : ""
-      }`}
-      onClick={onClick}
       type={type}
+      onClick={onClick}
       disabled={isDisabled}
+      className={`
+        btn-secondary 
+        flex flex-row justify-center items-center 
+        gap-2 
+        ${className ?? ""} 
+        ${isDisabled ? "cursor-not-allowed opacity-70" : ""}
+      `}
     >
       {loading && (
         <svg
@@ -42,17 +53,28 @@ const PrimaryButton = ({
             r="10"
             stroke="currentColor"
             strokeWidth="4"
-          ></circle>
+          />
           <path
             className="opacity-75"
             fill="currentColor"
             d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-          ></path>
+          />
         </svg>
       )}
+
+      {!loading && iconSrc && (
+        <Image
+          src={iconSrc}
+          alt="icon"
+          width={24}
+          height={24}
+          className="inline-block"
+        />
+      )}
+
       {loading ? loadingText : text}
     </button>
   );
 };
 
-export default PrimaryButton;
+export default SecondaryButton;

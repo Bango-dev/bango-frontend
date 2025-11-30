@@ -1,7 +1,8 @@
 "use client";
 import Input from "../form/Input";
 import Image from "next/image";
-import Button from "../components/ui/Button";
+import PrimaryButton from "../components/ui/PrimaryButton";
+import SecondaryButton from "../components/ui/SecondaryButton";
 import Link from "next/link";
 import { Figtree, Poppins } from "next/font/google";
 import { useState } from "react";
@@ -124,6 +125,11 @@ const SignUp = () => {
     }
   };
 
+  const handleGoogleSignUp = () => {
+    // Add your Google sign-up logic here
+    console.log("Google sign-up clicked");
+  };
+
   return (
     <div
       className={`flex justify-around min-h-screen mx-auto w-full ${figtree.className}`}
@@ -207,13 +213,22 @@ const SignUp = () => {
           </p>
         )}
 
-        <Button
-          firstBtn={loading ? "Signing up..." : "Sign Up"}
-          secondBtn="Sign Up with Google"
-          className="px-0 w-full flex flex-col"
-          src="/images/on-boarding/google-icon.svg"
-          type="submit"
-        />
+        <div className="flex flex-col gap-4 w-full px-0">
+          <PrimaryButton
+            text="Sign Up"
+            type="submit"
+            loading={loading}
+            loadingText="Signing up..."
+            className="w-full"
+          />
+
+          <SecondaryButton
+            text="Sign Up with Google"
+            onClick={handleGoogleSignUp}
+            iconSrc="/images/on-boarding/google-icon.svg"
+            className="w-full"
+          />
+        </div>
 
         {error && <p className="text-red-500 text-center text-sm">{error}</p>}
         {success && (
