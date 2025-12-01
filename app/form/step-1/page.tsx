@@ -170,7 +170,7 @@ const Step1 = () => {
             showError={!!errors.quantity}
             required
           />
-          {errors.market && (
+          {errors.quantity && (
             <p className="text-red-500 text-sm">{errors.market}</p>
           )}
 

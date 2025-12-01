@@ -109,18 +109,18 @@ const Step2 = () => {
         <SuggestionInput
           label="Seller's Name"
           type="text"
-          placeholder="Wuse Market"
+          placeholder="Madam Kemi"
           value={data.sellerName}
           field="sellerName"
           onChange={(val) => update({ sellerName: val })}
-          description="Where did you buy it?"
+          description="This helps other communicate with the seller better."
           showError={!!errors.sellerName}
           required
         />
         {errors.sellerName && (
           <p className="text-red-500 text-sm">{errors.sellerName}</p>
         )}
-        
+
         <SuggestionInput
           label="Seller’s Phone No"
           type="tel"

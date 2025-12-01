@@ -53,14 +53,15 @@ const Review = () => {
     if (!data.sellerName) newErrors.sellerName = "Seller's Name is required.";
       const phoneRegex = /^0\d{10}$/;
       if (!data.sellerPhoneNumber)
-        newErrors.phone = "Phone number is required.";
+        newErrors.sellerPhoneNumber = "Phone number is required.";
       else if (!phoneRegex.test(data.sellerPhoneNumber))
-        newErrors.phone =
+        newErrors.sellerPhoneNumber =
           "Enter a valid 11-digit phone number starting with 0.";
     if (!data.location) newErrors.location = "Please select your location.";
-    if (!data.market) newErrors.marketName = "Market name is required.";
+    if (!data.market) newErrors.market = "Market name is required.";
     if (!data.date) newErrors.date = "Please select a date.";
 
+    setErrors(newErrors);
 
     // Auto-clear errors after 3 seconds
     if (Object.keys(newErrors).length > 0) {
@@ -71,15 +72,31 @@ const Review = () => {
   };
 
   const handleSubmit = async () => {
-     if (!validate()) return;
-    setLoading(true); // start loading
+       setLoading(true);
+
+       const isValid = validate();
+
+       if (!isValid) {
+         setLoading(false);
+         return;
+       }
     try {
       let imageUrl = null;
 
       if (data.image) {
-        const res = await fetch(data.image as string);
-        const blob = await res.blob();
-        const file = new File([blob], "upload.jpg", { type: blob.type });
+        let file: File;
+
+        if (data.image instanceof Blob) {
+          // image is a Blob stored in Dexie / state
+          file = new File([data.image], "upload.jpg", {
+            type: data.image.type,
+          });
+        } else {
+          // image is a URL string (from Cloudinary or somewhere else)
+          const res = await fetch(data.image);
+          const blob = await res.blob();
+          file = new File([blob], "upload.jpg", { type: blob.type });
+        }
 
         const upload = await uploadToCloudinary(file);
         imageUrl = upload.secure_url;
@@ -162,7 +179,11 @@ const Review = () => {
           {data.image ? (
             <div className="mb-4 rounded-md overflow-hidden">
               <img
-                src={data.image as string}
+                src={
+                  data.image instanceof Blob
+                    ? URL.createObjectURL(data.image)
+                    : (data.image as string)
+                }
                 alt={data.commodityName || "Commodity image"}
                 className="object-cover"
                 width={504}
@@ -186,7 +207,6 @@ const Review = () => {
                 field="sellerName"
                 onChange={(val) => update({ sellerName: val })}
                 className="flex-1 min-w-0"
-                description="Where did you buy it?"
                 showError={!!errors.sellerName}
                 readOnly={!isEditing}
                 required
@@ -204,7 +224,6 @@ const Review = () => {
                 field="sellerPhoneNumber"
                 onChange={(val) => update({ sellerPhoneNumber: val })}
                 className="flex-1 min-w-0"
-                description="Phone Number"
                 showError={!!errors.sellerPhoneNumber}
                 readOnly={!isEditing}
                 required
@@ -227,7 +246,6 @@ const Review = () => {
                 field="commodityName"
                 onChange={(val) => update({ commodityName: val })}
                 className="flex-1 min-w-0"
-                description="What’s the name of the item you bought?"
                 showError={!!errors.commodityName}
                 readOnly={!isEditing}
                 required
@@ -251,8 +269,8 @@ const Review = () => {
                   update({ price: formatNumber(e.target.value) });
                   clearError("price");
                 }}
-                className="flex-1 min-w-0"
-                labelClassName="text-base text-[#1E1E1E] font-normal"
+                className="flex-1 min-w-0 "
+                labelClassName="text-xs sm:text-xl font-bold text-[#1E1E1E]"
                 readOnly={!isEditing}
                 required
               />
@@ -282,18 +300,16 @@ const Review = () => {
                 field="quantity"
                 onChange={(val) => update({ quantity: val })}
                 className="flex-1 min-w-0"
-                description="Specify the exact way it was bought."
                 showError={!!errors.quantity}
                 readOnly={!isEditing}
                 required
               />
-              {errors.market && (
-                <p className="text-red-500 text-sm">{errors.market}</p>
+              {errors.quantity && (
+                <p className="text-red-500 text-sm">{errors.quantity}</p>
               )}
             </div>
           </div>
           <div>
-
             <SuggestionInput
               label="Market Name"
               type="text"
@@ -302,8 +318,7 @@ const Review = () => {
               field="market"
               onChange={(val) => update({ market: val })}
               className="w-full"
-              description="Where did you buy it?"
-              showError={!!errors.marketName}
+              showError={!!errors.market}
               readOnly={!isEditing}
               required
             />
@@ -348,7 +363,6 @@ const Review = () => {
             onClick={handleSubmit}
             className="w-full"
             disabled={loading || isEditing} // disable while loading or editing
-            // icon={loading ? "/images/spinner.svg" : undefined} // optional spinner icon
           />
         </form>
       </div>

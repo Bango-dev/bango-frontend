@@ -11,7 +11,7 @@ export interface Commodity {
   date: string;
   sellerName: string;
   sellerPhoneNumber: string;
-  image?: string;
+  image?: Blob | string | null;
 }
 
 export class MyDatabase extends Dexie {

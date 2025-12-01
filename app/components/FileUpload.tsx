@@ -54,6 +54,7 @@ export default function FileUpload({
       const url = URL.createObjectURL(initial);
       setPreviewUrl(url);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initial]);
 
   /** Handle user selecting a file */
@@ -98,7 +99,6 @@ export default function FileUpload({
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      {/* Label */}
       <label className="text-xs sm:text-sm font-bold text-[#1E1E1E] flex items-center gap-1">
         {label}
         {/* {error && <span className="text-red-500">*</span>} */}
@@ -110,33 +110,44 @@ export default function FileUpload({
         </p>
       )}
 
-      {/* Upload box */}
-      {!readonly && (
+      {/* Preview UI */}
+      {previewUrl && (
+        <div className="relative w-full h-48 rounded-md overflow-hidden">
+          <img
+            src={previewUrl}
+            alt="preview"
+            className="w-full h-full object-cover rounded-md"
+          />
+
+          {!readonly && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleRemove();
+              }}
+              className="absolute top-2 right-2 bg-white rounded-full shadow p-1 hover:bg-gray-100 cursor-pointer"
+            >
+              <ImCancelCircle className="w-4 h-4 text-gray-600" />
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Upload Box */}
+      {!readonly && !previewUrl && (
         <label
-          className={`flex flex-col items-center justify-center border-2 border-dotted rounded-md h-48 w-full cursor-pointer transition relative
-          ${
-            error ? "border-red-500" : "border-gray-400 hover:border-gray-600"
-          }`}
+          className={`flex flex-col items-center justify-center border-2 border-dotted rounded-md h-48 w-full cursor-pointer transition
+           `}
         >
-          {preview ? (
-            <div className="relative w-full h-full">
-              <img
-                src={preview}
-                alt="preview"
-                className="w-full h-full object-cover rounded-md"
-              />
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleRemove();
-                }}
-                className="absolute top-2 right-2 bg-white rounded-full shadow p-1 hover:bg-gray-100"
-                aria-label="Remove image"
-              >
-                <ImCancelCircle className="w-4 h-4 text-gray-600" />
-              </button>
+          {loading ? (
+            <div className="flex flex-col items-center gap-2">
+              <div
+                className="w-8 h-8 border-4 border-gray-300 rounded-full animate-spin"
+                style={{ borderTopColor: "var(--color-primary)" }}
+              ></div>
+              <span className="text-gray-500 text-sm">Processing image...</span>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2 text-gray-500">
@@ -154,19 +165,6 @@ export default function FileUpload({
         </label>
       )}
 
-      {/* readonly mode */}
-      {readonly && preview && (
-        <div className="w-full rounded-md overflow-hidden">
-          <img
-            src={preview}
-            alt="preview"
-            className="w-full h-auto object-cover rounded-md"
-          />
-        </div>
-      )}
-
-      {/* Error message */}
-      {error && !readonly && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
 }
