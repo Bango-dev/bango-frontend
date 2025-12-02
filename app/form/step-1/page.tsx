@@ -43,7 +43,6 @@ const Step1 = () => {
     if (!data.market) newErrors.market = "Market name is required.";
     if (!data.date) newErrors.date = "Please select a date.";
 
-
     setErrors(newErrors);
 
     // Auto-clear errors after 3 seconds
@@ -64,7 +63,7 @@ const Step1 = () => {
       return;
     }
 
-    // Allow the overlay to show briefly before navigation
+    // Allow the overlay to show briefly before navigating
     setTimeout(() => {
       router.push("/form/step-2");
     }, 600);
