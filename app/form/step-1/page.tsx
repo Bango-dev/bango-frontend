@@ -19,7 +19,7 @@ const Step1 = () => {
   const [loading, setLoading] = useState(false);
 
   const formatNumber = (value: string) => {
-    // Remove everything except digits
+    // Remove all non-digit characters (including commas)
     const numericValue = value.replace(/\D/g, "");
 
     if (!numericValue) return "";
@@ -33,12 +33,17 @@ const Step1 = () => {
 
     if (!data.commodityName)
       newErrors.commodityName = "Commodity name is required.";
-    if (!data.price) newErrors.price = "Price is required.";
-    else if (
+
+    if (!data.price) {
+      newErrors.price = "Price is required.";
+    } else if (
       isNaN(Number(data.price.replace(/,/g, ""))) ||
       Number(data.price.replace(/,/g, "")) <= 0
-    )
-      if (!data.quantity) newErrors.quantity = "Quantity is required.";
+    ) {
+      newErrors.price = "Price must be a valid positive number.";
+    }
+
+    if (!data.quantity) newErrors.quantity = "Quantity is required.";
     if (!data.location) newErrors.location = "Please select your location.";
     if (!data.market) newErrors.market = "Market name is required.";
     if (!data.date) newErrors.date = "Please select a date.";
@@ -132,7 +137,7 @@ const Step1 = () => {
             value={data.commodityName}
             field="commodityName"
             onChange={(val) => update({ commodityName: val })}
-            description="What’s the name of the item you bought?"
+            description="What's the name of the item you bought?"
             showError={!!errors.commodityName}
             required
           />
@@ -146,7 +151,7 @@ const Step1 = () => {
             inputMode="numeric"
             placeholder="Enter price"
             description="How much did you pay the seller?"
-            value={data.price}
+            value={data.price || ""}
             showError={!!errors.price}
             onChange={(e) => {
               const formatted = formatNumber(e.target.value);
@@ -170,7 +175,7 @@ const Step1 = () => {
             required
           />
           {errors.quantity && (
-            <p className="text-red-500 text-sm">{errors.market}</p>
+            <p className="text-red-500 text-sm">{errors.quantity}</p>
           )}
 
           <LocationSelect
