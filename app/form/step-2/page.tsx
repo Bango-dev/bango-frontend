@@ -13,44 +13,43 @@ const Step2 = () => {
   const { data, update } = useFormData();
   const router = useRouter();
   const [errors, setErrors] = useState<{ [key: string]: string | boolean }>({});
-    const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-    const validate = () => {
-      const newErrors: { [key: string]: string } = {};
+  const validate = () => {
+    const newErrors: { [key: string]: string } = {};
 
+    if (!data.sellerName) newErrors.sellerName = "Seller name is required.";
 
-      if (!data.sellerName) newErrors.sellerName = "Seller name is required.";
+    const phoneRegex = /^0\d{10}$/;
+    if (!data.sellerPhoneNumber)
+      newErrors.sellerPhoneNumber = "Phone number is required.";
+    else if (!phoneRegex.test(data.sellerPhoneNumber))
+      newErrors.sellerPhoneNumber =
+        "Enter a valid 11-digit phone number starting with 0.";
 
-      const phoneRegex = /^0\d{10}$/;
-      if (!data.sellerPhoneNumber)
-        newErrors.phone = "Phone number is required.";
-      else if (!phoneRegex.test(data.sellerPhoneNumber))
-        newErrors.phone =
-          "Enter a valid 11-digit phone number starting with 0.";
+    setErrors(newErrors);
 
-      setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      setTimeout(() => setErrors({}), 3000);
+    }
+    return Object.keys(newErrors).length === 0;
+  };
 
-      if (Object.keys(newErrors).length > 0) {
-        setTimeout(() => setErrors({}), 3000);
-      }
-      return Object.keys(newErrors).length === 0;
-    };
+  const handleNext = () => {
+    setLoading(true);
 
-    const handleNext = () => {
-      setLoading(true);
+    const isValid = validate();
 
-      const isValid = validate();
+    if (!isValid) {
+      setLoading(false);
+      return;
+    }
 
-      if (!isValid) {
-        setLoading(false);
-        return;
-      }
-
-      // Allow the overlay to show briefly before navigation
-      setTimeout(() => {
-        router.push("/form/review");
-      }, 600);
-    };
+    // Allow the overlay to show briefly before navigation
+    setTimeout(() => {
+      router.push("/form/review");
+    }, 600);
+  };
   return (
     <div className="flex flex-col min-h-screen pt-5 px-3 sm:px-4 lg:px-4 mx-auto w-full ">
       <div className="relative flex items-center">
@@ -110,7 +109,7 @@ const Step2 = () => {
           label="Seller's Name"
           type="text"
           placeholder="Madam Kemi"
-          value={data.sellerName}
+          value={data.sellerName || ""}
           field="sellerName"
           onChange={(val) => update({ sellerName: val })}
           description="This helps other communicate with the seller better."
@@ -125,7 +124,7 @@ const Step2 = () => {
           label="Seller’s Phone No"
           type="tel"
           placeholder="08000000000"
-          value={data.sellerPhoneNumber}
+          value={data.sellerPhoneNumber || ""}
           field="sellerPhoneNumber"
           onChange={(val) => update({ sellerPhoneNumber: val })}
           description="Phone Number"

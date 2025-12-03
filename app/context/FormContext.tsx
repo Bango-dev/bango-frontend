@@ -17,7 +17,7 @@ type ContextType = {
 
 const defaultData: Commodity = {
   commodityName: "",
-  price: null,
+  price: 0,
   quantity: "",
   location: "",
   market: "",
