@@ -11,6 +11,7 @@ import { useFormData } from "../../context/FormContext";
 import { useState } from "react";
 import ProtectedRoute from "../../components/protectedRoute";
 import SuggestionInput from "../../components/ui/SuggestionInput";
+import { parseNumber, formatNumber } from "../../utils/numberHelpers";
 
 const Step1 = () => {
   const { data, update } = useFormData();
@@ -18,28 +19,13 @@ const Step1 = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
 
-  const formatNumber = (value: string) => {
-    // Remove all non-digit characters (including commas)
-    const numericValue = value.replace(/\D/g, "");
-
-    if (!numericValue) return "";
-
-    // Format with commas
-    return Number(numericValue).toLocaleString();
-  };
-
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
 
     if (!data.commodityName)
       newErrors.commodityName = "Commodity name is required.";
 
-    if (!data.price) {
-      newErrors.price = "Price is required.";
-    } else if (
-      isNaN(Number(data.price.replace(/,/g, ""))) ||
-      Number(data.price.replace(/,/g, "")) <= 0
-    ) {
+    if (data.price == null || data.price <= 0) {
       newErrors.price = "Price must be a valid positive number.";
     }
 
@@ -151,11 +137,11 @@ const Step1 = () => {
             inputMode="numeric"
             placeholder="Enter price"
             description="How much did you pay the seller?"
-            value={data.price || ""}
+            value={data.price != null ? formatNumber(data.price) : ""}
             showError={!!errors.price}
             onChange={(e) => {
-              const formatted = formatNumber(e.target.value);
-              update({ price: formatted });
+              const numericValue = parseNumber(e.target.value);
+              update({ price: numericValue });
             }}
             required
           />

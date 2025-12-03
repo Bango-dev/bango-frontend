@@ -11,52 +11,44 @@ import { uploadToCloudinary } from "../../utils/upload-to-cloudinary";
 import { useState } from "react";
 import LocationSelect from "../../components/LocationSelect";
 import SuggestionInput from "../../components/ui/SuggestionInput";
-// import type {Commodity} from "../../lib/types/commodities"
+import { parseNumber, formatNumber } from "../../utils/numberHelpers";
 
 const Review = () => {
   const { data, update, clear } = useFormData();
   const router = useRouter();
-  const [loading, setLoading] = useState(false); //  loading state
+  const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [originalData, setOriginalData] = useState(null);
 
-
-  // Price formatting
-  const formatNumber = (value: string) => {
-    const numericValue = value.replace(/\D/g, "");
-    return numericValue ? Number(numericValue).toLocaleString() : "";
-  };
-
-
-
   const clearError = (field: string) => {
-  setErrors((prev) => {
-    const updated = { ...prev };
-    delete updated[field];
-    return updated;
-  });
-};
-
+    setErrors((prev) => {
+      const updated = { ...prev };
+      delete updated[field];
+      return updated;
+    });
+  };
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
+
     if (!data.commodityName)
       newErrors.commodityName = "Commodity name is required.";
-    if (!data.price) newErrors.price = "Price is required.";
-    else if (
-      isNaN(Number(data.price.replace(/,/g, ""))) ||
-      Number(data.price.replace(/,/g, "")) <= 0
-    )
+
+    if (data.price == null || data.price <= 0)
       newErrors.price = "Enter a valid price.";
+
     if (!data.quantity) newErrors.quantity = "Quantity is required.";
+
     if (!data.sellerName) newErrors.sellerName = "Seller's Name is required.";
-      const phoneRegex = /^0\d{10}$/;
-      if (!data.sellerPhoneNumber)
-        newErrors.sellerPhoneNumber = "Phone number is required.";
-      else if (!phoneRegex.test(data.sellerPhoneNumber))
-        newErrors.sellerPhoneNumber =
-          "Enter a valid 11-digit phone number starting with 0.";
+
+    const phoneRegex = /^0\d{10}$/;
+    if (!data.sellerPhoneNumber)
+      newErrors.sellerPhoneNumber = "Phone number is required.";
+    else if (!phoneRegex.test(data.sellerPhoneNumber))
+      newErrors.sellerPhoneNumber =
+        "Enter a valid 11-digit phone number starting with 0.";
+
     if (!data.location) newErrors.location = "Please select your location.";
     if (!data.market) newErrors.market = "Market name is required.";
     if (!data.date) newErrors.date = "Please select a date.";
@@ -72,14 +64,14 @@ const Review = () => {
   };
 
   const handleSubmit = async () => {
-       setLoading(true);
+    setLoading(true);
 
-       const isValid = validate();
+    const isValid = validate();
+    if (!isValid) {
+      setLoading(false);
+      return;
+    }
 
-       if (!isValid) {
-         setLoading(false);
-         return;
-       }
     try {
       let imageUrl = null;
 
@@ -87,12 +79,10 @@ const Review = () => {
         let file: File;
 
         if (data.image instanceof Blob) {
-          // image is a Blob stored in Dexie / state
           file = new File([data.image], "upload.jpg", {
             type: data.image.type,
           });
         } else {
-          // image is a URL string (from Cloudinary or somewhere else)
           const res = await fetch(data.image);
           const blob = await res.blob();
           file = new File([blob], "upload.jpg", { type: blob.type });
@@ -104,7 +94,7 @@ const Review = () => {
 
       const payload = {
         commodityName: data.commodityName,
-        price: data.price,
+        price: data.price, // number
         quantity: data.quantity,
         location: data.location,
         market: data.market,
@@ -121,7 +111,7 @@ const Review = () => {
       console.error(error);
       alert("Something went wrong. Try again.");
     } finally {
-      setLoading(false); // stop loading
+      setLoading(false);
     }
   };
 
@@ -140,23 +130,22 @@ const Review = () => {
             Review Submission
           </span>
         </Link>
-        {/* Edit / Save / Cancel buttons */}
         {isEditing ? (
           <div className="flex gap-2">
             <MdSave
               className="h-8 w-8 cursor-pointer"
               onClick={() => {
                 setIsEditing(false);
-                setOriginalData(null); // clear backup
+                setOriginalData(null);
               }}
               title="Stop Editing"
             />
             <MdCancel
               className="h-8 w-8 cursor-pointer"
               onClick={() => {
-                update(originalData); // restore old values
+                update(originalData);
                 setIsEditing(false);
-                setOriginalData(null); // clear backup
+                setOriginalData(null);
               }}
               title="Cancel"
             />
@@ -165,7 +154,7 @@ const Review = () => {
           <MdEdit
             className="h-8 w-8 cursor-pointer"
             onClick={() => {
-              setOriginalData({ ...data }); // store a copy
+              setOriginalData({ ...data });
               setIsEditing(true);
             }}
             title="Edit Submission"
@@ -182,7 +171,7 @@ const Review = () => {
                 src={
                   data.image instanceof Blob
                     ? URL.createObjectURL(data.image)
-                    : (data.image as string)
+                    : data.image
                 }
                 alt={data.commodityName || "Commodity image"}
                 className="object-cover"
@@ -258,18 +247,13 @@ const Review = () => {
               <Input
                 label="Price Paid (NGN)"
                 type="text"
-                value={
-                  data.price
-                    ? `₦${Number(
-                        data.price.replace(/,/g, "")
-                      ).toLocaleString()}`
-                    : ""
-                }
+                value={data.price != null ? `₦${formatNumber(data.price)}` : ""}
                 onChange={(e) => {
-                  update({ price: formatNumber(e.target.value) });
+                  const numericValue = parseNumber(e.target.value);
+                  update({ price: numericValue });
                   clearError("price");
                 }}
-                className="flex-1 min-w-0 "
+                className="flex-1 min-w-0"
                 labelClassName="text-xs sm:text-xl font-bold text-[#1E1E1E]"
                 readOnly={!isEditing}
                 required
@@ -281,7 +265,6 @@ const Review = () => {
           </div>
 
           <div className="flex gap-4 mb-4">
-            {/* Location */}
             <LocationSelect
               value={data.location || ""}
               onChange={(val) => {
@@ -309,6 +292,7 @@ const Review = () => {
               )}
             </div>
           </div>
+
           <div>
             <SuggestionInput
               label="Market Name"
@@ -329,7 +313,6 @@ const Review = () => {
 
           <p className="text-lg text-[#757575]">Submitted: {data.date}</p>
 
-          {/* Submit button with loading state */}
           <PrimaryButton
             text={
               loading ? (
@@ -362,7 +345,7 @@ const Review = () => {
             }
             onClick={handleSubmit}
             className="w-full"
-            disabled={loading || isEditing} // disable while loading or editing
+            disabled={loading || isEditing}
           />
         </form>
       </div>

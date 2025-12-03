@@ -4,7 +4,7 @@ import Dexie, { Table } from "dexie";
 export interface Commodity {
   id?: number;
   commodityName: string;
-  price: string;
+  price: number;
   quantity: string;
   location: string;
   market: string;

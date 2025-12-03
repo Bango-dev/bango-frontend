@@ -7,7 +7,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import {  Commodity } from "../lib/db";
+import { Commodity } from "../lib/db";
 
 type ContextType = {
   data: Commodity;
@@ -17,7 +17,7 @@ type ContextType = {
 
 const defaultData: Commodity = {
   commodityName: "",
-  price: "",
+  price: null,
   quantity: "",
   location: "",
   market: "",
