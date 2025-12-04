@@ -89,10 +89,11 @@ const SuggestionInput = ({
 
   return (
     <div className="relative w-full">
-      <label className="text-xs sm:text-xl font-bold text-[#1E1E1E]">
+      <label className="text-xs sm:text-xl font-bold text-[#1E1E1E] ">
         {label}
+        {required && <span className="text-red-500 ml-1  ">*</span>}
       </label>
-      {required && <span className="text-red-500 ml-1 text-2xl ">*</span>}
+
       {description && (
         <p className="sm:text-base text-xs text-[#757575] mb-1">
           {description}
@@ -100,7 +101,7 @@ const SuggestionInput = ({
       )}
       <input
         type={type}
-        className={`w-full border p-2 rounded ${
+        className={`w-full text-xs sm:text-sm md:text-xl border p-2 rounded ${
           showError ? "border-red-500" : "border-gray-300"
         } ${className}`}
         placeholder={placeholder}
@@ -125,7 +126,7 @@ const SuggestionInput = ({
           {results.map((item, idx) => (
             <li
               key={idx}
-              className="p-2 hover:bg-gray-100 cursor-pointer"
+              className="p-2 hover:bg-gray-100 text-xs sm:text-sm md:text-xl cursor-pointer"
               onMouseDown={() => handleSelect(item)}
             >
               {item}

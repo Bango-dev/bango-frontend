@@ -92,7 +92,7 @@ function ListViewContent() {
               height={24}
             />
             <span className="font-bold sm:text-4xl text-2xl flex gap-2">
-              Submission <span className="sm:flex hidden">Prices</span>
+              Submissions 
             </span>
           </div>
         </Link>

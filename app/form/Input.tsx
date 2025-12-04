@@ -33,7 +33,9 @@ const Input: React.FC<InputProps> = ({
             {props.required && <span className="text-red-500 ml-1">*</span>}
           </label>
           {description && (
-            <span className="sm:text-base text-xs text-[#757575] mb-1">{description}</span>
+            <span className="sm:text-base text-xs text-[#757575] mb-1">
+              {description}
+            </span>
           )}
         </>
       )}
@@ -43,11 +45,11 @@ const Input: React.FC<InputProps> = ({
           {...props}
           className={`border ${
             showError ? "border-red-500" : "border-gray-300"
-          } rounded-md pl-3 py-2 outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition w-full  ${className}`}
+          } rounded-md text-xs sm:text-sm md:text-xl  p-2 outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition w-full  ${className}`}
         />
         {rightIcon && (
           <span
-            className=" text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center cursor-pointer"
+            className=" text-gray-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none flex items-center cursor-pointer"
             onClick={onRightIconClick}
           >
             <Image

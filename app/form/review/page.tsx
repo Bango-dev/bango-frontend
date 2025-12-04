@@ -40,7 +40,7 @@ const Review = () => {
 
     if (!data.quantity) newErrors.quantity = "Quantity is required.";
 
-    if (!data.sellerName) newErrors.sellerName = "Seller's Name is required.";
+    if (!data.sellerName) newErrors.sellerName = "Seller's name is required.";
 
     const phoneRegex = /^0\d{10}$/;
     if (!data.sellerPhoneNumber)
@@ -162,7 +162,7 @@ const Review = () => {
         )}
       </div>
 
-      <div className="flex md:flex-row flex-col items-center justify-center mx-auto gap-6">
+      <div className="flex md:flex-row flex-col items-center w-full justify-center ">
         {/* Image preview */}
         <div className="w-full md:w-1/3">
           {data.image ? (
@@ -180,14 +180,14 @@ const Review = () => {
               />
             </div>
           ) : (
-            <div className="mb-4 text-gray-500">No image uploaded</div>
+            <div className="mb-4 text-gray-500 text-center">No image uploaded</div>
           )}
         </div>
 
         {/* Form */}
         <form className="form border-none shadow-none md:w-2xl w-full">
-          <div className="flex gap-4 mb-4">
-            <div className="flex-1 min-w-0">
+          <div className="flex gap-4 w-full mb-4">
+            <div className="w-1/2">
               <SuggestionInput
                 label="Seller's Name"
                 type="text"
@@ -195,7 +195,7 @@ const Review = () => {
                 value={data.sellerName}
                 field="sellerName"
                 onChange={(val) => update({ sellerName: val })}
-                className="flex-1 min-w-0"
+                // className="w-1/2"
                 showError={!!errors.sellerName}
                 readOnly={!isEditing}
                 required
@@ -204,7 +204,7 @@ const Review = () => {
                 <p className="text-red-500 text-sm">{errors.sellerName}</p>
               )}
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="w-1/2">
               <SuggestionInput
                 label="Seller’s Phone No"
                 type="tel"
@@ -212,7 +212,7 @@ const Review = () => {
                 value={data.sellerPhoneNumber}
                 field="sellerPhoneNumber"
                 onChange={(val) => update({ sellerPhoneNumber: val })}
-                className="flex-1 min-w-0"
+                // className="w-1/2"
                 showError={!!errors.sellerPhoneNumber}
                 readOnly={!isEditing}
                 required
@@ -225,8 +225,8 @@ const Review = () => {
             </div>
           </div>
 
-          <div className="flex gap-4 mb-4">
-            <div className="flex-1 min-w-0">
+          <div className="flex  gap-4 w-full items-center ">
+            <div className="w-1/2">
               <SuggestionInput
                 label="Name of Commodity"
                 type="text"
@@ -234,7 +234,7 @@ const Review = () => {
                 value={data.commodityName}
                 field="commodityName"
                 onChange={(val) => update({ commodityName: val })}
-                className="flex-1 min-w-0"
+                // className="w-1/2"
                 showError={!!errors.commodityName}
                 readOnly={!isEditing}
                 required
@@ -243,7 +243,7 @@ const Review = () => {
                 <p className="text-red-500 text-sm">{errors.commodityName}</p>
               )}
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="w-1/2">
               <Input
                 label="Price Paid (NGN)"
                 type="text"
@@ -253,8 +253,7 @@ const Review = () => {
                   update({ price: numericValue });
                   clearError("price");
                 }}
-                className="flex-1 min-w-0"
-                labelClassName="text-xs sm:text-xl font-bold text-[#1E1E1E]"
+                placeholder="Enter price"
                 readOnly={!isEditing}
                 required
               />
@@ -264,37 +263,9 @@ const Review = () => {
             </div>
           </div>
 
-          <div className="flex gap-4 mb-4">
-            <LocationSelect
-              value={data.location || ""}
-              onChange={(val) => {
-                update({ location: val });
-                clearError("location");
-              }}
-              error={errors.location}
-              required
-            />
-            <div className="flex-1 min-w-0">
-              <SuggestionInput
-                label="Quantity"
-                type="text"
-                placeholder="1 mudu, 1 Kg, I pair, 1 Pack"
-                value={data.quantity}
-                field="quantity"
-                onChange={(val) => update({ quantity: val })}
-                className="flex-1 min-w-0"
-                showError={!!errors.quantity}
-                readOnly={!isEditing}
-                required
-              />
-              {errors.quantity && (
-                <p className="text-red-500 text-sm">{errors.quantity}</p>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <SuggestionInput
+          <div className="flex  gap-4 w-full mb-4">
+            <div className="w-1/2 ">
+                 <SuggestionInput
               label="Market Name"
               type="text"
               placeholder="Wuse Market"
@@ -309,6 +280,36 @@ const Review = () => {
             {errors.market && (
               <p className="text-red-500 text-sm">{errors.market}</p>
             )}
+            </div>
+            <div className="w-1/2 ">
+              <SuggestionInput
+                label="Quantity"
+                type="text"
+                placeholder="1 mudu, 1 Kg, I pair, 1 Pack"
+                value={data.quantity}
+                field="quantity"
+                onChange={(val) => update({ quantity: val })}
+                showError={!!errors.quantity}
+                readOnly={!isEditing}
+                required
+              />
+              {errors.quantity && (
+                <p className="text-red-500 text-sm">{errors.quantity}</p>
+              )}
+            </div>
+          </div>
+
+          <div>
+              <LocationSelect
+                value={data.location || ""}
+                onChange={(val) => {
+                  update({ location: val });
+                  clearError("location");
+                }}
+                error={errors.location}
+                required
+                // className="w-1/2"
+              />
           </div>
 
           <p className="text-lg text-[#757575]">Submitted: {data.date}</p>

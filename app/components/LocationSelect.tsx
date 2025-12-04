@@ -98,7 +98,7 @@ export default function LocationSelect({
 
   return (
     <div className="mb-4 relative" ref={dropdownRef}>
-      <label className="block text-xs sm:text-xl font-bold text-[#1E1E1E]">
+      <label className=" text-xs sm:text-xl font-bold text-[#1E1E1E]">
         Location {required && <span className="text-red-500">*</span>}
       </label>
 
@@ -134,7 +134,7 @@ export default function LocationSelect({
               setIsOpen(false);
             }
           }}
-          className={`w-full border rounded px-3 py-2 pr-10 ${
+          className={`w-full border rounded p-2 text-xs sm:text-sm md:text-xl  ${
             error ? "border-red-500" : "border-gray-300"
           } focus:outline-none focus:ring-2 focus:ring-blue-500`}
           aria-expanded={isOpen}
@@ -160,7 +160,7 @@ export default function LocationSelect({
 
       {isOpen && (
         <ul
-          className="absolute z-10 bg-white border border-gray-300 rounded mt-1 w-full max-h-48 overflow-y-auto"
+          className="absolute z-10 bg-white border text-xs sm:text-sm md:text-xl border-gray-300 rounded mt-1 w-full max-h-48 overflow-y-auto"
           role="listbox"
           id="location-listbox"
         >

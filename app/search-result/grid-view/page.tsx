@@ -87,7 +87,7 @@ function GridViewContent() {
               height={24}
             />
             <span className="font-bold sm:text-4xl text-2xl flex gap-2">
-              Submission <span className="sm:flex hidden">Prices</span>
+              Submissions
             </span>
           </div>
         </Link>
@@ -188,7 +188,9 @@ function GridViewContent() {
                 </div>
                 <div>
                   <p className="submission-key">Price Paid</p>
-                  <p className="submission-value">{item.price || "N/A"}</p>
+                  <p className="submission-value">
+                    ₦{parsePrice(item.price).toLocaleString()}
+                  </p>
                 </div>
               </div>
 
@@ -210,7 +212,6 @@ function GridViewContent() {
                   {avgPrice ? `₦${avgPrice.toLocaleString()}` : "N/A"}
                 </p>
               </div>
-
 
               <InfoBox className="sm:block hidden" />
 
