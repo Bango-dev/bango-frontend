@@ -48,11 +48,13 @@ export default function LocationSelect({
   onChange,
   error,
   required = false,
+   readOnly = false,
 }: {
   value: string;
   onChange: (val: string) => void;
   error?: string | null;
-  required?: boolean;
+    required?: boolean;
+  readOnly?: boolean;
 }) {
   const [query, setQuery] = useState(value || "");
   const [isOpen, setIsOpen] = useState(false);
@@ -98,7 +100,7 @@ export default function LocationSelect({
 
   return (
     <div className="mb-4 relative" ref={dropdownRef}>
-      <label className=" text-xs sm:text-xl font-bold text-[#1E1E1E]">
+      <label className=" text-xs sm:text-lg  font-bold text-[#1E1E1E]">
         Location {required && <span className="text-red-500">*</span>}
       </label>
 
@@ -108,11 +110,13 @@ export default function LocationSelect({
           placeholder="Select or type your location"
           value={query}
           onChange={(e) => {
+            if (readOnly) return;
             setQuery(e.target.value);
             setIsOpen(true);
             onChange(e.target.value);
           }}
           onFocus={() => setIsOpen(true)}
+           readOnly={readOnly}
           onKeyDown={(e) => {
             if (e.key === "ArrowDown") {
               e.preventDefault();
@@ -136,7 +140,8 @@ export default function LocationSelect({
           }}
           className={`w-full border rounded p-2 text-xs sm:text-sm md:text-xl  ${
             error ? "border-red-500" : "border-gray-300"
-          } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+            } focus:outline-none focus:ring-2 
+          ${readOnly ? "bg-gray-100 cursor-not-allowed" : ""}`}
           aria-expanded={isOpen}
           aria-controls="location-listbox"
           aria-invalid={!!error}
@@ -149,8 +154,9 @@ export default function LocationSelect({
           role="combobox"
         />
         <Image
-          onClick={toggleDropdown}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-600 cursor-pointer"
+          onClick={readOnly ? null : toggleDropdown}
+        className={`absolute right-3 top-1/2 -translate-y-1/2 ${readOnly ? "opacity-40 cursor-not-allowed" : "cursor-pointer"
+          }`}
           src="/images/form/map-marker-outline.svg"
           alt="icon"
           width={24}
@@ -160,7 +166,7 @@ export default function LocationSelect({
 
       {isOpen && (
         <ul
-          className="absolute z-10 bg-white border text-xs sm:text-sm md:text-xl border-gray-300 rounded mt-1 w-full max-h-48 overflow-y-auto"
+          className="absolute z-10 bg-white border text-xs sm:text-sm md:text-lg border-gray-300 rounded mt-1 w-full max-h-48 overflow-y-auto"
           role="listbox"
           id="location-listbox"
         >
@@ -178,7 +184,11 @@ export default function LocationSelect({
                 setHighlightedIndex(index);
               }}
               className={`px-3 py-2 cursor-pointer ${
-                highlightedIndex === index ? "bg-blue-100" : "hover:bg-gray-100"
+                readOnly
+                  ? "cursor-not-allowed opacity-40"
+                  : highlightedIndex === index
+                  ? "bg-blue-100"
+                  : "hover:bg-gray-100"
               }`}
               role="option"
               aria-selected={highlightedIndex === index}

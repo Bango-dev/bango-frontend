@@ -180,7 +180,9 @@ const Review = () => {
               />
             </div>
           ) : (
-            <div className="mb-4 text-gray-500 text-center">No image uploaded</div>
+            <div className="mb-4 text-gray-500 text-center">
+              No image uploaded
+            </div>
           )}
         </div>
 
@@ -265,21 +267,21 @@ const Review = () => {
 
           <div className="flex  gap-4 w-full mb-4">
             <div className="w-1/2 ">
-                 <SuggestionInput
-              label="Market Name"
-              type="text"
-              placeholder="Wuse Market"
-              value={data.market}
-              field="market"
-              onChange={(val) => update({ market: val })}
-              className="w-full"
-              showError={!!errors.market}
-              readOnly={!isEditing}
-              required
-            />
-            {errors.market && (
-              <p className="text-red-500 text-sm">{errors.market}</p>
-            )}
+              <SuggestionInput
+                label="Market Name"
+                type="text"
+                placeholder="Wuse Market"
+                value={data.market}
+                field="market"
+                onChange={(val) => update({ market: val })}
+                className="w-full"
+                showError={!!errors.market}
+                readOnly={!isEditing}
+                required
+              />
+              {errors.market && (
+                <p className="text-red-500 text-sm">{errors.market}</p>
+              )}
             </div>
             <div className="w-1/2 ">
               <SuggestionInput
@@ -300,18 +302,35 @@ const Review = () => {
           </div>
 
           <div>
-              <LocationSelect
-                value={data.location || ""}
-                onChange={(val) => {
-                  update({ location: val });
-                  clearError("location");
-                }}
-                error={errors.location}
-                required
-                // className="w-1/2"
-              />
+            <LocationSelect
+              value={data.location || ""}
+              onChange={(val) => {
+                update({ location: val });
+                clearError("location");
+              }}
+              error={errors.location}
+              required
+              readOnly={!isEditing}
+              // className="w-1/2"
+            />
           </div>
 
+          {/* Disclaimer */}
+          <div className="form w-full border border-(--color-primary) bg-[#FAFAFE] rounded-md">
+            <h4 className="  text-(--color-primary) text-xs sm:text-sm md:text-lg font-bold ">
+              Disclaimer
+            </h4>
+            <hr className="my-3 text-(--color-primary) " />
+            <div className="flex  justify-between">
+              <p className="text-[#757575] text-xs sm:text-sm md:text-lg ">
+                By submitting this information, you confirm that the seller has
+                given explicit consent for their details to be shared. You
+                accept full responsibility for the accuracy and authorization of
+                all uploaded data. Bango does not collect, verify, or assume
+                liability for any user-submitted information.
+              </p>
+            </div>
+          </div>
           <p className="text-lg text-[#757575]">Submitted: {data.date}</p>
 
           <PrimaryButton
