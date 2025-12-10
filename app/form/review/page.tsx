@@ -20,6 +20,8 @@ const Review = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [originalData, setOriginalData] = useState(null);
+  const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false);
+
 
   const clearError = (field: string) => {
     setErrors((prev) => {
@@ -63,14 +65,23 @@ const Review = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
 
-    const isValid = validate();
-    if (!isValid) {
-      setLoading(false);
-      return;
-    }
+
+
+  const handleSubmit = async () => {
+     setLoading(true);
+
+     if (!acceptedDisclaimer) {
+       alert("You must agree to the disclaimer before submitting.");
+       setLoading(false);
+       return;
+     }
+
+     const isValid = validate();
+     if (!isValid) {
+       setLoading(false);
+       return;
+     }
 
     try {
       let imageUrl = null;
@@ -317,11 +328,12 @@ const Review = () => {
 
           {/* Disclaimer */}
           <div className="form w-full border border-(--color-primary) bg-[#FAFAFE] rounded-md">
-            <h4 className="  text-(--color-primary) text-xs sm:text-sm md:text-lg font-bold ">
+            <h4 className="text-(--color-primary) text-xs sm:text-sm md:text-lg font-bold ">
               Disclaimer
             </h4>
-            <hr className="my-3 text-(--color-primary) " />
-            <div className="flex  justify-between">
+            <hr className="my-3 text-(--color-primary)" />
+
+            <div className="flex justify-between">
               <p className="text-[#757575] text-xs sm:text-sm md:text-lg ">
                 By submitting this information, you confirm that the seller has
                 given explicit consent for their details to be shared. You
@@ -330,7 +342,21 @@ const Review = () => {
                 liability for any user-submitted information.
               </p>
             </div>
+
+            {/*  ADD CHECKBOX HERE */}
+            <div className="mt-4 flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={acceptedDisclaimer}
+                onChange={() => setAcceptedDisclaimer(!acceptedDisclaimer)}
+                className="w-5 h-5 accent-(--color-primary)"
+              />
+              <label className="text-sm text-[#757575]">
+                I agree to the disclaimer above
+              </label>
+            </div>
           </div>
+
           <p className="text-lg text-[#757575]">Submitted: {data.date}</p>
 
           <PrimaryButton
@@ -365,7 +391,7 @@ const Review = () => {
             }
             onClick={handleSubmit}
             className="w-full"
-            disabled={loading || isEditing}
+            disabled={loading || isEditing || !acceptedDisclaimer}
           />
         </form>
       </div>
