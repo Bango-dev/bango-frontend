@@ -20,7 +20,7 @@ const Footer = () => {
       </ul>
       <div className="my-10">
         <Image
-          src="/images/footer/footer-logo.svg"
+          src="/images/navbar/new-bango-logo.svg"
           alt="The footer logo"
           width={830}
           height={174}

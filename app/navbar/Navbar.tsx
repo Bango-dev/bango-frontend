@@ -37,7 +37,7 @@ const Navbar = () => {
         <div>
           <Image
             className="pl-4"
-            src="/images/navbar/navbar-logo.svg"
+            src="/images/navbar/new-bango-logo.svg"
             alt="The logo at the navigation bar"
             width={153}
             height={32}
