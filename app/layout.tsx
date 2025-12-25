@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
-import Navbar from "./navbar/Navbar";
+// import Navbar from "./components/navbar/Navbar";
 import { FormProvider } from "../app/context/FormContext";
 import { Figtree, Poppins, Lexend } from "next/font/google";
 import { AuthProvider } from "./context/AuthContext";
@@ -42,7 +42,6 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <FormProvider>
-            <Navbar />
             {children}
           </FormProvider>
         </AuthProvider>

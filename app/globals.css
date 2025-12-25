@@ -151,6 +151,47 @@
   }
 }
 
+/* Smooth fade slideshow */
+@keyframes onboardingSlide {
+  0% {
+    opacity: 1;
+    background-image: url("/images/on-boarding/onboarding-img-1.png");
+  }
+  20% {
+    opacity: 1;
+    background-image: url("/images/on-boarding/onboarding-img-2.png");
+  }
+
+  /* 25% { opacity: 0; } */
+  30% {
+    opacity: 1;
+    background-image: url("/images/on-boarding/onboarding-img-3.png");
+  }
+
+  50% {
+    opacity: 1;
+    background-image: url("/images/on-boarding/onboarding-img-4.png");
+  }
+
+  /* 55% { opacity: 0; } */
+  60% {
+    opacity: 1;
+    background-image: url("/images/on-boarding/onboarding-img-5.png");
+  }
+
+  100% {
+    opacity: 1;
+    background-image: url("/images/on-boarding/onboarding-img-1.png");
+  }
+}
+
+/* Tailwind utility class */
+.onboarding-slideshow {
+  animation: onboardingSlide 18s infinite ease-in-out;
+  background-size: cover;
+  background-position: center;
+}
+
 body {
   font-family: var(--font-poppins), sans-serif;
 }
