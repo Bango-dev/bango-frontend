@@ -6,6 +6,7 @@ import Button from "../ui/Button";
 import { useState, useRef, useEffect, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import PrimaryButton from "../ui/PrimaryButton";
+import { MdOutlineLogout } from "react-icons/md";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -77,26 +78,31 @@ const Navbar = () => {
 
       {/* DESKTOP: If logged in → Show logout */}
       {user && (
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex items-center justify-center ">
           <Image
-            // className="pl-4"
+            className="hidden md:block"
             src="/images/navbar/bell-icon.svg"
             alt="The logo at the navigation bar"
             width={18}
             height={21}
           />
-          <span>Rose Doe</span>
+          <span className="hidden md:block nav-link ">Rose Doe</span>
           <Image
             // className="pl-4"
             src="/images/navbar/profile-pic.png"
             alt="The logo at the navigation bar"
             width={32}
             height={32}
+            className="hidden md:block"
           />
-          <PrimaryButton
+          {/* <PrimaryButton
             text="Logout"
             onClick={logout}
             className="hidden md:flex px-4 py-2 mx-4"
+          /> */}
+          <MdOutlineLogout
+            onClick={logout}
+            className="text-(--color-primary) w-8 h-8 hidden md:flex  mx-2 "
           />
         </div>
       )}

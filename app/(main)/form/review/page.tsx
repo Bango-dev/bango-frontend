@@ -351,7 +351,7 @@ const Review = () => {
                 onChange={() => setAcceptedDisclaimer(!acceptedDisclaimer)}
                 className="w-5 h-5 accent-(--color-primary)"
               />
-              <label className="text-sm text-[#757575]">
+              <label className="text-xs sm:text-sm md:text-lg text-[#757575]">
                 I agree to the disclaimer above
               </label>
             </div>

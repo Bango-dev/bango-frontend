@@ -27,7 +27,7 @@ const Input: React.FC<InputProps> = ({
       {label && (
         <>
           <label
-            className={`text-xs sm:text-lg  font-bold text-[#1E1E1E] ${labelClassName}`}
+            className={`text-xs sm:text-sm md:text-base  font-bold text-[#1E1E1E] ${labelClassName}`}
           >
             {label}
             {props.required && <span className="text-red-500 ml-1">*</span>}
@@ -45,7 +45,7 @@ const Input: React.FC<InputProps> = ({
           {...props}
           className={`border ${
             showError ? "border-red-500" : "border-gray-300"
-          } rounded-md text-xs sm:text-sm md:text-lg  p-2 outline-none focus:ring-2 focus:ring-(--primary-color) focus:border-(--primary-color) transition w-full  ${className}`}
+          } rounded-md text-base  p-2 outline-none focus:ring-2 focus:ring-(--primary-color) focus:border-(--primary-color) transition w-full  ${className}`}
         />
         {rightIcon && (
           <span

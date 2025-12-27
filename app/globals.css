@@ -13,7 +13,7 @@
   }
 
   .nav-link {
-    @apply px-3 py-2 rounded-md transition-colors duration-200 hover:bg-purple-200 hover:text-[var(--color-primary)] cursor-pointer lg:text-base md:text-sm;
+    @apply px-3 py-2 rounded-md transition-colors duration-200 hover:bg-purple-200 hover:text-[var(--color-primary)] cursor-pointer lg:text-base md:text-xs;
   }
 
   .social-link {
@@ -194,6 +194,7 @@
 
 body {
   font-family: var(--font-poppins), sans-serif;
+  overflow-x: hidden;
 }
 span,
 p {
@@ -214,3 +215,4 @@ nav {
 .card-border {
   border: 1px solid var(--Border-Default-Default, #d9d9d9);
 }
+html { overflow-x: hidden; }

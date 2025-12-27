@@ -46,9 +46,17 @@ const LandingPage = () => {
   };
 
   return (
-    <>
+    <div className="max-w-full overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative  flex flex-col  sm:bg-cover sm:bg-center   items-center pt-5 h-screen ">
+      <section
+        className="
+    relative flex flex-col items-center
+    pt-8 pb-20
+    min-h-fit
+    md:min-h-[50vh]
+    lg:min-h-screen
+  "
+      >
         {/* Desktop background image */}
 
         {/* Random decorative background images */}
@@ -385,8 +393,8 @@ const LandingPage = () => {
       </section>
 
       {/* submit price section */}
-      <section className="center h-screen">
-        <div className="w-9/12 bg-[#CBCBFA] rounded-2xl md:h-8/12 h-6/12 center relative -z-20 overflow-hidden">
+      <section className="center  h-auto my-20 ">
+        <div className="sm:w-9/12 bg-[#CBCBFA] w-[90%] rounded-2xl md:py-40 py-20  center relative -z-20 overflow-hidden">
           <Image
             src="/images/submit-price/Ellipse-12.svg"
             alt="background-image"
@@ -428,7 +436,7 @@ const LandingPage = () => {
           />
         </div>
       </section>
-    </>
+    </div>
   );
 };
 export default LandingPage;

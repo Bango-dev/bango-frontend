@@ -63,8 +63,8 @@ const FindPrice = () => {
   return (
     <ProtectedRoute>
       <div className="flex flex-col min-h-screen pt-5 px-3 sm:px-4 lg:px-4 mx-auto w-full">
-        <Link href="/">
-          <div className="flex items-center mb-6 cursor-pointer gap-2">
+        <Link href="/" className="w-fit" >
+          <div className="flex items-center  w-fit mb-6 cursor-pointer gap-2">
             <Image
               src="/images/form/arrow-left.svg"
               alt="Back arrow"
@@ -88,7 +88,6 @@ const FindPrice = () => {
             value={commodityName}
             onChange={setCommodityName}
             field="commodityName"
-            description="What’s the name of the item you bought?"
             showError={!!errors.commodityName}
             required
           />
@@ -104,19 +103,18 @@ const FindPrice = () => {
             value={market}
             field="market"
             onChange={setMarket}
-            description="Where did you buy it?"
             showError={!!errors.marketName}
           />
           {errors.market && (
             <p className="text-red-500 text-sm">{errors.market}</p>
           )}
           {/* Sorting options */}
-          <div className="flex flex-col w-full mb-4">
+          {/* <div className="flex flex-col w-full mb-4">
             <label className="text-xs sm:text-xl font-bold text-[#1E1E1E] mb-2">
               Sort By
             </label>
             <div className="flex gap-4">
-              {/* Most Recent */}
+              Most Recent
               <select
                 className="border border-gray-300 rounded-md px-3 py-2 w-1/2 text-base text-[#757575]"
                 value={sortRecent}
@@ -126,7 +124,7 @@ const FindPrice = () => {
                 <option value="oldest">Oldest</option>
               </select>
 
-              {/* Price Order */}
+              Price Order
               <select
                 className="border border-gray-300 rounded-md px-2 py-2 w-1/2 text-base text-[#757575]"
                 value={sortPrice}
@@ -137,7 +135,7 @@ const FindPrice = () => {
                 <option value="low">Price (Low → High)</option>
               </select>
             </div>
-          </div>
+          </div> */}
 
           {/* Submit button with loading state */}
           <PrimaryButton

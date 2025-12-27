@@ -100,7 +100,7 @@ export default function LocationSelect({
 
   return (
     <div className="mb-4 relative" ref={dropdownRef}>
-      <label className=" text-xs sm:text-lg  font-bold text-[#1E1E1E]">
+      <label className=" text-xs sm:text-sm md:text-base  font-bold text-[#1E1E1E]">
         Location {required && <span className="text-red-500">*</span>}
       </label>
 
@@ -116,7 +116,7 @@ export default function LocationSelect({
             onChange(e.target.value);
           }}
           onFocus={() => setIsOpen(true)}
-           readOnly={readOnly}
+          readOnly={readOnly}
           onKeyDown={(e) => {
             if (e.key === "ArrowDown") {
               e.preventDefault();
@@ -138,9 +138,9 @@ export default function LocationSelect({
               setIsOpen(false);
             }
           }}
-          className={`w-full border rounded p-2 text-xs sm:text-sm md:text-xl  ${
+          className={`w-full border rounded p-2 text-base md:text-xl  ${
             error ? "border-red-500" : "border-gray-300"
-            } focus:outline-none focus:ring-2 
+          } focus:outline-none focus:ring-2
           ${readOnly ? "bg-gray-100 cursor-not-allowed" : ""}`}
           aria-expanded={isOpen}
           aria-controls="location-listbox"
@@ -155,7 +155,8 @@ export default function LocationSelect({
         />
         <Image
           onClick={readOnly ? null : toggleDropdown}
-        className={`absolute right-3 top-1/2 -translate-y-1/2 ${readOnly ? "opacity-40 cursor-not-allowed" : "cursor-pointer"
+          className={`absolute right-3 top-1/2 -translate-y-1/2 ${
+            readOnly ? "opacity-40 cursor-not-allowed" : "cursor-pointer"
           }`}
           src="/images/form/map-marker-outline.svg"
           alt="icon"
@@ -166,7 +167,7 @@ export default function LocationSelect({
 
       {isOpen && (
         <ul
-          className="absolute z-10 bg-white border text-xs sm:text-sm md:text-lg border-gray-300 rounded mt-1 w-full max-h-48 overflow-y-auto"
+          className="absolute z-10 bg-white border text-base md:text-lg border-gray-300 rounded mt-1 w-full max-h-48 overflow-y-auto"
           role="listbox"
           id="location-listbox"
         >
