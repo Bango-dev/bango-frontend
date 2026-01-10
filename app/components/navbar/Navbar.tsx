@@ -7,8 +7,10 @@ import { useState, useRef, useEffect, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import PrimaryButton from "../ui/PrimaryButton";
 import { MdOutlineLogout } from "react-icons/md";
+import NotificationsDialog from "../NotificationsDialog";
 
 const Navbar = () => {
+  const [open, setOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -34,6 +36,7 @@ const Navbar = () => {
 
   return (
     <nav className="w-full flex items-center justify-between bg-(--color-secondary) py-4 cursor-pointer">
+      <NotificationsDialog isOpen={open} onClose={() => setOpen(false)} />
       <Link href="/">
         <div>
           <Image
@@ -47,19 +50,17 @@ const Navbar = () => {
       </Link>
 
       <ul className="hidden md:flex list-none">
-        <Link href="/form/step-1" className="nav-link">
+        <Link href="/timeline" className="nav-link">
           <li>Timeline</li>
         </Link>
         <Link href="/form/step-1" className="nav-link">
           <li>Submit Price</li>
         </Link>
-
-        <Link href="/coming-soon" className="nav-link">
-          <li>Top Sellers</li>
-        </Link>
-
         <Link href="/find-price" className="nav-link">
           <li>Find Prices</li>
+        </Link>
+        <Link href="/about-us" className="nav-link">
+          <li>About Us</li>
         </Link>
       </ul>
 
@@ -79,12 +80,13 @@ const Navbar = () => {
       {/* DESKTOP: If logged in → Show logout */}
       {user && (
         <div className="flex items-center justify-center ">
-          <Image
+          {/* <Image
             className="hidden md:block"
             src="/images/navbar/bell-icon.svg"
             alt="The logo at the navigation bar"
             width={18}
             height={21}
+            onClick={() => setOpen(true)}
           />
           <span className="hidden md:block nav-link ">Rose Doe</span>
           <Image
@@ -94,7 +96,7 @@ const Navbar = () => {
             width={32}
             height={32}
             className="hidden md:block"
-          />
+          /> */}
           {/* <PrimaryButton
             text="Logout"
             onClick={logout}
@@ -137,7 +139,7 @@ const Navbar = () => {
         {/* Menu items */}
         <ul className="flex flex-col gap-6 mt-16 list-none px-4">
           <Link
-            href="/form/step-1"
+            href="/timeline"
             className="hover:text-purple-600 cursor-pointer"
             onClick={() => setIsOpen(false)}
           >
@@ -151,18 +153,18 @@ const Navbar = () => {
             <li>Submit Price</li>
           </Link>
           <Link
-            href="/coming-soon"
-            className="hover:text-purple-600 cursor-pointer"
-            onClick={() => setIsOpen(false)}
-          >
-            <li>Top Sellers</li>
-          </Link>
-          <Link
             href="/find-price"
             className="hover:text-purple-600 cursor-pointer"
             onClick={() => setIsOpen(false)}
           >
             <li>Find Prices</li>
+          </Link>
+          <Link
+            href="/about-us"
+            className="hover:text-purple-600 cursor-pointer"
+            onClick={() => setIsOpen(false)}
+          >
+            <li>About Us</li>
           </Link>
 
           {!user && (

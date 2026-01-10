@@ -1,21 +1,97 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { useEffect, useState, useMemo } from "react";
+// import { usePathname } from "next/navigation";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import InfoBox from "../../../../components/ui/InfoBox";
 import Link from "next/link";
 import api from "../../../../utils/api";
 import { Commodity } from "../../../../lib/types/commodities";
-import { IoCopyOutline } from "react-icons/io5";
+// import { IoCopyOutline } from "react-icons/io5";
 import useAveragePrices from "../../../../components/utils/useAveragePrice";
+import { IoShareSocialSharp } from "react-icons/io5";
+import PrimaryButton from "../../../../components/ui/PrimaryButton";
 
 const MobileFullDetails = () => {
+  const [pageUrl, setPageUrl] = useState("");
   const { id } = useParams();
   const [product, setProduct] = useState<Commodity>(null);
   const [loading, setLoading] = useState(true);
-  const pathname = usePathname();
+  const [showDialog, setShowDialog] = useState(false);
+  const linkRef = useRef<HTMLParagraphElement>(null);
+  // const pathname = usePathname();
+
+  const SHARE_MESSAGE = encodeURIComponent(
+    `Hey! Check out this price on Bango 👇\n${pageUrl}`
+  );
+
+  const shareHandlers = {
+    whatsapp: () => {
+      window.open(`https://wa.me/?text=${SHARE_MESSAGE}`, "_blank");
+    },
+
+    facebook: () => {
+      window.open(
+        `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`,
+        "_blank"
+      );
+    },
+
+    x: () => {
+      // Opens DM inbox where user selects recipient
+      window.open(
+        `https://twitter.com/messages/compose?text=${SHARE_MESSAGE}`,
+        "_blank"
+      );
+    },
+
+    email: () => {
+      const subject = encodeURIComponent(
+        "Check prices of commodities on Bango"
+      );
+      const body = encodeURIComponent(
+        `Hey! Check out this price on Bango, \n${pageUrl}`
+      );
+
+      // Gmail app → Gmail web fallback
+      window.open(
+        `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`,
+        "_blank"
+      );
+    },
+  };
+
+  const SOCIALS_ICONS = [
+    {
+      icon: "/images/display/whatsapp-logo.svg",
+      label: "WhatsApp",
+      onClick: shareHandlers.whatsapp,
+    },
+    {
+      icon: "/images/display/facebook-logo.svg",
+      label: "Facebook",
+      onClick: shareHandlers.facebook,
+    },
+    {
+      icon: "/images/display/x-logo.svg",
+      label: "X",
+      onClick: shareHandlers.x,
+    },
+    {
+      icon: "/images/display/email-icon.svg",
+      label: "Email",
+      onClick: shareHandlers.email,
+    },
+  ];
+
+  useEffect(() => {
+    if (!id || typeof window === "undefined") return;
+
+    const shortUrl = `${window.location.origin}/p/${id}`;
+    setPageUrl(shortUrl);
+  }, [id]);
+
   const memoizedProductArray = useMemo(
     () => (product ? [product] : []),
     [product]
@@ -78,11 +154,25 @@ const MobileFullDetails = () => {
 
   if (!product) return <div className="p-6">Submission not found.</div>;
 
-  const handleCopy = async () => {
-    const fullUrl = `${window.location.origin}${pathname}`;
+  // const handleCopy = async () => {
+  //   const fullUrl = `${window.location.origin}${pathname}`;
 
-    await navigator.clipboard.writeText(fullUrl);
-    alert("Link copied!");
+  //   await navigator.clipboard.writeText(fullUrl);
+  //   alert("Link copied!");
+  // };
+
+  const handleCopyLink = () => {
+    if (linkRef.current) {
+      const textToCopy = linkRef.current.textContent || "";
+      navigator.clipboard
+        .writeText(textToCopy)
+        .then(() => {
+          alert("Link copied!");
+        })
+        .catch((err) => {
+          console.error("Failed to copy link: ", err);
+        });
+    }
   };
 
   const normalize = (val: string) =>
@@ -103,10 +193,78 @@ const MobileFullDetails = () => {
           </div>
         </Link>
 
-        <IoCopyOutline className="h-6 w-6" onClick={handleCopy} />
+        {/* <IoCopyOutline className="h-6 w-6" onClick={handleCopy} /> */}
+        <IoShareSocialSharp
+          className="h-6 w-6"
+          onClick={() => setShowDialog(!showDialog)}
+        />
       </div>
 
-      <div className="sm:flex items-center justify-center">
+      {/* dialog box */}
+      {showDialog && (
+        <div className=" fixed inset-0 flex justify-center items-center bg-black/40  z-50">
+          <div className="flex flex-col  justify-center items-center form border border-(--color-primary)  rounded-md p-6  bg-[#FAFAFE]   sm:w-xl w-[90%]  ">
+            <div className="flex items-center justify-center w-full relative ">
+              <h3 className=" text-(--color-primary) sm:text-2xl text-lg font-bold ">
+                Invite your friends
+              </h3>
+
+              <Image
+                src="/images/display/cancel-icon.svg"
+                alt="cancel icon"
+                width={14}
+                height={14}
+                className=" absolute right-1 enable-hover-cursor cursor-pointer  "
+                onClick={() => setShowDialog(!showDialog)}
+              />
+            </div>
+            <hr className="w-full text-(--color-primary) " />
+
+            <div className="flex w-full justify-center">
+              {SOCIALS_ICONS.map((social, index) => (
+                <div
+                  key={index}
+                  className=" justify-evenly mx-2  w-full flex flex-col "
+                >
+                  <div className="flex  items-center justify-evenly  my-3 cursor-pointer w-full  ">
+                    <div
+                      className="relative aspect-square w-[clamp(2.5rem,6vw,5.5rem)]"
+                      onClick={social.onClick}
+                    >
+                      <Image
+                        src={social.icon}
+                        alt={social.label}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                  </div>
+                  <p className="flex text-xs sm:text-sm md:text-base items-center justify-evenly  my-3 cursor-pointer w-full">
+                    {social.label}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="border flex rounded-md items-center p-2 justify-between w-full border-[#757575] bg-[#F5F5F5]">
+              <p
+                className="text-[#B3B3B3] sm:text-base text-[0.55rem]"
+                ref={linkRef}
+              >
+                {pageUrl}
+              </p>
+
+              <PrimaryButton
+                text="Copy Link"
+                className="rounded-xl h-12 p-0  w-[30%] sm:text-sm text-[0.55rem]  text-white  "
+                onClick={handleCopyLink}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="sm:flex items-center justify-center  ">
         {/* IMAGE (left) - reserve the same width even if image missing */}
         <div className="w-full sm:w-64 md:w-72 shrink-0 ">
           {product.photoUrl ? (
@@ -127,7 +285,7 @@ const MobileFullDetails = () => {
           )}
         </div>
 
-        <div className="bg-white rounded-lg p-6 space-y-4 w-full lg:w-2xl">
+        <div className="bg-white rounded-lg p-6 space-y-4 w-full lg:w-xl">
           <h2 className="text-2xl font-bold text-[#1E1E1E]">
             {product.commodityName}
           </h2>

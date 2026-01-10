@@ -6,6 +6,7 @@ import { useFormData } from "../../../context/FormContext";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import StepIndicator from "../../../components/ui/StepIndicator";
 import SuggestionInput from "../../../components/ui/SuggestionInput";
+import Input from "../Input";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -105,13 +106,14 @@ const Step2 = () => {
           range
         </h3>
 
-        <SuggestionInput
+        <Input
           label="Seller's Name"
           type="text"
           placeholder="Madam Kemi"
           value={data.sellerName || ""}
-          field="sellerName"
-          onChange={(val) => update({ sellerName: val })}
+          // field="sellerName"
+          // onChange={(val) => update({ sellerName: val })}
+          onChange={(e) => update({ sellerName: e.target.value })}
           description="This helps other communicate with the seller better."
           showError={!!errors.sellerName}
           required
@@ -120,13 +122,13 @@ const Step2 = () => {
           <p className="text-red-500 text-sm">{errors.sellerName}</p>
         )}
 
-        <SuggestionInput
+        <Input
           label="Seller’s Phone No"
           type="tel"
           placeholder="08000000000"
           value={data.sellerPhoneNumber || ""}
-          field="sellerPhoneNumber"
-          onChange={(val) => update({ sellerPhoneNumber: val })}
+          // field="sellerPhoneNumber"
+          onChange={(e) => update({ sellerPhoneNumber: e.target.value })}
           description="Phone Number"
           showError={!!errors.sellerPhoneNumber}
           required

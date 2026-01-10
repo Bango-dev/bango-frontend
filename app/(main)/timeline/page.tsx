@@ -5,20 +5,137 @@ import SecondaryButton from "../../components/ui/SecondaryButton";
 import PrimaryButton from "../../components/ui/PrimaryButton";
 import Image from "next/image";
 // import Button from "../../components/ui/Button";
-import { useState } from "react";
+import SearchInput from "../../components/ui/SearchInput";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useRef, useState } from "react";
+
+
+const REFERRAL_LINK = "https://bango.app/r/7F3K9Q2PBFCEJDBIJSCBHYSBJC/";
+
+const SHARE_MESSAGE = encodeURIComponent(
+  `Hey! Join me on Bango Market Day 👇\n${REFERRAL_LINK}`
+);
+
+const SHARE_PRICE = encodeURIComponent(`"Eggs Bango'd today at ₦2500/crate"`);
+
+const sharePriceHandlers = {
+  whatsapp: () => {
+    window.open(`https://wa.me/?text=${SHARE_PRICE}`, "_blank");
+  },
+
+  x: () => {
+    window.open(
+      `https://twitter.com/messages/compose?text=${SHARE_PRICE}`,
+      "_blank"
+    );
+  },
+
+  telegram: () => {
+    const PAGE_URL = encodeURIComponent(window.location.href);
+    const SHARE_TEXT = encodeURIComponent(
+      `"Eggs Bango'd today at ₦2500/crate"`
+    );
+
+    const appUrl = `https://t.me/share/url?url=${PAGE_URL}&text=${SHARE_TEXT}`;
+    const webUrl = `https://web.telegram.org/k/#/share?url=${PAGE_URL}&text=${SHARE_TEXT}`;
+
+    // Try opening the app
+    window.location.href = appUrl;
+
+    // Fallback to web after 1 second
+    setTimeout(() => {
+      window.location.href = webUrl;
+    }, 1000);
+  },
+};
+
+const shareHandlers = {
+  whatsapp: () => {
+    window.open(`https://wa.me/?text=${SHARE_MESSAGE}`, "_blank");
+  },
+
+  facebook: () => {
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${REFERRAL_LINK}`,
+      "_blank"
+    );
+  },
+
+  x: () => {
+    // Opens DM inbox where user selects recipient
+    window.open(
+      `https://twitter.com/messages/compose?text=${SHARE_MESSAGE}`,
+      "_blank"
+    );
+  },
+
+  email: () => {
+    const subject = encodeURIComponent("Join me on Market Day");
+    const body = encodeURIComponent(
+      `Hey,\n\nJoin me on Market Day using this link:\n${REFERRAL_LINK}`
+    );
+
+    // Gmail app → Gmail web fallback
+    window.open(
+      `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`,
+      "_blank"
+    );
+  },
+};
+
+const SOCIALS_ICONS = [
+  {
+    icon: "/images/insights/whatsapp-logo.svg",
+    label: "WhatsApp",
+    onClick: shareHandlers.whatsapp,
+  },
+  {
+    icon: "/images/insights/facebook-logo.svg",
+    label: "Facebook",
+    onClick: shareHandlers.facebook,
+  },
+  {
+    icon: "/images/insights/x-logo.svg",
+    label: "X",
+    onClick: shareHandlers.x,
+  },
+  {
+    icon: "/images/insights/email-icon.svg",
+    label: "Email",
+    onClick: shareHandlers.email,
+  },
+];
 
 const Timeline = () => {
-  const CATEGORIES = ["New", "Trending", "Most Bango'd", "For You"];
+  const CATEGORIES = ["New", "For You"];
   const [activeCategory, setActiveCategory] = useState("New");
+  const router = useRouter();
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+    const linkRef = useRef<HTMLParagraphElement>(null);
 
-  const FILTERS = [
-    "All",
-    "Fruits",
-    "Vegetables",
-    "Household",
-    "Proteins",
-    "Dairy",
-  ];
+    const handleCopyLink = () => {
+      if (linkRef.current) {
+        const textToCopy = linkRef.current.textContent || "";
+        navigator.clipboard
+          .writeText(textToCopy)
+          .then(() => {
+            alert("Link copied!");
+          })
+          .catch((err) => {
+            console.error("Failed to copy link: ", err);
+          });
+      }
+    };
+
+  // const FILTERS = [
+  //   "All",
+  //   "Fruits",
+  //   "Vegetables",
+  //   "Household",
+  //   "Proteins",
+  //   "Dairy",
+  // ];
 
   const COMMODITIES = [
     {
@@ -144,11 +261,11 @@ const Timeline = () => {
     const copy = [...COMMODITIES];
 
     switch (category) {
-      case "Trending":
-        return copy.reverse();
+      // case "Trending":
+      //   return copy.reverse();
 
-      case "Most Bango'd":
-        return [...copy.slice(3), ...copy.slice(0, 3)];
+      // case "Most Bango'd":
+      //   return [...copy.slice(3), ...copy.slice(0, 3)];
 
       case "For You":
         return [...copy.slice(5), ...copy.slice(0, 5)];
@@ -158,39 +275,118 @@ const Timeline = () => {
     }
   };
 
+    const handleClick = () => {
+      // Navigate to the timeline page
+      router.push("/submit-price");
+    };
+//  const handleFocus = () => {
+//    router.push("/search");
+//  };
   return (
     <>
       <div className="py-10 px-20 flex flex-col gap-4 w-full ">
         <h1 className="font-bold text-3xl">Welcome Back, Rose!</h1>
-        <Input
-          type="text"
-          placeholder="Search for prices, markets...."
-          // name="password"
-          // value={formData.password}
-          // onChange={handleChange}
-          className="w-full"
-        />
+        <Link href="/search" prefetch>
+          <div>
+            <SearchInput
+              placeholder="Search for prices, markets...."
+              readOnly
+              // onClick={handleFocus}
+            />
+          </div>
+        </Link>
+        {/* dialog box */}
+        {showDialog && (
+          <div className=" fixed inset-0 flex justify-center items-center bg-black/40  z-50">
+            <div className="flex flex-col  justify-center items-center form border border-(--color-primary)  rounded-md p-6  bg-[#FAFAFE]   sm:w-xl w-[90%]  ">
+              <div className="flex items-center justify-center w-full relative ">
+                <h3 className=" text-(--color-primary) sm:text-2xl text-lg font-bold ">
+                  Invite your friends
+                </h3>
+
+                <Image
+                  src="/images/insights/cancel-icon.svg"
+                  alt="cancel icon"
+                  width={14}
+                  height={14}
+                  className=" absolute right-1 enable-hover-cursor cursor-pointer  "
+                  onClick={() => setShowDialog(!showDialog)}
+                />
+              </div>
+              <hr className="w-full text-(--color-primary) " />
+
+              <p className=" text-[#757575]  sm:text-base text-sm text-center">
+                Share your referral link and get points every time someone signs
+                up through you. The more people you bring in, the smarter the
+                market becomes, for everyone.
+              </p>
+
+              <div className="flex w-full justify-center">
+                {SOCIALS_ICONS.map((social, index) => (
+                  <div
+                    key={index}
+                    className=" justify-evenly w-full flex flex-col "
+                  >
+                    <div className="flex  items-center justify-evenly  my-3 cursor-pointer w-full  ">
+                      <div
+                        className="relative aspect-square w-[clamp(2.5rem,6vw,5.5rem)]"
+                        onClick={social.onClick}
+                      >
+                        <Image
+                          src={social.icon}
+                          alt={social.label}
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
+                    </div>
+                    <p className="flex text-xs sm:text-sm md:text-base  items-center justify-evenly  my-3 cursor-pointer w-full">
+                      {social.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="border flex rounded-md items-center p-2 justify-between w-full border-[#757575] bg-[#F5F5F5]">
+                <p
+                  className="text-[#B3B3B3] sm:text-base text-[0.55rem]    "
+                  ref={linkRef}
+                >
+                  https://bango.app/r/7F3K9Q2PBFCEJDBIJSCBHYSBJC/
+                </p>
+
+                <PrimaryButton
+                  text="Copy Link"
+                  className="rounded-xl h-8 p-0  w-[20%] sm:text-sm text-[0.55rem]  text-white  "
+                  onClick={handleCopyLink}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex gap-3 w-full ">
-          <div className="form h-fit pb-20 w-[20%] ">
+          {/* <div className="form h-fit pb-20 w-[20%] ">
             <h3>Filter by</h3>
             {FILTERS.map((filter, index) => (
               <div>
                 <div className="flex  " key={index}>
-                  <input type="checkbox" name="" id="" /> <p className="ml-3" >{filter}</p>{" "}
+                  <input type="checkbox" name="" id="" />{" "}
+                  <p className="ml-3">{filter}</p>{" "}
                 </div>
               </div>
             ))}
-          </div>
+          </div> */}
 
-          <div className="w-[80%]" >
+          <div className="w-full">
             <div className="bg-[#5C32D0] w-full text-white rounded-lg  h-60 p-10 ">
               <h3 className="text-2xl font-semibold">Discover real prices</h3>
               <h4 className=" my-6 ">
                 Crowdsourced prices from across Nigeria
               </h4>
               <SecondaryButton
-                text="Explore Timeline"
-                // onClick={handleGoogleSignIn}
+                text="Submit Price"
+                onClick={handleClick}
                 // iconSrc="/images/on-boarding/google-icon.svg"
                 className=" text-[#5C32D0] "
               />
@@ -227,7 +423,10 @@ const Timeline = () => {
               <div className="flex  justify-start flex-wrap my-5 gap-5 ">
                 {getShuffledCommodities(activeCategory).map(
                   (commodity, index) => (
-                    <div className="form w-lg  rounded-4xl p-0 mx-0 " key={index}>
+                    <div
+                      className="form w-md  rounded-4xl p-0 mx-0 "
+                      key={index}
+                    >
                       <div>
                         <Image
                           src={commodity.image}
@@ -259,13 +458,15 @@ const Timeline = () => {
                         <p className="text-[#757575]">{commodity.date}</p>
                         <div className="w-full flex gap-3 ">
                           <SecondaryButton
-                            text="Insights"
-                            // onClick={handleGoogleSignIn}
-                            // iconSrc="/images/on-boarding/google-icon.svg"
-                            className=" text-[#5C32D0] w-full "
+                            text="Share"
+                            className="w-full text-[#5C32D0]"
+                            iconSrc="images/insights/share-icon.svg"
+                            iconClassName="w-5 h-5"
+                            onClick={() => setShowDialog(!showDialog)}
                           />
                           <PrimaryButton
-                            text="Bango this item"
+                            text="View"
+                            onClick={handleClick}
                             // type="submit"
                             // loading={loading}
                             // loadingText="Signing In..."
@@ -278,7 +479,7 @@ const Timeline = () => {
                 )}
               </div>
             </div>
-            <div className="flex justify-between bg-[#DFE0FF] p-5 rounded-2xl ">
+            {/* <div className="flex justify-between bg-[#DFE0FF] p-5 rounded-2xl ">
               <div>
                 <h4 className="font-semibold text-[#4B2CA9] text-2xl ">
                   Your Location: Abuja
@@ -287,10 +488,10 @@ const Timeline = () => {
               </div>
               <SecondaryButton
                 text="Change Location"
-                // onClick={handleGoogleSignIn}
-                // iconSrc="/images/on-boarding/google-icon.svg"
+                onClick={handleGoogleSignIn}
+                iconSrc="/images/on-boarding/google-icon.svg"
               />
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

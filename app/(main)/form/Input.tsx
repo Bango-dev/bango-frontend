@@ -5,8 +5,10 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   description?: string;
   rightIcon?: string;
+  leftIcon?: string;
   onRightIconClick?: () => void;
   labelClassName?: string;
+  inputClassName?: string;
   showError?: boolean;
   onIconClick?: () => void;
 }
@@ -15,9 +17,11 @@ const Input: React.FC<InputProps> = ({
   label,
   description,
   rightIcon,
+  leftIcon,
   onRightIconClick,
   className = "",
   labelClassName = "",
+  inputClassName = "",
   showError = false,
   onIconClick,
   ...props
@@ -41,11 +45,23 @@ const Input: React.FC<InputProps> = ({
       )}
 
       <div className={`relative w-full ${className}`}>
+        {/* Left Search Icon */}
+        {leftIcon && (
+          <span className="absolute left-3 top-1/2  -translate-y-1/2 pointer-events-none">
+            <Image
+              src="/images/timeline/search-icon.svg"
+              alt="Search"
+              width={12}
+              height={12}
+            />
+          </span>
+        )}
+
         <input
           {...props}
           className={`border ${
             showError ? "border-red-500" : "border-gray-300"
-          } rounded-md text-base  p-2 outline-none focus:ring-2 focus:ring-(--primary-color) focus:border-(--primary-color) transition w-full  ${className}`}
+          } rounded-md text-base  p-2 outline-none focus:ring-2 focus:ring-(--primary-color) focus:border-(--primary-color) transition w-full  ${className} ${inputClassName}`}
         />
         {rightIcon && (
           <span

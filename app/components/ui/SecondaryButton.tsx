@@ -4,6 +4,7 @@ import Image from "next/image";
 import React from "react";
 
 type ButtonProps = {
+  iconClassName?: string;
   text: React.ReactNode;
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
@@ -15,6 +16,7 @@ type ButtonProps = {
 };
 
 const SecondaryButton = ({
+  iconClassName,
   text,
   className,
   onClick,
@@ -32,10 +34,10 @@ const SecondaryButton = ({
       onClick={onClick}
       disabled={isDisabled}
       className={`
-        btn-secondary 
-        flex flex-row justify-center items-center 
-        gap-2 
-        ${className ?? ""} 
+        btn-secondary
+        flex flex-row justify-center items-center
+        gap-2
+        ${className ?? ""}
         ${isDisabled ? "cursor-not-allowed opacity-70" : ""}
       `}
     >
@@ -68,7 +70,7 @@ const SecondaryButton = ({
           alt="icon"
           width={24}
           height={24}
-          className="inline-block"
+          className={`inline-block ${iconClassName ?? ""}`}
         />
       )}
 

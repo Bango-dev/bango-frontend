@@ -10,6 +10,7 @@ type Props = {
   readonly?: boolean;
   label?: string;
   description?: string;
+  error?: string ;
 };
 
 export default function FileUpload({
@@ -18,6 +19,7 @@ export default function FileUpload({
   readonly = false,
   label = "Image",
   description = "You can add a picture of the item you bought to help others identify it.",
+  error = null,
 }: Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -101,7 +103,7 @@ export default function FileUpload({
     <div className="flex flex-col gap-2 w-full">
       <label className="text-xs sm:text-sm font-bold text-[#1E1E1E] flex items-center gap-1">
         {label}
-        {/* {error && <span className="text-red-500">*</span>} */}
+        <span className="text-red-500">*</span>
       </label>
 
       {description && (
@@ -139,6 +141,11 @@ export default function FileUpload({
       {!readonly && !previewUrl && (
         <label
           className={`flex flex-col items-center justify-center border-2 border-dotted rounded-md h-48 w-full cursor-pointer transition
+             ${
+               error
+                 ? "border-red-500 bg-red-50"
+                 : "border-gray-300 hover:border-(--color-primary)"
+             }
            `}
         >
           {loading ? (
@@ -161,10 +168,11 @@ export default function FileUpload({
             onChange={handleFileChange}
             ref={fileInputRef}
             className="hidden"
+            required
           />
         </label>
       )}
-
+      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
     </div>
   );
 }

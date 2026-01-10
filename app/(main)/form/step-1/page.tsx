@@ -33,6 +33,7 @@ const Step1 = () => {
     if (!data.location) newErrors.location = "Please select your location.";
     if (!data.market) newErrors.market = "Market name is required.";
     if (!data.date) newErrors.date = "Please select a date.";
+    if (!data.image) newErrors.image = "Image is required.";
 
     setErrors(newErrors);
 
@@ -179,7 +180,7 @@ const Step1 = () => {
             field="market"
             onChange={(val) => update({ market: val })}
             description="Where did you buy it?"
-            showError={!!errors.marketName}
+            showError={!!errors.market}
             required
           />
           {errors.market && (
@@ -190,7 +191,7 @@ const Step1 = () => {
             <FileUpload
               initial={data.image ?? null}
               onFileSelect={(file) => update({ image: file })}
-              // error={errors.image}
+              error={errors.image}
             />
           </div>
 
