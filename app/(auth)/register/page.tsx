@@ -7,7 +7,11 @@ import Link from "next/link";
 import { Figtree, Poppins } from "next/font/google";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import api from "../../utils/api";
+// import api from "../../utils/api";
+import toast from "react-hot-toast";
+import publicApi from "../../utils/api";
+import { formatNigerianPhone } from "../../utils/formatNigerianPhone";
+
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -24,29 +28,32 @@ const SignUp = () => {
 
   const [formData, setFormData] = useState({
     email: "",
+    phoneNumber: "",
     firstName: "",
     password: "",
-    confirmPassword: "",
+    passwordConfirmation: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [errorMessages, setErrorMessages] = useState({
     email: "",
+    phoneNumber: "",
     firstName: "",
     password: "",
-    confirmPassword: "",
+    passwordConfirmation: "",
   });
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  // const [error, setError] = useState("");
+  // const [success, setSuccess] = useState("");
 
   // validation function
   const validateForm = () => {
     let isValid = true;
     const errors = {
       email: "",
+      phoneNumber: "",
       firstName: "",
       password: "",
-      confirmPassword: "",
+      passwordConfirmation: "",
     };
 
     if (!formData.firstName.trim()) {
@@ -62,6 +69,15 @@ const SignUp = () => {
       isValid = false;
     }
 
+        const formattedPhone = formatNigerianPhone(formData.phoneNumber);
+    if (!formData.phoneNumber) {
+      errors.phoneNumber = "Phone number is required.";
+      isValid = false;
+    } else if (!formattedPhone) {
+      errors.phoneNumber = "Enter a valid Nigerian phone number.";
+      isValid = false;
+    }
+
     if (!formData.password.trim()) {
       errors.password = "Password is required.";
       isValid = false;
@@ -70,15 +86,18 @@ const SignUp = () => {
       isValid = false;
     }
 
-    if (!formData.confirmPassword.trim()) {
-      errors.confirmPassword = "Please confirm your password.";
+    if (!formData.passwordConfirmation.trim()) {
+      errors.passwordConfirmation = "Please confirm your password.";
       isValid = false;
-    } else if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = "Passwords do not match.";
+    } else if (formData.password !== formData.passwordConfirmation) {
+      errors.passwordConfirmation = "Passwords do not match.";
       isValid = false;
     }
 
     setErrorMessages(errors);
+    if (!isValid) {
+  toast.error("Please complete all required fields correctly");
+}
     return isValid;
   };
 
@@ -89,42 +108,97 @@ const SignUp = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
+  e.preventDefault();
 
-    if (!validateForm()) return;
+  if (!validateForm()) return;
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const response = await api.post("/auth/register", {
-        firstName: formData.firstName,
-        email: formData.email,
-        password: formData.password,
-      });
+  try {
+     const response = await publicApi.post("/auth/register", {
+      firstName: formData.firstName,
+      email: formData.email,
+      phoneNumber: formData.phoneNumber,
+      password: formData.password,
+      passwordConfirmation: formData.passwordConfirmation,
+    });
+// console.log(response)
+    toast.success("Signup successful! Redirecting to login...");
 
-      console.log(response.data);
+    setFormData({
+      email: "",
+phoneNumber: "",
+      firstName: "",
+      password: "",
+      passwordConfirmation: "",
+    });
 
-      setSuccess("Signup successful!");
-      setFormData({
-        email: "",
-        firstName: "",
-        password: "",
-        confirmPassword: "",
-      });
+    setTimeout(() => {
+      router.push("/login");
+    }, 2000);
+  } catch (err) {
+    console.log(err)
+    toast.error(
+      err.response ||
+        "Signup failed. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
-      setTimeout(() => router.push("/login"), 2500);
-    } catch (err) {
-      console.error("Signup error:", err);
-      setError(
-        err.response?.data?.message || "Signup failed. Please try again."
-      );
-    } finally {
-      setLoading(false);
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     // setError("");
+//     // setSuccess("");
+
+//     if (!validateForm()){
+//       toast.error("Please fix the errors in the form");
+//     };
+
+//     setLoading(true);
+
+//     try {
+//       const response = await api.post("/auth/register", {
+//         firstName: formData.firstName,
+//         email: formData.email,
+//         password: formData.password,
+//       });
+
+//       console.log(response.data);
+// toast.success("Signup successful! Redirecting to login...");
+//       // setSuccess("Signup successful!");
+//       setFormData({
+//         email: "",
+//         firstName: "",
+//         password: "",
+//         confirmPassword: "",
+//       });
+
+//       setTimeout(() => router.push("/login"), 2500);
+//     } catch (err) {
+//       console.error("Signup error:", err);
+//       // setError(
+//       //   err.response?.data?.message || "Signup failed. Please try again."
+//       // );
+//       toast.error(
+//       err.response?.data?.message ||
+//         "Signup failed. Please try again."
+//     );
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+  const handlePhoneBlur = () => {
+    const formatted = formatNigerianPhone(formData.phoneNumber);
+    if (formatted) {
+      setFormData((prev) => ({
+        ...prev,
+        phoneNumber: formatted,
+      }));
     }
   };
-
   const handleGoogleSignUp = () => {
     // Add your Google sign-up logic here
     console.log("Google sign-up clicked");
@@ -158,11 +232,11 @@ const SignUp = () => {
           value={formData.firstName}
           onChange={handleChange}
         />
-        {errorMessages.firstName && (
+        {/* {errorMessages.firstName && (
           <p className="text-red-500 text-sm -mt-2.5 mb-2">
             {errorMessages.firstName}
           </p>
-        )}
+        )} */}
 
         {/* EMAIL */}
         <Input
@@ -175,11 +249,29 @@ const SignUp = () => {
           value={formData.email}
           onChange={handleChange}
         />
-        {errorMessages.email && (
+        {/* {errorMessages.email && (
           <p className="text-red-500 text-sm -mt-2.5 mb-2">
             {errorMessages.email}
           </p>
-        )}
+        )} */}
+
+        {/* phone Number */}
+        <Input
+          label="Phone Number"
+          type="tel"
+          placeholder="+2348172197475"
+          name="phoneNumber"
+          autoComplete="tel"
+          required
+          value={formData.phoneNumber}
+          onChange={handleChange}
+          onBlur={handlePhoneBlur}
+        />
+        {/* {errorMessages.phoneNumber && (
+          <p className="text-red-500 text-sm mt-2.5 mb-2">
+            {errorMessages.phoneNumber}
+          </p>
+        )} */}
 
         {/* PASSWORD */}
         <Input
@@ -191,27 +283,27 @@ const SignUp = () => {
           value={formData.password}
           onChange={handleChange}
         />
-        {errorMessages.password && (
+        {/* {errorMessages.password && (
           <p className="text-red-500 text-sm -mt-2.5 mb-2">
             {errorMessages.password}
           </p>
-        )}
+        )} */}
 
         {/* CONFIRM PASSWORD */}
         <Input
           label="Confirm Password"
           type="password"
           placeholder="********"
-          name="confirmPassword"
+          name="passwordConfirmation"
           required
-          value={formData.confirmPassword}
+          value={formData.passwordConfirmation}
           onChange={handleChange}
         />
-        {errorMessages.confirmPassword && (
+        {/* {errorMessages.confirmPassword && (
           <p className="text-red-500 text-sm -mt-2.5 mb-2">
             {errorMessages.confirmPassword}
           </p>
-        )}
+        )} */}
 
         <div className="flex flex-col gap-4 w-full px-0">
           <PrimaryButton
@@ -230,10 +322,10 @@ const SignUp = () => {
           />
         </div>
 
-        {error && <p className="text-red-500 text-center text-sm">{error}</p>}
+        {/* {error && <p className="text-red-500 text-center text-sm">{error}</p>}
         {success && (
           <p className="text-green-600 text-center text-sm">{success}</p>
-        )}
+        )} */}
 
         <p className="text-center text-[#757575] text-sm mt-2">
           Already have an account?

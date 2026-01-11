@@ -61,7 +61,7 @@ const FindPrice = () => {
   };
 
   return (
-    <ProtectedRoute>
+    // <ProtectedRoute>
       <div className="flex flex-col min-h-screen pt-5 px-3 sm:px-4 lg:px-4 mx-auto w-full">
         <Link href="/" className="w-fit" >
           <div className="flex items-center  w-fit mb-6 cursor-pointer gap-2">
@@ -175,7 +175,7 @@ const FindPrice = () => {
           />
         </form>
       </div>
-    </ProtectedRoute>
+    // </ProtectedRoute>
   );
 };
 

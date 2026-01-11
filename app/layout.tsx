@@ -5,6 +5,7 @@ import "./globals.css";
 import { FormProvider } from "../app/context/FormContext";
 import { Figtree, Poppins, Lexend } from "next/font/google";
 import { AuthProvider } from "./context/AuthContext";
+import { Toaster } from "react-hot-toast";
 
 const lexend = Lexend({
   subsets: ["latin"],
@@ -42,6 +43,12 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <FormProvider>
+                    <Toaster
+          position="top-left"
+          toastOptions={{
+            duration: 5000,
+          }}
+        />
             {children}
           </FormProvider>
         </AuthProvider>

@@ -9,7 +9,6 @@ import LocationSelect from "../../../components/LocationSelect";
 import { useRouter } from "next/navigation";
 import { useFormData } from "../../../context/FormContext";
 import { useState } from "react";
-import ProtectedRoute from "../../../components/protectedRoute";
 import SuggestionInput from "../../../components/ui/SuggestionInput";
 import { parseNumber, formatNumber } from "../../../utils/numberHelpers";
 
@@ -62,7 +61,6 @@ const Step1 = () => {
   };
 
   return (
-    <ProtectedRoute>
       <div className="flex flex-col min-h-screen pt-5 px-3 sm:px-4 lg:px-4 mx-auto w-full ">
         <div className="relative flex items-center">
           <Link href="/">
@@ -214,7 +212,6 @@ const Step1 = () => {
           />
         </form>
       </div>
-    </ProtectedRoute>
   );
 };
 export default Step1;

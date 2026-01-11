@@ -3,7 +3,8 @@
 import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import api from "../../../utils/api";
+// import api from "../../../utils/api";
+import authApi from "../../../utils/api";
 import DisplayIndicator from "../../../components/ui/DisplayIndicator";
 import Link from "next/link";
 import Image from "next/image";
@@ -39,12 +40,12 @@ function GridViewContent() {
       try {
         setIsLoading(true);
 
-        const res = await api.get("/search", {
+        const res = await authApi.get("/search", {
           params: { commodityName },
         });
 
-        console.log(res.data?.data?.data);
-        setResults(res.data?.data?.data || []);
+        console.log(res);
+        setResults(res.data?.entity?.data?.data || []);
       } catch (error) {
         console.error(error);
         setResults([]);

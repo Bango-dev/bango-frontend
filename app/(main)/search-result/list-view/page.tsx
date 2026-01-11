@@ -9,7 +9,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import useAveragePrices from "../../../components/utils/useAveragePrice";
-import api from "../../../utils/api";
+import authApi from "../../../utils/api";
 
 
 const ITEMS_PER_PAGE = 10;
@@ -41,12 +41,12 @@ function ListViewContent() {
       try {
         setIsLoading(true);
 
-        const res = await api.get("/search", {
+        const res = await authApi.get("/search", {
           params: { commodityName },
         });
 
-        console.log(res.data);
-        setResults(res.data?.data?.data || []);
+        console.log(res);
+        setResults(res.data?.entity?.data?.data || []);
       } catch (error) {
         console.error(error);
         setResults([]);

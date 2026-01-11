@@ -14,3 +14,4 @@ export type Commodity = {
   createdAt: string;
   viewCount?: number;
 };
+

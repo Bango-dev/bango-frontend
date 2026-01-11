@@ -14,8 +14,10 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, loading } = useContext(AuthContext);
+
   console.log("Navbar user:", user);
+  const logoHref = user ? "/timeline" : "/about-us";
 
   //  Close mobile menu when clicking outside
   useEffect(() => {
@@ -34,10 +36,12 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
+  if (loading) return null; // or skeleton navbar
+
   return (
     <nav className="w-full flex items-center justify-between bg-(--color-secondary) py-4 cursor-pointer">
       <NotificationsDialog isOpen={open} onClose={() => setOpen(false)} />
-      <Link href="/">
+      <Link href={logoHref}>
         <div>
           <Image
             className="pl-4"
@@ -182,8 +186,8 @@ const Navbar = () => {
               text="Logout"
               className="mt-6 w-full"
               onClick={() => {
-                logout();
                 setIsOpen(false);
+                logout();
               }}
             />
           )}
