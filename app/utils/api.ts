@@ -8,10 +8,6 @@ const api = axios.create({
   },
 });
 
-/**
- * Global response interceptor
- * Handles API errors consistently for cookie-based auth
- */
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError<any>) => {

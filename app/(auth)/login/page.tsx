@@ -12,7 +12,11 @@ import toast from "react-hot-toast";
 
 const SignIn = () => {
   const router = useRouter();
-  const { refreshUser } = useContext(AuthContext);
+
+    if (!AuthContext) {
+      throw new Error("AuthContext must be used within AuthProvider");
+    }
+  const { setUser } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -36,20 +40,21 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-     const response = await authApi.post("/auth/login", {
-        email: formData.email,
-        password: formData.password,
-      });
-console.log("Login successful:", response);
-      //  THIS LINE IS REQUIRED
-      await refreshUser();
-console.log("Login response:", response);
-      toast.success("Login successful!");
-      router.replace("/timeline");
+      const response = await authApi.post("/auth/login", formData);
+      console.log("Login response:", response.data);
+
+  if (response.data.entity) {
+        setUser(response.data.entity); // Set user directly
+    toast.success("Login successful!");
+    router.refresh();
+        router.push("/timeline");
+      }
+
     } catch (err: any) {
       console.error("Login error:", err);
       toast.error(
         err.response?.data?.message ||
+          err.message ||
           "Login failed. Please check your credentials."
       );
     } finally {

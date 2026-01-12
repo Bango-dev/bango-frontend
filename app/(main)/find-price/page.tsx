@@ -8,7 +8,8 @@ import PrimaryButton from "../../components/ui/PrimaryButton";
 import LocationSelect from "../../components/LocationSelect";
 import Link from "next/link";
 import Image from "next/image";
-import ProtectedRoute from "../../components/protectedRoute";
+import { AuthContext } from "../../context/AuthContext";
+import {useContext} from "react"
 
 const FindPrice = () => {
   const [commodityName, setCommodityName] = useState("");
@@ -19,6 +20,17 @@ const FindPrice = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [loading, setLoading] = useState(false);
   const router = useRouter();
+    const { user } = useContext(AuthContext);
+
+
+    useEffect(() => {
+      if (!loading && !user) {
+        router.replace("/login");
+      }
+    }, [user, loading]);
+
+    if (loading) return null;
+    if (!user) return null;
 
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
@@ -61,7 +73,6 @@ const FindPrice = () => {
   };
 
   return (
-    // <ProtectedRoute>
       <div className="flex flex-col min-h-screen pt-5 px-3 sm:px-4 lg:px-4 mx-auto w-full">
         <Link href="/" className="w-fit" >
           <div className="flex items-center  w-fit mb-6 cursor-pointer gap-2">
@@ -175,7 +186,6 @@ const FindPrice = () => {
           />
         </form>
       </div>
-    // </ProtectedRoute>
   );
 };
 

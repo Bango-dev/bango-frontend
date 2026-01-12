@@ -7,6 +7,10 @@ import Image from "next/image";
 import SearchInput from "../ui/SearchInput";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import authApi from "../../utils/api";
+import CommodityCard from "../CommodityCard";
+
 import Button from "../ui/Button";
 
 const LandingPage = () => {
@@ -26,89 +30,112 @@ const LandingPage = () => {
   //   },
   // ];
 
-  const TRENDING_COMMODITIES = [
-    {
-      image: "/images/dashboard/groundnut_oil.png",
-      name: "Ground Oil",
-      price: "#800",
-      bangos: "1,247 Bangos",
-      category: "Households",
-      quantity: "Per Kg",
-      date: "Bango'd on 02/12/2025",
-    },
-    {
-      image: "/images/dashboard/egg.png",
-      name: "Eggs",
-      price: "#800",
-      bangos: "1,247 Bangos",
-      category: "Protein",
-      quantity: "Per Crate",
-      date: "Bango'd on 02/12/2025",
-    },
-    {
-      image: "/images/dashboard/yam.png",
-      name: "Yam",
-      price: "#1500",
-      bangos: "1,247 Bangos",
-      category: "Tuber",
-      quantity: "Per Pcs",
-      date: "Bango'd on 02/12/2025",
-    },
-    {
-      image: "/images/dashboard/rice.png",
-      name: "Rice",
-      price: "#25000",
-      bangos: "1,247 Bangos",
-      category: "Grain",
-      quantity: "Per bag",
-      date: "Bango'd on 02/12/2025",
-    },
-    {
-      image: "/images/dashboard/beans.png",
-      name: "Beans",
-      price: "#800",
-      bangos: "1,247 Bangos",
-      category: "Grain",
-      quantity: "Per kg",
-      date: "Bango'd on 02/12/2025",
-    },
-    {
-      image: "/images/dashboard/yam.png",
-      name: "Yam",
-      price: "#1500",
-      bangos: "1,247 Bangos",
-      category: "Tuber",
-      quantity: "Per Pcs",
-      date: "Bango'd on 02/12/2025",
-    },
-    {
-      image: "/images/dashboard/egg.png",
-      name: "Eggs",
-      price: "#800",
-      bangos: "1,247 Bangos",
-      category: "Protein",
-      quantity: "Per Crate",
-      date: "Bango'd on 02/12/2025",
-    },
-    {
-      image: "/images/dashboard/groundnut_oil.png",
-      name: "Ground Oil",
-      price: "#800",
-      bangos: "1,247 Bangos",
-      category: "Households",
-      quantity: "Per Kg",
-      date: "Bango'd on 02/12/2025",
-    },
-    {
-      image: "/images/dashboard/rice.png",
-      name: "Rice",
-      price: "#25000",
-      bangos: "1,247 Bangos",
-      category: "Grain",
-      quantity: "Per bag",
-      date: "Bango'd on 02/12/2025",
-    },
-  ];
+  // const TRENDING_COMMODITIES = [
+  //   {
+  //     image: "/images/dashboard/groundnut_oil.png",
+  //     name: "Ground Oil",
+  //     price: "#800",
+  //     bangos: "1,247 Bangos",
+  //     category: "Households",
+  //     quantity: "Per Kg",
+  //     date: "Bango'd on 02/12/2025",
+  //   },
+  //   {
+  //     image: "/images/dashboard/egg.png",
+  //     name: "Eggs",
+  //     price: "#800",
+  //     bangos: "1,247 Bangos",
+  //     category: "Protein",
+  //     quantity: "Per Crate",
+  //     date: "Bango'd on 02/12/2025",
+  //   },
+  //   {
+  //     image: "/images/dashboard/yam.png",
+  //     name: "Yam",
+  //     price: "#1500",
+  //     bangos: "1,247 Bangos",
+  //     category: "Tuber",
+  //     quantity: "Per Pcs",
+  //     date: "Bango'd on 02/12/2025",
+  //   },
+  //   {
+  //     image: "/images/dashboard/rice.png",
+  //     name: "Rice",
+  //     price: "#25000",
+  //     bangos: "1,247 Bangos",
+  //     category: "Grain",
+  //     quantity: "Per bag",
+  //     date: "Bango'd on 02/12/2025",
+  //   },
+  //   {
+  //     image: "/images/dashboard/beans.png",
+  //     name: "Beans",
+  //     price: "#800",
+  //     bangos: "1,247 Bangos",
+  //     category: "Grain",
+  //     quantity: "Per kg",
+  //     date: "Bango'd on 02/12/2025",
+  //   },
+  //   {
+  //     image: "/images/dashboard/yam.png",
+  //     name: "Yam",
+  //     price: "#1500",
+  //     bangos: "1,247 Bangos",
+  //     category: "Tuber",
+  //     quantity: "Per Pcs",
+  //     date: "Bango'd on 02/12/2025",
+  //   },
+  //   {
+  //     image: "/images/dashboard/egg.png",
+  //     name: "Eggs",
+  //     price: "#800",
+  //     bangos: "1,247 Bangos",
+  //     category: "Protein",
+  //     quantity: "Per Crate",
+  //     date: "Bango'd on 02/12/2025",
+  //   },
+  //   {
+  //     image: "/images/dashboard/groundnut_oil.png",
+  //     name: "Ground Oil",
+  //     price: "#800",
+  //     bangos: "1,247 Bangos",
+  //     category: "Households",
+  //     quantity: "Per Kg",
+  //     date: "Bango'd on 02/12/2025",
+  //   },
+  //   {
+  //     image: "/images/dashboard/rice.png",
+  //     name: "Rice",
+  //     price: "#25000",
+  //     bangos: "1,247 Bangos",
+  //     category: "Grain",
+  //     quantity: "Per bag",
+  //     date: "Bango'd on 02/12/2025",
+  //   },
+  // ];
+
+  const [commodities, setCommodities] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTrending = async () => {
+      try {
+        setLoading(true);
+        const res = await authApi.get("/timeline?page=1&limit=9");
+        setCommodities(res?.data?.entity?.items ?? []);
+      } catch (err: any) {
+        setError(
+          err.response?.data?.message || "Unable to load trending prices"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrending();
+  }, []);
+
 
   const handleClick = () => {
     // Navigate to the timeline page
@@ -121,7 +148,10 @@ const LandingPage = () => {
     <div className="py-10 px-20 flex flex-col gap-4 w-full ">
       <h1 className="font-bold text-3xl">Welcome!</h1>
 
-      <SearchInput placeholder="Search for prices, markets...." onClick={handleFocus} />
+      <SearchInput
+        placeholder="Search for prices, markets...."
+        onClick={handleFocus}
+      />
       <div className="bg-[#5C32D0] w-full text-white rounded-lg  h-60 p-10 ">
         <h3 className="text-2xl font-semibold">Discover real prices</h3>
         <h4 className=" my-6 ">Crowdsourced prices from across Nigeria</h4>
@@ -171,54 +201,25 @@ const LandingPage = () => {
 
         {/* trending commodities */}
         <div className="flex w-full flex-wrap my-5 gap-5 ">
-          {TRENDING_COMMODITIES.map((commodity, index) => (
-            <div className="form w-md  rounded-4xl p-0 " key={index}>
-              <div>
-                <Image
-                  src={commodity.image}
-                  alt={commodity.name}
-                  width={400}
-                  height={146}
-                  className="w-full "
-                />
-                {/* <div>
-                  <p>Trending Now</p>
-                </div>
-                <div>
-                  <p>{commodity.bangos}</p>
-                </div> */}
-              </div>
-              <div className="flex flex-col gap-2 px-6 pb-6 w-full">
-                <div className="flex items-center justify-between font-semibold ">
-                  <p className="text-[#1E1E1E] text-lg  ">{commodity.name}</p>
-                  <p className="text-(--color-primary) text-2xl  ">
-                    {commodity.price}
-                  </p>
-                </div>
-                <div className="flex items-center justify-between text-[#757575] ">
-                  <p>{commodity.category}</p>
-                  <p>{commodity.quantity}</p>
-                </div>
-                <p className="text-[#757575]">{commodity.date}</p>
-                <div className="w-full flex gap-3 ">
-                  <SecondaryButton
-                    text="Share"
-                    className="w-full text-[#5C32D0]"
-                    iconSrc="images/insights/share-icon.svg"
-                    iconClassName="w-5 h-5"
-                    onClick={handleClick}
-                  />
-                  <PrimaryButton
-                    text="View"
-                    onClick={handleClick}
-                    // type="submit"
-                    // loading={loading}
-                    // loadingText="Signing In..."
-                    className="w-full"
-                  />
-                </div>
-              </div>
+          {loading && (
+            <div className="w-full flex justify-center items-center py-10">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-(--color-primary)" />
             </div>
+          )}
+
+          {error && <p className="text-red-500">{error}</p>}
+
+          {!loading && !error && commodities.length === 0 && (
+            <p>No trending prices available</p>
+          )}
+
+          {commodities.map((commodity) => (
+            <CommodityCard
+              key={commodity.id}
+              commodity={commodity}
+              onShare={handleClick}
+              onView={handleClick}
+            />
           ))}
         </div>
       </div>

@@ -2,12 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import Button from "../ui/Button";
+import Button from "../../components/ui/Button";
 import { useState, useRef, useEffect, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import PrimaryButton from "../ui/PrimaryButton";
+import PrimaryButton from "../../components/ui/PrimaryButton";
 import { MdOutlineLogout } from "react-icons/md";
-import NotificationsDialog from "../NotificationsDialog";
+import NotificationsDialog from "../../components/NotificationsDialog";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);

@@ -8,10 +8,10 @@ import Image from "next/image";
 import SearchInput from "../../components/ui/SearchInput";
 import { useRouter } from "next/navigation";
 // import Link from "next/link";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useContext } from "react";
 import authApi from "../../utils/api";
 import CommodityCard from "../../components/CommodityCard";
-
+import { AuthContext } from "../../context/AuthContext";
 
 type Commodity = {
   id?: string;
@@ -132,7 +132,11 @@ const Timeline = () => {
   const [searchResults, setSearchResults] = useState<Commodity[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const { user } = useContext(AuthContext);
 
+
+
+  console.log("Timeline user", user)
   useEffect(() => {
     // Reset when search is cleared
     if (searchQuery.trim().length === 0) {
@@ -361,94 +365,98 @@ const Timeline = () => {
     // Navigate to the timeline page
     router.push("/submit-price");
   };
+  const handleView = (item: any) => {
+    router.push(`/timeline/${item.id}`);
+  };
+
   //  const handleFocus = () => {
   //    router.push("/search");
   //  };
   return (
     <>
-        <div className="py-10 px-20 flex flex-col gap-4 w-full ">
-          <h1 className="font-bold text-3xl">Welcome Back!</h1>
+      <div className="py-10 px-20 flex flex-col gap-4 w-full ">
+        <h1 className="font-bold text-3xl">Welcome Back {user?.firstName || "User"}!</h1>
 
-          <div>
-            <SearchInput
-              placeholder="Search for prices, markets...."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+        <div>
+          <SearchInput
+            placeholder="Search for prices, markets...."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
 
-          {/* dialog box */}
-          {showDialog && (
-            <div className=" fixed inset-0 flex justify-center items-center bg-black/40  z-50">
-              <div className="flex flex-col  justify-center items-center form border border-(--color-primary)  rounded-md p-6  bg-[#FAFAFE]   sm:w-xl w-[90%]  ">
-                <div className="flex items-center justify-center w-full relative ">
-                  <h3 className=" text-(--color-primary) sm:text-2xl text-lg font-bold ">
-                    Invite your friends
-                  </h3>
+        {/* dialog box */}
+        {showDialog && (
+          <div className=" fixed inset-0 flex justify-center items-center bg-black/40  z-50">
+            <div className="flex flex-col  justify-center items-center form border border-(--color-primary)  rounded-md p-6  bg-[#FAFAFE]   sm:w-xl w-[90%]  ">
+              <div className="flex items-center justify-center w-full relative ">
+                <h3 className=" text-(--color-primary) sm:text-2xl text-lg font-bold ">
+                  Invite your friends
+                </h3>
 
-                  <Image
-                    src="/images/insights/cancel-icon.svg"
-                    alt="cancel icon"
-                    width={14}
-                    height={14}
-                    className=" absolute right-1 enable-hover-cursor cursor-pointer  "
-                    onClick={() => setShowDialog(!showDialog)}
-                  />
-                </div>
-                <hr className="w-full text-(--color-primary) " />
+                <Image
+                  src="/images/insights/cancel-icon.svg"
+                  alt="cancel icon"
+                  width={14}
+                  height={14}
+                  className=" absolute right-1 enable-hover-cursor cursor-pointer  "
+                  onClick={() => setShowDialog(!showDialog)}
+                />
+              </div>
+              <hr className="w-full text-(--color-primary) " />
 
-                <p className=" text-[#757575]  sm:text-base text-sm text-center">
-                  Share your referral link and get points every time someone
-                  signs up through you. The more people you bring in, the
-                  smarter the market becomes, for everyone.
+              <p className=" text-[#757575]  sm:text-base text-sm text-center">
+                Share your referral link and get points every time someone signs
+                up through you. The more people you bring in, the smarter the
+                market becomes, for everyone.
+              </p>
+
+              <div className="flex w-full justify-center">
+                {SOCIALS_ICONS.map((social, index) => (
+                  <div
+                    key={index}
+                    className=" justify-evenly w-full flex flex-col "
+                  >
+                    <div className="flex  items-center justify-evenly  my-3 cursor-pointer w-full  ">
+                      <div
+                        className="relative aspect-square w-[clamp(2.5rem,6vw,5.5rem)]"
+                        onClick={social.onClick}
+                      >
+                        <Image
+                          src={social.icon}
+                          alt={social.label}
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
+                    </div>
+                    <p className="flex text-xs sm:text-sm md:text-base  items-center justify-evenly  my-3 cursor-pointer w-full">
+                      {social.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="border flex rounded-md items-center p-2 justify-between w-full border-[#757575] bg-[#F5F5F5]">
+                <p
+                  className="text-[#B3B3B3] sm:text-base text-[0.55rem]    "
+                  ref={linkRef}
+                >
+                  https://bango.app/r/7F3K9Q2PBFCEJDBIJSCBHYSBJC/
                 </p>
 
-                <div className="flex w-full justify-center">
-                  {SOCIALS_ICONS.map((social, index) => (
-                    <div
-                      key={index}
-                      className=" justify-evenly w-full flex flex-col "
-                    >
-                      <div className="flex  items-center justify-evenly  my-3 cursor-pointer w-full  ">
-                        <div
-                          className="relative aspect-square w-[clamp(2.5rem,6vw,5.5rem)]"
-                          onClick={social.onClick}
-                        >
-                          <Image
-                            src={social.icon}
-                            alt={social.label}
-                            fill
-                            className="object-contain"
-                          />
-                        </div>
-                      </div>
-                      <p className="flex text-xs sm:text-sm md:text-base  items-center justify-evenly  my-3 cursor-pointer w-full">
-                        {social.label}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="border flex rounded-md items-center p-2 justify-between w-full border-[#757575] bg-[#F5F5F5]">
-                  <p
-                    className="text-[#B3B3B3] sm:text-base text-[0.55rem]    "
-                    ref={linkRef}
-                  >
-                    https://bango.app/r/7F3K9Q2PBFCEJDBIJSCBHYSBJC/
-                  </p>
-
-                  <PrimaryButton
-                    text="Copy Link"
-                    className="rounded-xl h-8 p-0  w-[20%] sm:text-sm text-[0.55rem]  text-white  "
-                    onClick={handleCopyLink}
-                  />
-                </div>
+                <PrimaryButton
+                  text="Copy Link"
+                  className="rounded-xl h-8 p-0  w-[20%] sm:text-sm text-[0.55rem]  text-white  "
+                  onClick={handleCopyLink}
+                />
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          <div className="flex gap-3 w-full ">
-            {/* <div className="form h-fit pb-20 w-[20%] ">
+        <div className="flex gap-3 w-full ">
+          {/* <div className="form h-fit pb-20 w-[20%] ">
             <h3>Filter by</h3>
             {FILTERS.map((filter, index) => (
               <div>
@@ -460,57 +468,56 @@ const Timeline = () => {
             ))}
           </div> */}
 
-            <div className="w-full">
-              <div className="bg-[#5C32D0] w-full text-white rounded-lg  h-60 p-10 ">
-                <h3 className="text-2xl font-semibold">Discover real prices</h3>
-                <h4 className=" my-6 ">
-                  Crowdsourced prices from across Nigeria
-                </h4>
-                <SecondaryButton
-                  text="Submit Price"
-                  onClick={handleClick}
-                  // iconSrc="/images/on-boarding/google-icon.svg"
-                  className=" text-[#5C32D0] "
-                />
-              </div>
-              {/* categories */}
-              <div className="flex justify-between">
-                {/* SEARCH MODE */}
-                {searchQuery.trim().length > 0 ? (
-                  <>
-                    <h3 className="text-xl font-semibold mt-6">
-                      Search results for “{searchQuery}”
-                    </h3>
+          <div className="w-full">
+            <div className="bg-[#5C32D0] w-full text-white rounded-lg  h-60 p-10 ">
+              <h3 className="text-2xl font-semibold">Discover real prices</h3>
+              <h4 className=" my-6 ">
+                Crowdsourced prices from across Nigeria
+              </h4>
+              <SecondaryButton
+                text="Submit Price"
+                onClick={handleClick}
+                // iconSrc="/images/on-boarding/google-icon.svg"
+                className=" text-[#5C32D0] "
+              />
+            </div>
+            {/* categories */}
+            <div className="flex flex-col justify-between">
+              {/* SEARCH MODE */}
+              {searchQuery.trim().length > 0 ? (
+                <>
+                  <h3 className="text-xl font-semibold mt-6">
+                    Search results for “{searchQuery}”
+                  </h3>
 
-                    {isSearching && <p>Searching...</p>}
+                  {isSearching && <p>Searching...</p>}
 
-                    {searchError && (
-                      <p className="text-red-500">{searchError}</p>
+                  {searchError && <p className="text-red-500">{searchError}</p>}
+
+                  {!isSearching &&
+                    !searchError &&
+                    searchResults.length === 0 && (
+                      <p className="text-2xl font-semibold mt-20 text-center">
+                        No results found
+                      </p>
                     )}
 
-                    {!isSearching &&
-                      !searchError &&
-                      searchResults.length === 0 && (
-                        <p className="text-2xl font-semibold mt-20 text-center">
-                          No results found
-                        </p>
-                      )}
+                  <div className="flex justify-start flex-wrap my-5 gap-5">
+                    {searchResults.map((commodity) => (
+                      <CommodityCard
+                        key={commodity.id}
+                        commodity={commodity}
+                        onShare={() => setShowDialog(true)}
+                        onView={() => handleView(commodity)}
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* NORMAL TIMELINE MODE */}
 
-                    <div className="flex justify-start flex-wrap my-5 gap-5">
-                      {searchResults.map((commodity) => (
-                        <CommodityCard
-                          key={commodity.id}
-                          commodity={commodity}
-                          onShare={() => setShowDialog(true)}
-                          onView={handleClick}
-                        />
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {/* NORMAL TIMELINE MODE */}
-
+                  <div className="flex flex-col">
                     {/* categories */}
                     <div className="flex justify-between">
                       {CATEGORIES.map((category, index) => {
@@ -535,7 +542,12 @@ const Timeline = () => {
 
                     {/* timeline commodities */}
                     <div className="flex justify-start flex-wrap my-5 gap-5">
-                      {isLoading && <p>Loading prices...</p>}
+                      {isLoading && (
+                        <div className="w-full flex justify-center items-center py-10">
+                          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-(--color-primary)" />
+                        </div>
+                      )}
+
                       {error && <p className="text-red-500">{error}</p>}
                       {!isLoading && !error && commodities.length === 0 && (
                         <p>No prices available</p>
@@ -546,15 +558,16 @@ const Timeline = () => {
                           key={commodity.id}
                           commodity={commodity}
                           onShare={() => setShowDialog(true)}
-                          onView={handleClick}
+                          onView={() => handleView(commodity)}
                         />
                       ))}
                     </div>
-                  </>
-                )}
-              </div>
+                  </div>
+                </>
+              )}
             </div>
-            {/* <div className="flex justify-between bg-[#DFE0FF] p-5 rounded-2xl ">
+          </div>
+          {/* <div className="flex justify-between bg-[#DFE0FF] p-5 rounded-2xl ">
               <div>
                 <h4 className="font-semibold text-[#4B2CA9] text-2xl ">
                   Your Location: Abuja
@@ -567,9 +580,9 @@ const Timeline = () => {
                 iconSrc="/images/on-boarding/google-icon.svg"
               />
             </div> */}
-          </div>
         </div>
-        {/* </div> */}
+      </div>
+      {/* </div> */}
     </>
   );
 };

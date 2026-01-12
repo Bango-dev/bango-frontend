@@ -1,5 +1,6 @@
-
-import Navbar from "../components/navbar/Navbar";
+import Navbar from "./navbar/Navbar";
+import { AuthProvider } from "../context/AuthContext";
+// import ProtectedRoute from "../components/ProtectedRoute";
 import { FormProvider } from "../context/FormContext";
 
 export default function MainLayout({
@@ -11,7 +12,9 @@ export default function MainLayout({
     <>
       <FormProvider>
         <Navbar />
-        {children}
+        {/* <ProtectedRoute> */}
+        <AuthProvider>{children}</AuthProvider>
+        {/* </ProtectedRoute> */}
       </FormProvider>
     </>
   );
