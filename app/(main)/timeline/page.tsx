@@ -62,9 +62,6 @@ type Commodity = {
 //   },
 // };
 
-
-
-
 const Timeline = () => {
   const CATEGORIES = ["New", "For You"];
   const [activeCategory, setActiveCategory] = useState("New");
@@ -84,62 +81,66 @@ const Timeline = () => {
   const getCommodityShareLink = (id: string) =>
     `${window.location.origin}/timeline/${id}`;
 
+  const shareHandlers = {
+    whatsapp: (id: string) => {
+      const link = encodeURIComponent(getCommodityShareLink(id));
+      window.open(`https://wa.me/?text=${link}`, "_blank");
+    },
 
-const shareHandlers = {
-  whatsapp: (id: string) => {
-    const link = encodeURIComponent(getCommodityShareLink(id));
-    window.open(`https://wa.me/?text=${link}`, "_blank");
-  },
+    facebook: (id: string) => {
+      const link = encodeURIComponent(getCommodityShareLink(id));
+      window.open(
+        `https://www.facebook.com/sharer/sharer.php?u=${link}`,
+        "_blank"
+      );
+    },
 
-  facebook: (id: string) => {
-    const link = encodeURIComponent(getCommodityShareLink(id));
-    window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${link}`,
-      "_blank"
-    );
-  },
+    x: (id: string) => {
+      const link = encodeURIComponent(getCommodityShareLink(id));
+      window.open(
+        `https://twitter.com/messages/compose?text=${link}`,
+        "_blank"
+      );
+    },
 
-  x: (id: string) => {
-    const link = encodeURIComponent(getCommodityShareLink(id));
-    window.open(`https://twitter.com/messages/compose?text=${link}`, "_blank");
-  },
+    email: (id: string) => {
+      const link = getCommodityShareLink(id);
+      const subject = encodeURIComponent("Check this price on Bango");
+      const body = encodeURIComponent(
+        `Hey,\n\nCheck out this commodity price on Bango:\n${link}`
+      );
 
-  email: (id: string) => {
-    const link = getCommodityShareLink(id);
-    const subject = encodeURIComponent("Check this price on Bango");
-    const body = encodeURIComponent(
-      `Hey,\n\nCheck out this commodity price on Bango:\n${link}`
-    );
+      window.open(
+        `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`,
+        "_blank"
+      );
+    },
+  };
 
-    window.open(
-      `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`,
-      "_blank"
-    );
-  },
-};
-
-const SOCIALS_ICONS = [
-  {
-    icon: "/images/insights/whatsapp-logo.svg",
-    label: "WhatsApp",
-    onClick: () => shareCommodityId && shareHandlers.whatsapp(shareCommodityId),
-  },
-  {
-    icon: "/images/insights/facebook-logo.svg",
-    label: "Facebook",
-    onClick: () => shareCommodityId && shareHandlers.facebook(shareCommodityId),
-  },
-  {
-    icon: "/images/insights/x-logo.svg",
-    label: "X",
-    onClick: () => shareCommodityId && shareHandlers.x(shareCommodityId),
-  },
-  {
-    icon: "/images/insights/email-icon.svg",
-    label: "Email",
-    onClick: () => shareCommodityId && shareHandlers.email(shareCommodityId),
-  },
-];
+  const SOCIALS_ICONS = [
+    {
+      icon: "/images/insights/whatsapp-logo.svg",
+      label: "WhatsApp",
+      onClick: () =>
+        shareCommodityId && shareHandlers.whatsapp(shareCommodityId),
+    },
+    {
+      icon: "/images/insights/facebook-logo.svg",
+      label: "Facebook",
+      onClick: () =>
+        shareCommodityId && shareHandlers.facebook(shareCommodityId),
+    },
+    {
+      icon: "/images/insights/x-logo.svg",
+      label: "X",
+      onClick: () => shareCommodityId && shareHandlers.x(shareCommodityId),
+    },
+    {
+      icon: "/images/insights/email-icon.svg",
+      label: "Email",
+      onClick: () => shareCommodityId && shareHandlers.email(shareCommodityId),
+    },
+  ];
 
   // console.log("Timeline user", user)
   useEffect(() => {
@@ -413,9 +414,7 @@ const SOCIALS_ICONS = [
               <hr className="w-full text-(--color-primary) " />
 
               <p className=" text-[#757575]  sm:text-base text-sm text-center">
-                Share your referral link and get points every time someone signs
-                up through you. The more people you bring in, the smarter the
-                market becomes, for everyone.
+                Share the link below to invite your friends to Bango
               </p>
 
               <div className="flex w-full justify-center">
@@ -446,10 +445,10 @@ const SOCIALS_ICONS = [
 
               <div className="border flex rounded-md items-center p-2 justify-between w-full border-[#757575] bg-[#F5F5F5]">
                 <p
-                  className="text-[#B3B3B3] sm:text-base text-[0.55rem]    "
+                  className="text-[#B3B3B3] sm:text-base text-[0.55rem] truncate   "
                   ref={linkRef}
                 >
-                  https://bango.app/r/7F3K9Q2PBFCEJDBIJSCBHYSBJC/
+                  {getCommodityShareLink(shareCommodityId)}
                 </p>
 
                 <PrimaryButton

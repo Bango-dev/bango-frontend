@@ -44,7 +44,7 @@ const PublicNavbar = () => {
       </Link>
 
       {/* Middle Navigation Menu */}
-      <ul className="hidden w-full md:flex list-none justify-center gap-8">
+      <ul className="hidden flex-1 md:flex list-none justify-center gap-8">
         <Link href="/timeline" className="nav-link">
           <li>Timeline</li>
         </Link>
