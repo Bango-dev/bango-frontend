@@ -5,7 +5,7 @@ import Button from "../../components/ui/Button";
 import { useRouter } from "next/navigation";
 import PrimaryButton from "../../components/ui/PrimaryButton";
 import SecondaryButton from "../../components/ui/SecondaryButton";
-import Footer from "../footer/Footer";
+import Footer from "../../components/footer/Footer";
 
 const AboutUs = () => {
   // hero section

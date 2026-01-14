@@ -1,31 +1,15 @@
-// (main)/navbar/Navbar.tsx
 "use client";
 
 import Image from "next/image";
 import Link from "next/link";
 import Button from "../../components/ui/Button";
-import { useState, useRef, useEffect, useContext } from "react";
-import { AuthContext } from "../../context/AuthContext";
-import PrimaryButton from "../../components/ui/PrimaryButton";
-import { MdOutlineLogout } from "react-icons/md";
-import NotificationsDialog from "../../components/NotificationsDialog";
+import { useState, useRef, useEffect } from "react";
+// import NotificationsDialog from "../../components/NotificationsDialog";
 
-const Navbar = () => {
+const PublicNavbar = () => {
   const [open, setOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  const authContext = useContext(AuthContext);
-
-  if (!authContext) {
-    throw new Error("Navbar must be used within AuthProvider");
-  }
-
-  const { user, logout, loading } = authContext;
-
-  // console.log("Navbar render - user:", user, "loading:", loading);
-
-  const logoHref = user ? "/timeline" : "/about-us";
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -43,47 +27,14 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  // ✅ Show skeleton buttons while loading (instead of hiding navbar)
-  const AuthButtons = () => {
-    if (loading) {
-      return (
-        <div className="hidden md:flex items-center gap-2">
-          <div className="w-20 h-10 bg-gray-200 animate-pulse rounded"></div>
-          <div className="w-20 h-10 bg-gray-200 animate-pulse rounded"></div>
-        </div>
-      );
-    }
-
-    if (user) {
-      return (
-        <div className="flex items-center justify-center">
-          <MdOutlineLogout
-            onClick={logout}
-            className="text-(--color-primary) w-8 h-8 hidden md:flex mx-2 cursor-pointer"
-          />
-        </div>
-      );
-    }
-
-    return (
-      <Button
-        firstBtn="Login"
-        secondBtn="Register"
-        firstHref="/login"
-        secondHref="/register"
-        className="hidden md:flex"
-      />
-    );
-  };
-
   return (
-    <nav className="w-full flex items-center justify-between bg-(--color-secondary) py-4 cursor-pointer">
-      <NotificationsDialog isOpen={open} onClose={() => setOpen(false)} />
+    <nav className="w-full flex items-center justify-between bg-(--color-secondary) py-4 cursor-pointer px-4 md:px-8">
+      {/* <NotificationsDialog isOpen={open} onClose={() => setOpen(false)} /> */}
 
-      <Link href={logoHref}>
+      {/* Logo */}
+      <Link href="/about-us">
         <div>
           <Image
-            className="pl-4"
             src="/images/navbar/new-bango-logo.svg"
             alt="The logo at the navigation bar"
             width={153}
@@ -92,7 +43,8 @@ const Navbar = () => {
         </div>
       </Link>
 
-      <ul className="hidden md:flex list-none">
+      {/* Middle Navigation Menu */}
+      <ul className="hidden w-full md:flex list-none justify-center gap-8">
         <Link href="/timeline" className="nav-link">
           <li>Timeline</li>
         </Link>
@@ -107,8 +59,14 @@ const Navbar = () => {
         </Link>
       </ul>
 
-      {/* ✅ Use the new component that handles all states */}
-      <AuthButtons />
+      {/* Right side - Buttons */}
+      <Button
+        firstBtn="Login"
+        secondBtn="Register"
+        firstHref="/login"
+        secondHref="/register"
+        className="hidden md:flex"
+      />
 
       {/* Mobile menu button */}
       <div className="flex justify-end md:hidden">
@@ -165,27 +123,13 @@ const Navbar = () => {
           >
             <li>About Us</li>
           </Link>
-
-          {loading ? (
-            <div className="w-full h-10 bg-gray-200 animate-pulse rounded"></div>
-          ) : user ? (
-            <PrimaryButton
-              text="Logout"
-              className="mt-6 w-full"
-              onClick={() => {
-                setIsOpen(false);
-                logout();
-              }}
-            />
-          ) : (
-            <Button
-              firstBtn="Login"
-              secondBtn="Register"
-              firstHref="/login"
-              secondHref="/register"
-              onClick={() => setIsOpen(false)}
-            />
-          )}
+          <Button
+            firstBtn="Login"
+            secondBtn="Register"
+            firstHref="/login"
+            secondHref="/register"
+            onClick={() => setIsOpen(false)}
+          />
         </ul>
       </div>
 
@@ -199,4 +143,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default PublicNavbar;

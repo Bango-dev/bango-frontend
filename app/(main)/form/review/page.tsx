@@ -8,10 +8,11 @@ import { useFormData } from "../../../context/FormContext";
 import { useRouter } from "next/navigation";
 import api from "../../../utils/api";
 import { uploadToCloudinary } from "../../../utils/upload-to-cloudinary";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import LocationSelect from "../../../components/LocationSelect";
 import SuggestionInput from "../../../components/ui/SuggestionInput";
 import { parseNumber, formatNumber } from "../../../utils/numberHelpers";
+import { formatNigerianPhone } from "../../../utils/formatNigerianPhone";
 
 const Review = () => {
   const { data, update, clear } = useFormData();
@@ -21,7 +22,6 @@ const Review = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [originalData, setOriginalData] = useState(null);
   const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false);
-
 
   const clearError = (field: string) => {
     setErrors((prev) => {
@@ -44,12 +44,16 @@ const Review = () => {
 
     if (!data.sellerName) newErrors.sellerName = "Seller's name is required.";
 
-    const phoneRegex = /^0\d{10}$/;
-    if (!data.sellerPhoneNumber)
+ //  Validate the formatted phone number
+    if (!data.sellerPhoneNumber) {
       newErrors.sellerPhoneNumber = "Phone number is required.";
-    else if (!phoneRegex.test(data.sellerPhoneNumber))
-      newErrors.sellerPhoneNumber =
-        "Enter a valid 11-digit phone number starting with 0.";
+    } else {
+      const formatted = formatNigerianPhone(data.sellerPhoneNumber);
+      if (!formatted) {
+        newErrors.sellerPhoneNumber =
+          "Enter a valid Nigerian phone number (e.g., 08012345678)";
+      }
+    }
 
     if (!data.location) newErrors.location = "Please select your location.";
     if (!data.market) newErrors.market = "Market name is required.";
@@ -65,26 +69,29 @@ const Review = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-
-
-
   const handleSubmit = async () => {
-     setLoading(true);
+    setLoading(true);
 
-     if (!acceptedDisclaimer) {
-       alert("You must agree to the disclaimer before submitting.");
-       setLoading(false);
-       return;
-     }
+    if (!acceptedDisclaimer) {
+      alert("You must agree to the disclaimer before submitting.");
+      setLoading(false);
+      return;
+    }
 
-     const isValid = validate();
-     if (!isValid) {
-       setLoading(false);
-       return;
-     }
+    const isValid = validate();
+    if (!isValid) {
+      setLoading(false);
+      return;
+    }
 
     try {
+      //  Add debugging
+      // console.log("=== DEBUGGING SUBMISSION ===");
+      // console.log("Cookies in browser:", document.cookie);
+      // console.log("API Base URL:", process.env.NEXT_PUBLIC_API_BASE_URL);
+
       let imageUrl = null;
+
 
       if (data.image) {
         let file: File;
@@ -105,7 +112,7 @@ const Review = () => {
 
       const payload = {
         commodityName: data.commodityName,
-        price: data.price, // number
+        price: data.price,
         quantity: data.quantity,
         location: data.location,
         market: data.market,
@@ -115,16 +122,27 @@ const Review = () => {
         sellerName: data.sellerName,
       };
 
-      await api.post("/submissions", payload);
+      console.log("Payload:", payload);
+
+      // ✅ Log the actual request
+       await api.post("/submissions", payload);
+      // console.log("Response:", response);
+
       router.push("/confirmation");
       clear();
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong. Try again.");
+    } catch (error: any) {
+      console.error("=== SUBMISSION ERROR ===");
+      console.error("Full error:", error);
+      // console.error("Response data:", error.response?.data);
+      // console.error("Response status:", error.response?.status);
+      // console.error("Response headers:", error.response?.headers);
+      alert(error.message || "Something went wrong. Try again.");
     } finally {
       setLoading(false);
     }
   };
+
+
 
   return (
     <div className="p-6 flex flex-col w-full">

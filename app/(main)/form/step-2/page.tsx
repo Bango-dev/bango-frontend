@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { useFormData } from "../../../context/FormContext";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import StepIndicator from "../../../components/ui/StepIndicator";
-import SuggestionInput from "../../../components/ui/SuggestionInput";
 import Input from "../Input";
 import Image from "next/image";
 import Link from "next/link";
+import { formatNigerianPhone } from "../../../utils/formatNigerianPhone"; // ✅ Import the formatter
 
 const Step2 = () => {
   const { data, update } = useFormData();
@@ -21,12 +21,16 @@ const Step2 = () => {
 
     if (!data.sellerName) newErrors.sellerName = "Seller name is required.";
 
-    const phoneRegex = /^0\d{10}$/;
-    if (!data.sellerPhoneNumber)
+    // ✅ Validate the formatted phone number
+    if (!data.sellerPhoneNumber) {
       newErrors.sellerPhoneNumber = "Phone number is required.";
-    else if (!phoneRegex.test(data.sellerPhoneNumber))
-      newErrors.sellerPhoneNumber =
-        "Enter a valid 11-digit phone number starting with 0.";
+    } else {
+      const formatted = formatNigerianPhone(data.sellerPhoneNumber);
+      if (!formatted) {
+        newErrors.sellerPhoneNumber =
+          "Enter a valid Nigerian phone number (e.g., 08012345678)";
+      }
+    }
 
     setErrors(newErrors);
 
@@ -34,6 +38,28 @@ const Step2 = () => {
       setTimeout(() => setErrors({}), 3000);
     }
     return Object.keys(newErrors).length === 0;
+  };
+
+  // ✅ Handle phone number formatting on blur
+  const handlePhoneBlur = () => {
+    if (data.sellerPhoneNumber) {
+      const formatted = formatNigerianPhone(data.sellerPhoneNumber);
+      if (formatted) {
+        update({ sellerPhoneNumber: formatted });
+        // Clear error if it exists
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors.sellerPhoneNumber;
+          return newErrors;
+        });
+      } else {
+        // Show error if invalid
+        setErrors((prev) => ({
+          ...prev,
+          sellerPhoneNumber: "Enter a valid Nigerian phone number",
+        }));
+      }
+    }
   };
 
   const handleNext = () => {
@@ -51,6 +77,7 @@ const Step2 = () => {
       router.push("/form/review");
     }, 600);
   };
+
   return (
     <div className="flex flex-col min-h-screen pt-5 px-3 sm:px-4 lg:px-4 mx-auto w-full ">
       <div className="relative flex items-center">
@@ -111,10 +138,8 @@ const Step2 = () => {
           type="text"
           placeholder="Madam Kemi"
           value={data.sellerName || ""}
-          // field="sellerName"
-          // onChange={(val) => update({ sellerName: val })}
           onChange={(e) => update({ sellerName: e.target.value })}
-          description="This helps other communicate with the seller better."
+          description="This helps others communicate with the seller better."
           showError={!!errors.sellerName}
           required
         />
@@ -123,13 +148,13 @@ const Step2 = () => {
         )}
 
         <Input
-          label="Seller’s Phone No"
+          label="Seller's Phone No"
           type="tel"
-          placeholder="08000000000"
+          placeholder="08012345678"
           value={data.sellerPhoneNumber || ""}
-          // field="sellerPhoneNumber"
           onChange={(e) => update({ sellerPhoneNumber: e.target.value })}
-          description="Phone Number"
+          onBlur={handlePhoneBlur} // ✅ Format on blur
+          description="Enter Nigerian phone number (e.g., 08012345678)"
           showError={!!errors.sellerPhoneNumber}
           required
         />
@@ -148,4 +173,5 @@ const Step2 = () => {
     </div>
   );
 };
+
 export default Step2;

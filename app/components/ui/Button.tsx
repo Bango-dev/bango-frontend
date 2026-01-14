@@ -36,7 +36,7 @@ const Button = ({
   };
 
   return (
-    <div className={`btns ${className}`}>
+    <div className={`btns w-auto ${className}`}>
       <button
         className={`find-price btn-primary flex flex-row justify-center items-center ${className} `}
         onClick={handleFirstClick}

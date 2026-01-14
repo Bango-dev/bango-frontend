@@ -29,38 +29,49 @@ const SignIn = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // (auth)/login/page.tsx
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (!formData.email || !formData.password) {
-      toast.error("Please enter your email and password");
-      return;
+  if (!formData.email || !formData.password) {
+    toast.error("Please enter your email and password");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const response = await authApi.post("/auth/login", formData);
+    console.log("Login response:", response.data);
+    console.log("Login headers:", response.headers);
+    console.log("Cookies after login:", document.cookie); // ✅ Check cookies
+    if (response.data.entity) {
+      console.log("Setting user:", response.data.entity.user);
+
+      // ✅ Set user first
+      setUser(response.data.entity);
+
+      // ✅ Wait for React to process the state update
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      toast.success("Login successful!");
+
+      // ✅ Then navigate
+      router.replace("/timeline");
+    } else {
+      toast.error("Login succeeded but user data is missing");
     }
-
-    setLoading(true);
-
-    try {
-      const response = await authApi.post("/auth/login", formData);
-      console.log("Login response:", response.data);
-
-  if (response.data.entity) {
-        setUser(response.data.entity); // Set user directly
-    toast.success("Login successful!");
-    router.refresh();
-        router.push("/timeline");
-      }
-
-    } catch (err: any) {
-      console.error("Login error:", err);
-      toast.error(
-        err.response?.data?.message ||
-          err.message ||
-          "Login failed. Please check your credentials."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (err: any) {
+    console.error("Login error:", err);
+    toast.error(
+      err.response?.data?.message ||
+        err.message ||
+        "Login failed. Please check your credentials."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex justify-around items-center min-h-screen mx-auto w-full">

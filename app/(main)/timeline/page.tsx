@@ -23,101 +23,47 @@ type Commodity = {
   quantity?: string;
   purchaseDate?: string;
 };
-const REFERRAL_LINK = "https://bango.app/r/7F3K9Q2PBFCEJDBIJSCBHYSBJC/";
+// const REFERRAL_LINK = "https://bango.app/r/7F3K9Q2PBFCEJDBIJSCBHYSBJC/";
 
-const SHARE_MESSAGE = encodeURIComponent(
-  `Hey! Join me on Bango Market Day 👇\n${REFERRAL_LINK}`
-);
+// const SHARE_MESSAGE = encodeURIComponent(
+//   `Hey! Join me on Bango Market Day 👇\n${REFERRAL_LINK}`
+// );
 
-const SHARE_PRICE = encodeURIComponent(`"Eggs Bango'd today at ₦2500/crate"`);
+// const SHARE_PRICE = encodeURIComponent(`"Eggs Bango'd today at ₦2500/crate"`);
 
-const sharePriceHandlers = {
-  whatsapp: () => {
-    window.open(`https://wa.me/?text=${SHARE_PRICE}`, "_blank");
-  },
+// const sharePriceHandlers = {
+//   whatsapp: () => {
+//     window.open(`https://wa.me/?text=${SHARE_PRICE}`, "_blank");
+//   },
 
-  x: () => {
-    window.open(
-      `https://twitter.com/messages/compose?text=${SHARE_PRICE}`,
-      "_blank"
-    );
-  },
+//   x: () => {
+//     window.open(
+//       `https://twitter.com/messages/compose?text=${SHARE_PRICE}`,
+//       "_blank"
+//     );
+//   },
 
-  telegram: () => {
-    const PAGE_URL = encodeURIComponent(window.location.href);
-    const SHARE_TEXT = encodeURIComponent(
-      `"Eggs Bango'd today at ₦2500/crate"`
-    );
+//   telegram: () => {
+//     const PAGE_URL = encodeURIComponent(window.location.href);
+//     const SHARE_TEXT = encodeURIComponent(
+//       `"Eggs Bango'd today at ₦2500/crate"`
+//     );
 
-    const appUrl = `https://t.me/share/url?url=${PAGE_URL}&text=${SHARE_TEXT}`;
-    const webUrl = `https://web.telegram.org/k/#/share?url=${PAGE_URL}&text=${SHARE_TEXT}`;
+//     const appUrl = `https://t.me/share/url?url=${PAGE_URL}&text=${SHARE_TEXT}`;
+//     const webUrl = `https://web.telegram.org/k/#/share?url=${PAGE_URL}&text=${SHARE_TEXT}`;
 
-    // Try opening the app
-    window.location.href = appUrl;
+//     // Try opening the app
+//     window.location.href = appUrl;
 
-    // Fallback to web after 1 second
-    setTimeout(() => {
-      window.location.href = webUrl;
-    }, 1000);
-  },
-};
+//     // Fallback to web after 1 second
+//     setTimeout(() => {
+//       window.location.href = webUrl;
+//     }, 1000);
+//   },
+// };
 
-const shareHandlers = {
-  whatsapp: () => {
-    window.open(`https://wa.me/?text=${SHARE_MESSAGE}`, "_blank");
-  },
 
-  facebook: () => {
-    window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${REFERRAL_LINK}`,
-      "_blank"
-    );
-  },
 
-  x: () => {
-    // Opens DM inbox where user selects recipient
-    window.open(
-      `https://twitter.com/messages/compose?text=${SHARE_MESSAGE}`,
-      "_blank"
-    );
-  },
-
-  email: () => {
-    const subject = encodeURIComponent("Join me on Market Day");
-    const body = encodeURIComponent(
-      `Hey,\n\nJoin me on Market Day using this link:\n${REFERRAL_LINK}`
-    );
-
-    // Gmail app → Gmail web fallback
-    window.open(
-      `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`,
-      "_blank"
-    );
-  },
-};
-
-const SOCIALS_ICONS = [
-  {
-    icon: "/images/insights/whatsapp-logo.svg",
-    label: "WhatsApp",
-    onClick: shareHandlers.whatsapp,
-  },
-  {
-    icon: "/images/insights/facebook-logo.svg",
-    label: "Facebook",
-    onClick: shareHandlers.facebook,
-  },
-  {
-    icon: "/images/insights/x-logo.svg",
-    label: "X",
-    onClick: shareHandlers.x,
-  },
-  {
-    icon: "/images/insights/email-icon.svg",
-    label: "Email",
-    onClick: shareHandlers.email,
-  },
-];
 
 const Timeline = () => {
   const CATEGORIES = ["New", "For You"];
@@ -133,10 +79,69 @@ const Timeline = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const { user } = useContext(AuthContext);
+  const [shareCommodityId, setShareCommodityId] = useState<string | null>(null);
+
+  const getCommodityShareLink = (id: string) =>
+    `${window.location.origin}/timeline/${id}`;
 
 
+const shareHandlers = {
+  whatsapp: (id: string) => {
+    const link = encodeURIComponent(getCommodityShareLink(id));
+    window.open(`https://wa.me/?text=${link}`, "_blank");
+  },
 
-  console.log("Timeline user", user)
+  facebook: (id: string) => {
+    const link = encodeURIComponent(getCommodityShareLink(id));
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${link}`,
+      "_blank"
+    );
+  },
+
+  x: (id: string) => {
+    const link = encodeURIComponent(getCommodityShareLink(id));
+    window.open(`https://twitter.com/messages/compose?text=${link}`, "_blank");
+  },
+
+  email: (id: string) => {
+    const link = getCommodityShareLink(id);
+    const subject = encodeURIComponent("Check this price on Bango");
+    const body = encodeURIComponent(
+      `Hey,\n\nCheck out this commodity price on Bango:\n${link}`
+    );
+
+    window.open(
+      `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`,
+      "_blank"
+    );
+  },
+};
+
+const SOCIALS_ICONS = [
+  {
+    icon: "/images/insights/whatsapp-logo.svg",
+    label: "WhatsApp",
+    onClick: () => shareCommodityId && shareHandlers.whatsapp(shareCommodityId),
+  },
+  {
+    icon: "/images/insights/facebook-logo.svg",
+    label: "Facebook",
+    onClick: () => shareCommodityId && shareHandlers.facebook(shareCommodityId),
+  },
+  {
+    icon: "/images/insights/x-logo.svg",
+    label: "X",
+    onClick: () => shareCommodityId && shareHandlers.x(shareCommodityId),
+  },
+  {
+    icon: "/images/insights/email-icon.svg",
+    label: "Email",
+    onClick: () => shareCommodityId && shareHandlers.email(shareCommodityId),
+  },
+];
+
+  // console.log("Timeline user", user)
   useEffect(() => {
     // Reset when search is cleared
     if (searchQuery.trim().length === 0) {
@@ -374,8 +379,10 @@ const Timeline = () => {
   //  };
   return (
     <>
-      <div className="py-10 px-20 flex flex-col gap-4 w-full ">
-        <h1 className="font-bold text-3xl">Welcome Back {user?.firstName || "User"}!</h1>
+      <div className="py-10 md:px-20 px-5 flex flex-col gap-4 w-full ">
+        <h1 className="font-bold sm:text-3xl text-2xl">
+          Welcome Back {user?.firstName || "User"}!
+        </h1>
 
         <div>
           <SearchInput
@@ -470,7 +477,9 @@ const Timeline = () => {
 
           <div className="w-full">
             <div className="bg-[#5C32D0] w-full text-white rounded-lg  h-60 p-10 ">
-              <h3 className="text-2xl font-semibold">Discover real prices</h3>
+              <h3 className="sm:text-2xl text-lg font-semibold">
+                Discover real prices
+              </h3>
               <h4 className=" my-6 ">
                 Crowdsourced prices from across Nigeria
               </h4>
@@ -478,7 +487,7 @@ const Timeline = () => {
                 text="Submit Price"
                 onClick={handleClick}
                 // iconSrc="/images/on-boarding/google-icon.svg"
-                className=" text-[#5C32D0] "
+                className=" text-[#5C32D0] w "
               />
             </div>
             {/* categories */}
@@ -507,7 +516,10 @@ const Timeline = () => {
                       <CommodityCard
                         key={commodity.id}
                         commodity={commodity}
-                        onShare={() => setShowDialog(true)}
+                        onShare={() => {
+                          setShareCommodityId(commodity.id!);
+                          setShowDialog(true);
+                        }}
                         onView={() => handleView(commodity)}
                       />
                     ))}
@@ -517,7 +529,7 @@ const Timeline = () => {
                 <>
                   {/* NORMAL TIMELINE MODE */}
 
-                  <div className="flex flex-col">
+                  <div className="flex flex-col w-full">
                     {/* categories */}
                     <div className="flex justify-between">
                       {CATEGORIES.map((category, index) => {
@@ -541,7 +553,7 @@ const Timeline = () => {
                     </div>
 
                     {/* timeline commodities */}
-                    <div className="flex justify-start flex-wrap my-5 gap-5">
+                    <div className="flex justify-center w-full flex-wrap my-5 gap-2">
                       {isLoading && (
                         <div className="w-full flex justify-center items-center py-10">
                           <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-(--color-primary)" />

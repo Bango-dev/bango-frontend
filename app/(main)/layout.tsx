@@ -1,6 +1,6 @@
+
 import Navbar from "./navbar/Navbar";
-import { AuthProvider } from "../context/AuthContext";
-// import ProtectedRoute from "../components/ProtectedRoute";
+import ProtectedRoute from "../components/ProtectedRoute";
 import { FormProvider } from "../context/FormContext";
 
 export default function MainLayout({
@@ -9,13 +9,11 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <ProtectedRoute>
       <FormProvider>
         <Navbar />
-        {/* <ProtectedRoute> */}
-        <AuthProvider>{children}</AuthProvider>
-        {/* </ProtectedRoute> */}
+        {children}
       </FormProvider>
-    </>
+    </ProtectedRoute>
   );
 }

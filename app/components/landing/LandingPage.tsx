@@ -1,8 +1,7 @@
 "use client";
 
-import Input from "../../(main)/form/Input";
+
 import SecondaryButton from "../ui/SecondaryButton";
-import PrimaryButton from "../ui/PrimaryButton";
 import Image from "next/image";
 import SearchInput from "../ui/SearchInput";
 import Link from "next/link";
@@ -11,7 +10,7 @@ import { useEffect, useState } from "react";
 import authApi from "../../utils/api";
 import CommodityCard from "../CommodityCard";
 
-import Button from "../ui/Button";
+
 
 const LandingPage = () => {
   const router = useRouter();
@@ -145,7 +144,7 @@ const LandingPage = () => {
    router.push("/register");
  };
   return (
-    <div className="py-10 px-20 flex flex-col gap-4 w-full ">
+    <div className="py-10 md:px-20 px-5 flex flex-col gap-4 w-full ">
       <h1 className="font-bold text-3xl">Welcome!</h1>
 
       <SearchInput
@@ -153,7 +152,9 @@ const LandingPage = () => {
         onClick={handleFocus}
       />
       <div className="bg-[#5C32D0] w-full text-white rounded-lg  h-60 p-10 ">
-        <h3 className="text-2xl font-semibold">Discover real prices</h3>
+        <h3 className="sm:text-2xl text-lg font-semibold">
+          Discover real prices
+        </h3>
         <h4 className=" my-6 ">Crowdsourced prices from across Nigeria</h4>
         <SecondaryButton
           text="Explore Timeline"

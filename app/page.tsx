@@ -1,13 +1,11 @@
 import LandingPage from "./components/landing/LandingPage";
-// import Footer from "./components/footer/Footer";
-import Navbar from "./(main)/navbar/Navbar";
+import PublicNavbar from "./components/public-navbar/PublicNavbar";
 
 export default function Home() {
   return (
     <>
-      <Navbar />
+      <PublicNavbar />
       <LandingPage />
-      {/* <Footer /> */}
     </>
   );
 }

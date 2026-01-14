@@ -8,99 +8,90 @@ import InfoBox from "../../../components/ui/InfoBox";
 import Link from "next/link";
 import api from "../../../utils/api";
 import { Commodity } from "../../../lib/types/commodities";
-// import { IoCopyOutline } from "react-icons/io5";
+import { IoCopyOutline } from "react-icons/io5";
 import useAveragePrices from "../../../components/utils/useAveragePrice";
 import { IoShareSocialSharp } from "react-icons/io5";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
-
-
-
-
-
-
-
-
-
+import toast from "react-hot-toast";
 
 const MobileFullDetails = () => {
   const [pageUrl, setPageUrl] = useState("");
   const { id } = useParams();
   const [product, setProduct] = useState<Commodity>(null);
   const [loading, setLoading] = useState(true);
-      const [showDialog, setShowDialog] = useState(false);
-      const linkRef = useRef<HTMLParagraphElement>(null);
+  const [showDialog, setShowDialog] = useState(false);
+  const linkRef = useRef<HTMLParagraphElement>(null);
   // const pathname = usePathname();
 
-
-
   const SHARE_MESSAGE = encodeURIComponent(
-  `Hey! Check out this price on Bango 👇\n${pageUrl}`
-);
+    `Hey! Check out this price on Bango 👇\n${pageUrl}`
+  );
 
-const shareHandlers = {
-  whatsapp: () => {
-    window.open(`https://wa.me/?text=${SHARE_MESSAGE}`, "_blank");
-  },
+  const shareHandlers = {
+    whatsapp: () => {
+      window.open(`https://wa.me/?text=${SHARE_MESSAGE}`, "_blank");
+    },
 
-  facebook: () => {
-    window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`,
-      "_blank"
-    );
-  },
+    facebook: () => {
+      window.open(
+        `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`,
+        "_blank"
+      );
+    },
 
-  x: () => {
-    // Opens DM inbox where user selects recipient
-    window.open(
-      `https://twitter.com/messages/compose?text=${SHARE_MESSAGE}`,
-      "_blank"
-    );
-  },
+    x: () => {
+      // Opens DM inbox where user selects recipient
+      window.open(
+        `https://twitter.com/messages/compose?text=${SHARE_MESSAGE}`,
+        "_blank"
+      );
+    },
 
-  email: () => {
-    const subject = encodeURIComponent("Check prices of commodities on Bango");
-    const body = encodeURIComponent(
-      `Hey! Check out this price on Bango, \n${pageUrl}`
-    );
+    email: () => {
+      const subject = encodeURIComponent(
+        "Check prices of commodities on Bango"
+      );
+      const body = encodeURIComponent(
+        `Hey! Check out this price on Bango, \n${pageUrl}`
+      );
 
-    // Gmail app → Gmail web fallback
-    window.open(
-      `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`,
-      "_blank"
-    );
-  },
+      // Gmail app → Gmail web fallback
+      window.open(
+        `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`,
+        "_blank"
+      );
+    },
   };
 
-   const SOCIALS_ICONS = [
-     {
-       icon: "/images/display/whatsapp-logo.svg",
-       label: "WhatsApp",
-       onClick: shareHandlers.whatsapp,
-     },
-     {
-       icon: "/images/display/facebook-logo.svg",
-       label: "Facebook",
-       onClick: shareHandlers.facebook,
-     },
-     {
-       icon: "/images/display/x-logo.svg",
-       label: "X",
-       onClick: shareHandlers.x,
-     },
-     {
-       icon: "/images/display/email-icon.svg",
-       label: "Email",
-       onClick: shareHandlers.email,
-     },
-   ];
+  const SOCIALS_ICONS = [
+    {
+      icon: "/images/display/whatsapp-logo.svg",
+      label: "WhatsApp",
+      onClick: shareHandlers.whatsapp,
+    },
+    {
+      icon: "/images/display/facebook-logo.svg",
+      label: "Facebook",
+      onClick: shareHandlers.facebook,
+    },
+    {
+      icon: "/images/display/x-logo.svg",
+      label: "X",
+      onClick: shareHandlers.x,
+    },
+    {
+      icon: "/images/display/email-icon.svg",
+      label: "Email",
+      onClick: shareHandlers.email,
+    },
+  ];
 
- useEffect(() => {
-   if (!id || typeof window === "undefined") return;
+  useEffect(() => {
+    if (!id || typeof window === "undefined") return;
 
-   const shortUrl = `${window.location.origin}/p/${id}`;
-   setPageUrl(shortUrl);
- }, [id]);
-
+    const shortUrl = `${window.location.origin}/p/${id}`;
+    setPageUrl(shortUrl);
+  }, [id]);
 
   const memoizedProductArray = useMemo(
     () => (product ? [product] : []),
@@ -112,7 +103,6 @@ const shareHandlers = {
     product?.location || "",
     product?.market || ""
   );
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -172,25 +162,59 @@ const shareHandlers = {
   //   alert("Link copied!");
   // };
 
-
-
-    const handleCopyLink = () => {
-      if (linkRef.current) {
-        const textToCopy = linkRef.current.textContent || "";
-        navigator.clipboard
-          .writeText(textToCopy)
-          .then(() => {
-            alert("Link copied!");
-          })
-          .catch((err) => {
-            console.error("Failed to copy link: ", err);
-          });
-      }
-    };
+  const handleCopyLink = () => {
+    if (linkRef.current) {
+      const textToCopy = linkRef.current.textContent || "";
+      navigator.clipboard
+        .writeText(textToCopy)
+        .then(() => {
+          alert("Link copied!");
+        })
+        .catch((err) => {
+          console.error("Failed to copy link: ", err);
+        });
+    }
+  };
 
   const normalize = (val: string) =>
     val.trim().toLowerCase().replace(/\s+/g, " ");
 
+  const handleCopyDetails = () => {
+    if (!product) return;
+
+    const avgKey = `${normalize(product.commodityName)}-${normalize(
+      product.quantity
+    )}`;
+    const avgPrice = averagePrices[avgKey]
+      ? `₦${averagePrices[avgKey].toLocaleString()}`
+      : "No data";
+
+    const detailsText = `
+Commodity: ${product.commodityName}
+Price: ₦${Number(product.price).toLocaleString()}
+Location: ${product.location}
+Market: ${product.market}
+Quantity: ${product.quantity}
+Seller Name: ${product.sellerName || "—"}
+Seller Phone: ${product.sellerPhoneNumber || "—"}
+Average Price: ${avgPrice}
+Submitted by: ${product.BuyerName}
+Date: ${new Date(product.createdAt).toLocaleDateString()}
+Views: ${product.viewCount}
+
+Link: ${pageUrl}
+    `.trim();
+
+    navigator.clipboard
+      .writeText(detailsText)
+      .then(() => {
+        toast.success("Commodity details copied to clipboard!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy details: ", err);
+        toast.error("Failed to copy details");
+      });
+  };
 
   return (
     <div className="flex flex-col  sm:shadow-none shadow-md p-5 w-full ">
@@ -208,10 +232,18 @@ const shareHandlers = {
         </Link>
 
         {/* <IoCopyOutline className="h-6 w-6" onClick={handleCopy} /> */}
-        <IoShareSocialSharp
-          className="h-6 w-6"
-          onClick={() => setShowDialog(!showDialog)}
-        />
+        <div className="flex gap-3 items-center">
+          <IoCopyOutline
+            className="h-6 w-6 cursor-pointer hover:text-[#5C32D0] transition-colors"
+            onClick={handleCopyDetails}
+            title="Copy commodity details"
+          />
+          <IoShareSocialSharp
+            className="h-6 w-6 cursor-pointer hover:text-[#5C32D0] transition-colors"
+            onClick={() => setShowDialog(!showDialog)}
+            title="Share to social media"
+          />
+        </div>
       </div>
 
       {/* dialog box */}
