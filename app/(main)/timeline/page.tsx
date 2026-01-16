@@ -371,9 +371,10 @@ const Timeline = () => {
     // Navigate to the timeline page
     router.push("/form/step-1");
   };
-  const handleView = (item: any) => {
-    router.push(`/submissions/${item.id}`);
-  };
+ const handleView = (commodity: Commodity) => {
+   // Update this path to match your file structure
+   router.push(`search-result/grid-view/${commodity.id}`);
+ };
 
   //  const handleFocus = () => {
   //    router.push("/search");

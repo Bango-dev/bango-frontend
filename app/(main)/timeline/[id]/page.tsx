@@ -113,7 +113,8 @@ const MobileFullDetails = () => {
 
         // Fetch single submission
         const res = await api.get(`/submissions/${id}`);
-        const submission = res.data?.data;
+        console.log(res);
+        const submission = res.data?.entity.items;
         console.log(submission);
         setProduct(submission || null);
       } catch (err) {
