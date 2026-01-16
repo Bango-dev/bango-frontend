@@ -26,6 +26,19 @@ function GridViewContent() {
   const sortRecent = searchParams.get("sortRecent") || "recent";
   const sortPrice = searchParams.get("sortPrice") || "";
 
+  // Helper to build product detail URL with search params
+  const getProductDetailUrl = (itemId: string) => {
+    const params = new URLSearchParams({
+      commodityName,
+      location: location || "",
+      market: market || "",
+      sortRecent,
+      sortPrice: sortPrice || "",
+      viewType: "grid-view",
+    });
+    return `/search-result/grid-view/${itemId}?${params.toString()}`;
+  };
+
   const parsePrice = (p: unknown) => {
     const cleaned = String(p ?? "").replace(/[^0-9.]/g, "");
     const n = parseFloat(cleaned);
@@ -35,7 +48,7 @@ function GridViewContent() {
   const normalize = (str: string | undefined | null) =>
     (str || "").trim().toLowerCase().replace(/\s+/g, " ");
 
-  // Call all hooks at the top level before any conditional logic
+  // Always call the hook, even with empty results - the hook handles this internally
   const { averagePrices } = useAveragePrices(results, location, market);
 
   useEffect(() => {
@@ -48,7 +61,7 @@ function GridViewContent() {
         });
 
         console.log(res);
-        setResults(res.data?.entity?.data?.data || []);
+        setResults(res.data?.entity.items || []);
       } catch (error) {
         console.error(error);
         setResults([]);
@@ -57,7 +70,9 @@ function GridViewContent() {
       }
     };
 
-    fetchData();
+    if (commodityName) {
+      fetchData();
+    }
   }, [commodityName, location, market, sortRecent, sortPrice]);
 
   useEffect(() => {
@@ -216,10 +231,7 @@ function GridViewContent() {
               <InfoBox className="sm:block hidden" />
 
               <div className="w-full mt-4 flex sm:hidden">
-                <Link
-                  href={`/search-result/grid-view/${item.id}`}
-                  className="w-full"
-                >
+                <Link href={getProductDetailUrl(item.id)} className="w-full">
                   <button className="btn-primary w-full">View</button>
                 </Link>
               </div>
@@ -279,10 +291,7 @@ function GridViewContent() {
               </div>
             </div>
             <div className="w-full mt-4">
-              <Link
-                href={`/search-result/grid-view/${item.id}`}
-                className="w-full"
-              >
+              <Link href={getProductDetailUrl(item.id)} className="w-full">
                 <button className="btn-primary w-full">View</button>
               </Link>
             </div>

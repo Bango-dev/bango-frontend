@@ -9,7 +9,7 @@ import LocationSelect from "../../components/LocationSelect";
 import Link from "next/link";
 import Image from "next/image";
 import { AuthContext } from "../../context/AuthContext";
-import {useContext} from "react"
+import { useContext } from "react";
 
 const FindPrice = () => {
   const [commodityName, setCommodityName] = useState("");
@@ -18,26 +18,33 @@ const FindPrice = () => {
   const [sortRecent, setSortRecent] = useState("recent");
   const [sortPrice, setSortPrice] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-    const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
-    const { user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
+  // Check authentication and protect route
+  useEffect(() => {
+    if (!user && !loading) {
+      router.replace("/login");
+    }
+  }, [user, loading, router]);
 
-    useEffect(() => {
-      if (!loading && !user) {
-        router.replace("/login");
-      }
-    }, [user, loading]);
-
-    if (loading) return null;
-    if (!user) return null;
-
+  // Clear errors after timeout
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
       const timer = setTimeout(() => setErrors({}), 3000);
       return () => clearTimeout(timer);
     }
   }, [errors]);
+
+  // Early return AFTER all hooks - not before
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
@@ -73,54 +80,54 @@ const FindPrice = () => {
   };
 
   return (
-      <div className="flex flex-col min-h-screen pt-5 px-3 sm:px-4 lg:px-4 mx-auto w-full">
-        <Link href="/timeline" className="w-fit" >
-          <div className="flex items-center  w-fit mb-6 cursor-pointer gap-2">
-            <Image
-              src="/images/form/arrow-left.svg"
-              alt="Back arrow"
-              width={24}
-              height={24}
-            />
-            <span>Back</span>
-          </div>
-        </Link>
-
-        <form className="form" onSubmit={handleFindPrice} noValidate>
-          <h2 className="font-bold text-2xl leading-4">Find Price</h2>
-          <h3 className="text-[#757575] sm:text-base text-sm">
-            Find the price of an item to know how to plan your budget
-          </h3>
-
-          <SuggestionInput
-            label="Name of Commodity"
-            type="text"
-            placeholder="Eg, rice, Airforce 1, sugar"
-            value={commodityName}
-            onChange={setCommodityName}
-            field="commodityName"
-            showError={!!errors.commodityName}
-            required
+    <div className="flex flex-col min-h-screen pt-5 px-3 sm:px-4 lg:px-4 mx-auto w-full">
+      <Link href="/timeline" className="w-fit">
+        <div className="flex items-center  w-fit mb-6 cursor-pointer gap-2">
+          <Image
+            src="/images/form/arrow-left.svg"
+            alt="Back arrow"
+            width={24}
+            height={24}
           />
-          {errors.commodityName && (
-            <p className="text-red-500 text-sm">{errors.commodityName}</p>
-          )}
+          <span>Back</span>
+        </div>
+      </Link>
 
-          <LocationSelect value={location} onChange={setLocation} />
-          <SuggestionInput
-            label="Market Name"
-            type="text"
-            placeholder="Wuse Market"
-            value={market}
-            field="market"
-            onChange={setMarket}
-            showError={!!errors.marketName}
-          />
-          {errors.market && (
-            <p className="text-red-500 text-sm">{errors.market}</p>
-          )}
-          {/* Sorting options */}
-          {/* <div className="flex flex-col w-full mb-4">
+      <form className="form" onSubmit={handleFindPrice} noValidate>
+        <h2 className="font-bold text-2xl leading-4">Find Price</h2>
+        <h3 className="text-[#757575] sm:text-base text-sm">
+          Find the price of an item to know how to plan your budget
+        </h3>
+
+        <SuggestionInput
+          label="Name of Commodity"
+          type="text"
+          placeholder="Eg, rice, Airforce 1, sugar"
+          value={commodityName}
+          onChange={setCommodityName}
+          field="commodityName"
+          showError={!!errors.commodityName}
+          required
+        />
+        {errors.commodityName && (
+          <p className="text-red-500 text-sm">{errors.commodityName}</p>
+        )}
+
+        <LocationSelect value={location} onChange={setLocation} />
+        <SuggestionInput
+          label="Market Name"
+          type="text"
+          placeholder="Wuse Market"
+          value={market}
+          field="market"
+          onChange={setMarket}
+          showError={!!errors.marketName}
+        />
+        {errors.market && (
+          <p className="text-red-500 text-sm">{errors.market}</p>
+        )}
+        {/* Sorting options */}
+        {/* <div className="flex flex-col w-full mb-4">
             <label className="text-xs sm:text-xl font-bold text-[#1E1E1E] mb-2">
               Sort By
             </label>
@@ -148,44 +155,44 @@ const FindPrice = () => {
             </div>
           </div> */}
 
-          {/* Submit button with loading state */}
-          <PrimaryButton
-            text={
-              loading ? (
-                <>
-                  <svg
-                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Finding Price...
-                </>
-              ) : (
-                "Find Price"
-              )
-            }
-            type="submit"
-            className="w-full"
-            disabled={loading} // disable while loading or editing
-            // icon={loading ? "/images/spinner.svg" : undefined} // optional spinner icon
-          />
-        </form>
-      </div>
+        {/* Submit button with loading state */}
+        <PrimaryButton
+          text={
+            loading ? (
+              <>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Finding Price...
+              </>
+            ) : (
+              "Find Price"
+            )
+          }
+          type="submit"
+          className="w-full"
+          disabled={loading} // disable while loading or editing
+          // icon={loading ? "/images/spinner.svg" : undefined} // optional spinner icon
+        />
+      </form>
+    </div>
   );
 };
 

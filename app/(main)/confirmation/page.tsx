@@ -26,7 +26,7 @@ const Confirmation = () => {
       <div className="flex flex-col sm:flex-row gap-4 w-full px-4 justify-center">
         <PrimaryButton
           text="Back to Home"
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/timeline")}
           className="sm:w-auto"
         />
         <SecondaryButton

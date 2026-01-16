@@ -4,8 +4,9 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { MdGridOn } from "react-icons/md";
 import { FaList, FaFilter } from "react-icons/fa";
 import Link from "next/link";
+import { Suspense } from "react";
 
-const DisplayIndicator = () => {
+const DisplayIndicatorContent = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -51,6 +52,14 @@ const DisplayIndicator = () => {
         </Link>
       </div>
     </div>
+  );
+};
+
+const DisplayIndicator = () => {
+  return (
+    <Suspense fallback={<div className="flex gap-2 mb-4">Loading...</div>}>
+      <DisplayIndicatorContent />
+    </Suspense>
   );
 };
 
