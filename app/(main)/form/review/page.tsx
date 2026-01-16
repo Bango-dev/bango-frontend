@@ -145,7 +145,7 @@ const Review = () => {
 
 
   return (
-    <div className="p-6 flex flex-col w-full">
+    <div className="p-2 flex flex-col w-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-6 cursor-pointer gap-2">
         <Link href="/form/step-2" className="flex items-center gap-2">

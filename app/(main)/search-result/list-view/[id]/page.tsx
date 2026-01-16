@@ -2,7 +2,7 @@
 
 // import { usePathname } from "next/navigation";
 import { useEffect, useState, useMemo, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import InfoBox from "../../../../components/ui/InfoBox";
 import Link from "next/link";
@@ -16,11 +16,21 @@ import PrimaryButton from "../../../../components/ui/PrimaryButton";
 const MobileFullDetails = () => {
   const [pageUrl, setPageUrl] = useState("");
   const { id } = useParams();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [product, setProduct] = useState<Commodity>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setIsLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
   const linkRef = useRef<HTMLParagraphElement>(null);
-  // const pathname = usePathname();
+
+  // Build back URL based on search params
+  const getBackUrl = () => {
+    const queryString = searchParams.toString();
+    const querySuffix = queryString ? `?${queryString}` : "";
+    // Default to list-view, or use grid-view if specified in params
+    const viewType = searchParams.get("viewType") || "list-view";
+    return `/search-result/${viewType}${querySuffix}`;
+  };
 
   const SHARE_MESSAGE = encodeURIComponent(
     `Hey! Check out this price on Bango 👇\n${pageUrl}`
@@ -108,18 +118,18 @@ const MobileFullDetails = () => {
       try {
         if (!id) return;
 
-        setLoading(true);
+        setIsLoading(true);
 
         // Fetch single submission
         const res = await api.get(`/submissions/${id}`);
-        const submission = res.data?.data;
+        const submission = res.data?.entity;
         console.log(submission);
         setProduct(submission || null);
       } catch (err) {
         console.error(err);
         setProduct(null);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -181,7 +191,7 @@ const MobileFullDetails = () => {
   return (
     <div className="flex flex-col  sm:shadow-none shadow-md p-5 w-full ">
       <div className=" w-full flex justify-between items-center mb-5 ">
-        <Link href="/search-result/grid-view">
+        <Link href={getBackUrl()}>
           <div className="flex justify-start items-center  cursor-pointer gap-2 w-fit">
             <Image
               src="/images/form/arrow-left.svg"

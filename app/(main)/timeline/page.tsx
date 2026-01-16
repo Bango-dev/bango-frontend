@@ -192,7 +192,7 @@ const Timeline = () => {
             : "/timeline?page=1&limit=16";
 
         const response = await authApi.get(endpoint);
-        // console.log(response);
+        console.log(response);
         // Axios puts response body in response.data
         setCommodities(response?.data?.entity?.items);
       } catch (err: any) {

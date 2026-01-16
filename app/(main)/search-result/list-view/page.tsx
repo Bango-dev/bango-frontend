@@ -11,7 +11,6 @@ import { useRouter } from "next/navigation";
 import useAveragePrices from "../../../components/utils/useAveragePrice";
 import authApi from "../../../utils/api";
 
-
 const ITEMS_PER_PAGE = 10;
 
 function ListViewContent() {
@@ -27,6 +26,19 @@ function ListViewContent() {
   const sortRecent = searchParams.get("sortRecent") || "recent";
   const sortPrice = searchParams.get("sortPrice") || "";
 
+  // Helper to build product detail URL with search params
+  const getProductDetailUrl = (itemId: string) => {
+    const params = new URLSearchParams({
+      commodityName,
+      location: location || "",
+      market: market || "",
+      sortRecent,
+      sortPrice: sortPrice || "",
+      viewType: "list-view",
+    });
+    return `/search-result/grid-view/${itemId}?${params.toString()}`;
+  };
+
   const parsePrice = (p: unknown) => {
     const cleaned = String(p ?? "").replace(/[^0-9.]/g, "");
     const n = parseFloat(cleaned);
@@ -35,6 +47,9 @@ function ListViewContent() {
 
   const normalize = (str: string | undefined | null) =>
     (str || "").trim().toLowerCase().replace(/\s+/g, " ");
+
+  // Always call the hook - the hook handles empty results internally
+  const { averagePrices } = useAveragePrices(results, location, market);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,7 +61,7 @@ function ListViewContent() {
         });
 
         console.log(res);
-        setResults(res.data?.entity?.data?.data || []);
+        setResults(res.data?.entity.items || []);
       } catch (error) {
         console.error(error);
         setResults([]);
@@ -55,10 +70,10 @@ function ListViewContent() {
       }
     };
 
-    fetchData();
+    if (commodityName) {
+      fetchData();
+    }
   }, [commodityName, location, sortRecent, sortPrice]);
-
-  const { averagePrices } = useAveragePrices(results, location, market);
 
   useEffect(() => {
     if (!isLoading && commodityName && results.length === 0) {
@@ -230,7 +245,7 @@ function ListViewContent() {
               </div>
             </div>
             <div className="w-full mt-4">
-              <Link href={`/search-result/grid-view/${item.id}`}>
+              <Link href={getProductDetailUrl(item.id)}>
                 <button className="btn-primary w-full">View</button>
               </Link>
             </div>
