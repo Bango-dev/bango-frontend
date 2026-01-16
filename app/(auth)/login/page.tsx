@@ -9,13 +9,14 @@ import Link from "next/link";
 import authApi from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
 import toast from "react-hot-toast";
+import { handleGoogleSignIn } from "../../utils/googleAuth";
 
 const SignIn = () => {
   const router = useRouter();
 
-    if (!AuthContext) {
-      throw new Error("AuthContext must be used within AuthProvider");
-    }
+  if (!AuthContext) {
+    throw new Error("AuthContext must be used within AuthProvider");
+  }
   const { setUser } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
@@ -29,49 +30,54 @@ const SignIn = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handle Google Sign-In
+  const handleGoogleClick = () => {
+    handleGoogleSignIn();
+  };
+
   // (auth)/login/page.tsx
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (!formData.email || !formData.password) {
-    toast.error("Please enter your email and password");
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const response = await authApi.post("/auth/login", formData);
-    console.log("Login response:", response.data);
-    console.log("Login headers:", response.headers);
-    console.log("Cookies after login:", document.cookie); // ✅ Check cookies
-    if (response.data.entity) {
-      console.log("Setting user:", response.data.entity.user);
-
-      // ✅ Set user first
-      setUser(response.data.entity);
-
-      // ✅ Wait for React to process the state update
-      await new Promise((resolve) => setTimeout(resolve, 0));
-
-      toast.success("Login successful!");
-
-      // ✅ Then navigate
-      router.replace("/timeline");
-    } else {
-      toast.error("Login succeeded but user data is missing");
+    if (!formData.email || !formData.password) {
+      toast.error("Please enter your email and password");
+      return;
     }
-  } catch (err: any) {
-    console.error("Login error:", err);
-    toast.error(
-      err.response?.data?.message ||
-        err.message ||
-        "Login failed. Please check your credentials."
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+
+    setLoading(true);
+
+    try {
+      const response = await authApi.post("/auth/login", formData);
+      console.log("Login response:", response.data);
+      console.log("Login headers:", response.headers);
+      console.log("Cookies after login:", document.cookie); // ✅ Check cookies
+      if (response.data.entity) {
+        console.log("Setting user:", response.data.entity.user);
+
+        // ✅ Set user first
+        setUser(response.data.entity);
+
+        // ✅ Wait for React to process the state update
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        toast.success("Login successful!");
+
+        // ✅ Then navigate
+        router.replace("/timeline");
+      } else {
+        toast.error("Login succeeded but user data is missing");
+      }
+    } catch (err: any) {
+      console.error("Login error:", err);
+      toast.error(
+        err.response?.data?.message ||
+          err.message ||
+          "Login failed. Please check your credentials."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex justify-around items-center min-h-screen mx-auto w-full">
@@ -129,7 +135,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           <SecondaryButton
             text="Sign In with Google"
-            onClick={() => console.log("Google sign-in")}
+            onClick={handleGoogleClick}
             iconSrc="/images/on-boarding/google-icon.svg"
             className="w-full"
           />

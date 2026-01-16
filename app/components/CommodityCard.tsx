@@ -42,7 +42,7 @@ const CommodityCard = ({ commodity, onShare, onView }: Props) => {
   };
 
   return (
-    <div className="form lg:w-[30%] md:w-[45%] w-full rounded-4xl p-0 mx-0">
+    <div className="form lg:w-[30%] md:w-[45%] w-[70%] rounded-4xl p-0 mx-auto sm:mx-2 md:mx-3 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden bg-white">
       {/* Uncomment when you have images */}
       {/* {commodity.photoUrl && (
         <div className="relative w-full h-40 overflow-hidden rounded-t-4xl">

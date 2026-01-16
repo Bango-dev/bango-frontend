@@ -20,7 +20,7 @@ export default function ProtectedRoute({
 
   const { user, loading } = authContext;
 
-  console.log("ProtectedRoute - loading:", loading, "user:", user);
+  // console.log("ProtectedRoute - loading:", loading, "user:", user);
 
 
 const PUBLIC_ROUTES = ["/", "/login", "/register", "/about-us"];

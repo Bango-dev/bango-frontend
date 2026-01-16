@@ -1,4 +1,3 @@
-
 import api from "./api";
 
 export async function uploadToCloudinary(file: Blob | File) {
@@ -10,9 +9,9 @@ export async function uploadToCloudinary(file: Blob | File) {
 
     // ✅ Log the ENTIRE response
     // console.log("2. Full response:", response);
-    // console.log("3. Response data:", response.data);
+    // console.log("3. Response data:", response.data.entity);
 
-    const sig = response.data;
+    const sig = response.data.entity;
 
     // ✅ Log each field individually
     // console.log("4. Signature object:", sig);

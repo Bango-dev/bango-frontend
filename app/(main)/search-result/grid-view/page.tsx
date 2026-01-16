@@ -35,6 +35,9 @@ function GridViewContent() {
   const normalize = (str: string | undefined | null) =>
     (str || "").trim().toLowerCase().replace(/\s+/g, " ");
 
+  // Call all hooks at the top level before any conditional logic
+  const { averagePrices } = useAveragePrices(results, location, market);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -57,8 +60,6 @@ function GridViewContent() {
     fetchData();
   }, [commodityName, location, market, sortRecent, sortPrice]);
 
-  const { averagePrices } = useAveragePrices(results, location, market);
-
   useEffect(() => {
     if (!isLoading && commodityName && results.length === 0) {
       router.push("/no-result");
@@ -72,8 +73,6 @@ function GridViewContent() {
   const handleNext = () =>
     currentPage < totalPages && setCurrentPage((p) => p + 1);
   const handlePrev = () => currentPage > 1 && setCurrentPage((p) => p - 1);
-
-
 
   return (
     <div className="py-5 px-5">
