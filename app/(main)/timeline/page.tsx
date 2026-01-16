@@ -192,7 +192,7 @@ const Timeline = () => {
             : "/timeline?page=1&limit=16";
 
         const response = await authApi.get(endpoint);
-        console.log(response);
+        // console.log(response);
         // Axios puts response body in response.data
         setCommodities(response?.data?.entity?.items);
       } catch (err: any) {
@@ -369,10 +369,10 @@ const Timeline = () => {
 
   const handleClick = () => {
     // Navigate to the timeline page
-    router.push("/submit-price");
+    router.push("/form/step-1");
   };
   const handleView = (item: any) => {
-    router.push(`/timeline/${item.id}`);
+    router.push(`/submissions/${item.id}`);
   };
 
   //  const handleFocus = () => {
@@ -552,7 +552,7 @@ const Timeline = () => {
                     </div>
 
                     {/* timeline commodities */}
-                    <div className="flex justify-center w-full flex-wrap my-5 gap-2">
+                    <div className="flex  w-full justify-start flex-wrap my-5 gap-2">
                       {isLoading && (
                         <div className="w-full flex justify-center items-center py-10">
                           <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-(--color-primary)" />

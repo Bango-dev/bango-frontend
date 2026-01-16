@@ -63,7 +63,7 @@ const Step1 = () => {
   return (
     <div className="flex flex-col min-h-screen pt-5 px-3 sm:px-4 lg:px-4 mx-auto w-full ">
       <div className="relative flex items-center">
-        <Link href="/">
+        <Link href="/timeline">
           <div className="flex items-center mb-6 cursor-pointer gap-2">
             <Image
               src="/images/form/arrow-left.svg"

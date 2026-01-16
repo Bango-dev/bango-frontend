@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import publicApi from "../../utils/api";
 import { formatNigerianPhone } from "../../utils/formatNigerianPhone";
-
+import { handleGoogleSignIn } from "../../utils/googleAuth";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -69,7 +69,7 @@ const SignUp = () => {
       isValid = false;
     }
 
-        const formattedPhone = formatNigerianPhone(formData.phoneNumber);
+    const formattedPhone = formatNigerianPhone(formData.phoneNumber);
     if (!formData.phoneNumber) {
       errors.phoneNumber = "Phone number is required.";
       isValid = false;
@@ -96,8 +96,8 @@ const SignUp = () => {
 
     setErrorMessages(errors);
     if (!isValid) {
-  toast.error("Please complete all required fields correctly");
-}
+      toast.error("Please complete all required fields correctly");
+    }
     return isValid;
   };
 
@@ -107,89 +107,90 @@ const SignUp = () => {
     setErrorMessages((prev) => ({ ...prev, [name]: "" }));
   };
 
+  // Handle Google Sign-Up
+  const handleGoogleSignUp = () => {
+    handleGoogleSignIn();
+  };
+
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!validateForm()) return;
+    if (!validateForm()) return;
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-     const response = await publicApi.post("/auth/register", {
-      firstName: formData.firstName,
-      email: formData.email,
-      phoneNumber: formData.phoneNumber,
-      password: formData.password,
-      passwordConfirmation: formData.passwordConfirmation,
-    });
-// console.log(response)
-    toast.success("Signup successful! Redirecting to login...");
+    try {
+      const response = await publicApi.post("/auth/register", {
+        firstName: formData.firstName,
+        email: formData.email,
+        phoneNumber: formData.phoneNumber,
+        password: formData.password,
+        passwordConfirmation: formData.passwordConfirmation,
+      });
+      // console.log(response)
+      toast.success("Signup successful! Redirecting to login...");
 
-    setFormData({
-      email: "",
-phoneNumber: "",
-      firstName: "",
-      password: "",
-      passwordConfirmation: "",
-    });
+      setFormData({
+        email: "",
+        phoneNumber: "",
+        firstName: "",
+        password: "",
+        passwordConfirmation: "",
+      });
 
-    setTimeout(() => {
-      router.push("/login");
-    }, 2000);
-  } catch (err) {
-    console.log(err)
-    toast.error(
-      err.response ||
-        "Signup failed. Please try again."
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+    } catch (err) {
+      console.log(err);
+      toast.error(err.response || "Signup failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  //   const handleSubmit = async (e) => {
+  //     e.preventDefault();
+  //     // setError("");
+  //     // setSuccess("");
 
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     // setError("");
-//     // setSuccess("");
+  //     if (!validateForm()){
+  //       toast.error("Please fix the errors in the form");
+  //     };
 
-//     if (!validateForm()){
-//       toast.error("Please fix the errors in the form");
-//     };
+  //     setLoading(true);
 
-//     setLoading(true);
+  //     try {
+  //       const response = await api.post("/auth/register", {
+  //         firstName: formData.firstName,
+  //         email: formData.email,
+  //         password: formData.password,
+  //       });
 
-//     try {
-//       const response = await api.post("/auth/register", {
-//         firstName: formData.firstName,
-//         email: formData.email,
-//         password: formData.password,
-//       });
+  //       console.log(response.data);
+  // toast.success("Signup successful! Redirecting to login...");
+  //       // setSuccess("Signup successful!");
+  //       setFormData({
+  //         email: "",
+  //         firstName: "",
+  //         password: "",
+  //         confirmPassword: "",
+  //       });
 
-//       console.log(response.data);
-// toast.success("Signup successful! Redirecting to login...");
-//       // setSuccess("Signup successful!");
-//       setFormData({
-//         email: "",
-//         firstName: "",
-//         password: "",
-//         confirmPassword: "",
-//       });
-
-//       setTimeout(() => router.push("/login"), 2500);
-//     } catch (err) {
-//       console.error("Signup error:", err);
-//       // setError(
-//       //   err.response?.data?.message || "Signup failed. Please try again."
-//       // );
-//       toast.error(
-//       err.response?.data?.message ||
-//         "Signup failed. Please try again."
-//     );
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+  //       setTimeout(() => router.push("/login"), 2500);
+  //     } catch (err) {
+  //       console.error("Signup error:", err);
+  //       // setError(
+  //       //   err.response?.data?.message || "Signup failed. Please try again."
+  //       // );
+  //       toast.error(
+  //       err.response?.data?.message ||
+  //         "Signup failed. Please try again."
+  //     );
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
   const handlePhoneBlur = () => {
     const formatted = formatNigerianPhone(formData.phoneNumber);
     if (formatted) {
@@ -198,10 +199,6 @@ phoneNumber: "",
         phoneNumber: formatted,
       }));
     }
-  };
-  const handleGoogleSignUp = () => {
-    // Add your Google sign-up logic here
-    console.log("Google sign-up clicked");
   };
 
   return (
@@ -335,7 +332,7 @@ phoneNumber: "",
         </p>
       </form>
 
-     <div className="hidden md:flex h-screen w-[50%] ">
+      <div className="hidden md:flex h-screen w-[50%] ">
         <div className="hidden md:flex h-screen w-full   onboarding-slideshow" />
       </div>
     </div>
