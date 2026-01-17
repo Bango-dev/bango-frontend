@@ -138,10 +138,10 @@ const LandingPage = () => {
 
   const handleClick = () => {
     // Navigate to the timeline page
-    router.push("/register");
+    router.push("/login");
   }
  const handleFocus = () => {
-   router.push("/register");
+   router.push("/login");
  };
   return (
     <div className="py-10 md:px-20 px-5 flex flex-col gap-4 w-full ">
@@ -187,7 +187,7 @@ const LandingPage = () => {
             />
             <h4 className="text-2xl font-semibold">Trending Now</h4>
           </div>
-          <Link href="/register">
+          <Link href="/login">
             <div className="flex items-center gap-2">
               <span>See all</span>
               <Image

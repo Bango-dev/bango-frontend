@@ -125,10 +125,7 @@ const MobileFullDetails = () => {
         console.log("Response entity:", res.data?.entity);
 
         // ✅ Try different response structures
-        const submission =
-          res.data?.entity ||
-          res.data?.data ||
-          res.data;
+        const submission = res.data?.entity || res.data?.data || res.data;
 
         console.log("Extracted submission:", submission);
 
@@ -229,7 +226,6 @@ const MobileFullDetails = () => {
       </div>
     );
   }
-
 
   return (
     <div className="flex flex-col  sm:shadow-none shadow-md p-5 w-full ">
