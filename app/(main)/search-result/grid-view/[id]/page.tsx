@@ -1,14 +1,12 @@
 "use client";
 
-// import { usePathname } from "next/navigation";
 import { useEffect, useState, useMemo, useRef } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import InfoBox from "../../../../components/ui/InfoBox";
 import Link from "next/link";
-import api from "../../../../utils/api";
+import authApi from "../../../../utils/api"; // ✅ Changed from api
 import { Commodity } from "../../../../lib/types/commodities";
-// import { IoCopyOutline } from "react-icons/io5";
 import useAveragePrices from "../../../../components/utils/useAveragePrice";
 import { IoShareSocialSharp } from "react-icons/io5";
 import PrimaryButton from "../../../../components/ui/PrimaryButton";
@@ -17,17 +15,16 @@ const MobileFullDetails = () => {
   const [pageUrl, setPageUrl] = useState("");
   const { id } = useParams();
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const [product, setProduct] = useState<Commodity>(null);
+  const [product, setProduct] = useState<Commodity | null>(null); // ✅ Added null type
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
+  const [error, setError] = useState<string | null>(null); // ✅ Added error state
   const linkRef = useRef<HTMLParagraphElement>(null);
 
   // Build back URL based on search params
   const getBackUrl = () => {
     const queryString = searchParams.toString();
     const querySuffix = queryString ? `?${queryString}` : "";
-    // Default to grid-view, or use list-view if specified in params
     const viewType = searchParams.get("viewType") || "grid-view";
     return `/search-result/${viewType}${querySuffix}`;
   };
@@ -40,22 +37,18 @@ const MobileFullDetails = () => {
     whatsapp: () => {
       window.open(`https://wa.me/?text=${SHARE_MESSAGE}`, "_blank");
     },
-
     facebook: () => {
       window.open(
         `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`,
         "_blank"
       );
     },
-
     x: () => {
-      // Opens DM inbox where user selects recipient
       window.open(
         `https://twitter.com/messages/compose?text=${SHARE_MESSAGE}`,
         "_blank"
       );
     },
-
     email: () => {
       const subject = encodeURIComponent(
         "Check prices of commodities on Bango"
@@ -63,8 +56,6 @@ const MobileFullDetails = () => {
       const body = encodeURIComponent(
         `Hey! Check out this price on Bango, \n${pageUrl}`
       );
-
-      // Gmail app → Gmail web fallback
       window.open(
         `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`,
         "_blank"
@@ -97,7 +88,6 @@ const MobileFullDetails = () => {
 
   useEffect(() => {
     if (!id || typeof window === "undefined") return;
-
     const shortUrl = `${window.location.origin}/p/${id}`;
     setPageUrl(shortUrl);
   }, [id]);
@@ -116,18 +106,52 @@ const MobileFullDetails = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (!id) return;
+        if (!id) {
+          console.error("No ID provided");
+          setError("No submission ID provided");
+          return;
+        }
 
+        console.log("=== FETCHING SUBMISSION ===");
+        console.log("ID:", id);
         setLoading(true);
+        setError(null);
 
-        // Fetch single submission
-        const res = await api.get(`/submissions/${id}`);
-        console.log(res);
-        const submission = res.data?.entity;
-        console.log(submission);
-        setProduct(submission || null);
-      } catch (err) {
-        console.error(err);
+        // ✅ Using authApi instead of api
+        const res = await authApi.get(`/submissions/${id}`);
+
+        console.log("Full response:", res);
+        console.log("Response data:", res.data);
+        console.log("Response entity:", res.data?.entity);
+
+        // ✅ Try different response structures
+        const submission =
+          res.data?.entity ||
+          res.data?.data ||
+          res.data;
+
+        console.log("Extracted submission:", submission);
+
+        if (!submission) {
+          throw new Error("No submission data in response");
+        }
+
+        setProduct(submission);
+      } catch (err: any) {
+        console.error("=== FETCH ERROR ===");
+        console.error("Error:", err);
+        console.error("Response status:", err.response?.status);
+        console.error("Response data:", err.response?.data);
+
+        // ✅ Set user-friendly error message
+        if (err.response?.status === 401) {
+          setError("Please log in to view this submission");
+        } else if (err.response?.status === 404) {
+          setError("Submission not found");
+        } else {
+          setError(err.response?.data?.message || "Failed to load submission");
+        }
+
         setProduct(null);
       } finally {
         setLoading(false);
@@ -137,7 +161,25 @@ const MobileFullDetails = () => {
     fetchData();
   }, [id]);
 
-  if (loading)
+  const handleCopyLink = () => {
+    if (linkRef.current) {
+      const textToCopy = linkRef.current.textContent || "";
+      navigator.clipboard
+        .writeText(textToCopy)
+        .then(() => {
+          alert("Link copied!");
+        })
+        .catch((err) => {
+          console.error("Failed to copy link: ", err);
+        });
+    }
+  };
+
+  const normalize = (val: string) =>
+    val.trim().toLowerCase().replace(/\s+/g, " ");
+
+  // ✅ Loading state
+  if (loading) {
     return (
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
         <svg
@@ -162,32 +204,32 @@ const MobileFullDetails = () => {
         </svg>
       </div>
     );
+  }
 
-  if (!product) return <div className="p-6">Submission not found.</div>;
+  // ✅ Error state
+  if (error) {
+    return (
+      <div className="p-6 text-center">
+        <p className="text-xl text-red-600 mb-4">{error}</p>
+        <Link href={getBackUrl()} className="text-(--color-primary) underline">
+          Go Back
+        </Link>
+      </div>
+    );
+  }
 
-  // const handleCopy = async () => {
-  //   const fullUrl = `${window.location.origin}${pathname}`;
+  // ✅ No product state
+  if (!product) {
+    return (
+      <div className="p-6 text-center">
+        <p className="text-xl text-gray-600 mb-4">Submission not found</p>
+        <Link href={getBackUrl()} className="text-(--color-primary) underline">
+          Go Back
+        </Link>
+      </div>
+    );
+  }
 
-  //   await navigator.clipboard.writeText(fullUrl);
-  //   alert("Link copied!");
-  // };
-
-  const handleCopyLink = () => {
-    if (linkRef.current) {
-      const textToCopy = linkRef.current.textContent || "";
-      navigator.clipboard
-        .writeText(textToCopy)
-        .then(() => {
-          alert("Link copied!");
-        })
-        .catch((err) => {
-          console.error("Failed to copy link: ", err);
-        });
-    }
-  };
-
-  const normalize = (val: string) =>
-    val.trim().toLowerCase().replace(/\s+/g, " ");
 
   return (
     <div className="flex flex-col  sm:shadow-none shadow-md p-5 w-full ">

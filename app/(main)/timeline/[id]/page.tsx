@@ -114,7 +114,7 @@ const MobileFullDetails = () => {
         // Fetch single submission
         const res = await api.get(`/submissions/${id}`);
         console.log(res);
-        const submission = res.data?.entity.items;
+        const submission = res.data?.entity;
         console.log(submission);
         setProduct(submission || null);
       } catch (err) {
@@ -220,7 +220,7 @@ Link: ${pageUrl}
   return (
     <div className="flex flex-col  sm:shadow-none shadow-md p-5 w-full ">
       <div className=" w-full flex justify-between items-center mb-5 ">
-        <Link href="/search-result/grid-view">
+        <Link href="/timeline">
           <div className="flex justify-start items-center  cursor-pointer gap-2 w-fit">
             <Image
               src="/images/form/arrow-left.svg"
@@ -234,11 +234,11 @@ Link: ${pageUrl}
 
         {/* <IoCopyOutline className="h-6 w-6" onClick={handleCopy} /> */}
         <div className="flex gap-3 items-center">
-          <IoCopyOutline
+          {/* <IoCopyOutline
             className="h-6 w-6 cursor-pointer hover:text-[#5C32D0] transition-colors"
             onClick={handleCopyDetails}
             title="Copy commodity details"
-          />
+          /> */}
           <IoShareSocialSharp
             className="h-6 w-6 cursor-pointer hover:text-[#5C32D0] transition-colors"
             onClick={() => setShowDialog(!showDialog)}

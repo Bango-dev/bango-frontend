@@ -373,7 +373,7 @@ const Timeline = () => {
   };
  const handleView = (commodity: Commodity) => {
    // Update this path to match your file structure
-   router.push(`search-result/grid-view/${commodity.id}`);
+   router.push(`timeline/${commodity.id}`);
  };
 
   //  const handleFocus = () => {
