@@ -6,12 +6,14 @@ import SecondaryButton from "../../components/ui/SecondaryButton";
 import Link from "next/link";
 import { Figtree, Poppins } from "next/font/google";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 // import api from "../../utils/api";
 import toast from "react-hot-toast";
 import publicApi from "../../utils/api";
 import { formatNigerianPhone } from "../../utils/formatNigerianPhone";
 import { handleGoogleSignIn } from "../../utils/googleAuth";
+import { validateRedirectUrl } from "../../utils/redirectvalidation";
+
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -25,7 +27,13 @@ const poppins = Poppins({
 
 const SignUp = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
+  // ✅ Validate redirect URL
+  const redirectTo = validateRedirectUrl(
+    searchParams.get("redirect") || "/timeline"
+  );
+  
   const [formData, setFormData] = useState({
     email: "",
     phoneNumber: "",
@@ -109,7 +117,7 @@ const SignUp = () => {
 
   // Handle Google Sign-Up
   const handleGoogleSignUp = () => {
-    handleGoogleSignIn();
+    handleGoogleSignIn(redirectTo);
   };
 
   const handleSubmit = async (e) => {
@@ -326,7 +334,14 @@ const SignUp = () => {
 
         <p className="text-center text-[#757575] text-sm mt-2">
           Already have an account?
-          <Link href="/login" className="ml-2 text-(--color-primary) font-bold">
+          <Link
+            href={`/login${
+              searchParams.get("redirect")
+                ? `?redirect=${searchParams.get("redirect")}`
+                : ""
+            }`}
+            className="ml-2 text-(--color-primary) font-bold"
+          >
             Sign in
           </Link>
         </p>

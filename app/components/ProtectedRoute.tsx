@@ -1,9 +1,10 @@
+// components/ProtectedRoute.tsx
 "use client";
 
 import { useContext, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { AuthContext } from "../context/AuthContext";
-import { usePathname } from "next/navigation";
+import { validateRedirectUrl } from "../utils/redirectvalidation";
 
 export default function ProtectedRoute({
   children,
@@ -12,7 +13,7 @@ export default function ProtectedRoute({
 }) {
   const authContext = useContext(AuthContext);
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = usePathname(); // ✅ Get current path
 
   if (!authContext) {
     throw new Error("ProtectedRoute must be used within AuthProvider");
@@ -20,36 +21,29 @@ export default function ProtectedRoute({
 
   const { user, loading } = authContext;
 
-  // console.log("ProtectedRoute - loading:", loading, "user:", user);
+  useEffect(() => {
+    if (!loading && !user) {
+      console.log("No user, redirecting to login");
 
+      // ✅ Pass current URL as redirect parameter
+      // ✅ Validate before encoding
+      const validatedPath = validateRedirectUrl(pathname);
+      const encodedPath = encodeURIComponent(validatedPath);
+      router.replace(`/login?redirect=${encodedPath}`);
+    }
+  }, [user, loading, router, pathname]);
 
-const PUBLIC_ROUTES = ["/", "/login", "/register", "/about-us"];
-
-useEffect(() => {
-  if (PUBLIC_ROUTES.includes(pathname)) return;
-
-  if (!loading && !user) {
-    router.replace("/login");
-  }
-}, [user, loading, pathname, router]);
-
-
-  //  Show loading screen while checking authentication
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-pulse">
-          <div className="text-lg">Loading...</div>
-        </div>
+        <div className="animate-pulse">Loading...</div>
       </div>
     );
   }
 
-  //  If not loading and no user, show nothing (redirect happens in useEffect)
   if (!user) {
     return null;
   }
 
-  //  User is authenticated, render protected content
   return <>{children}</>;
 }

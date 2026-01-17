@@ -10,9 +10,12 @@ import authApi from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import { handleGoogleSignIn } from "../../utils/googleAuth";
+import { useSearchParams } from "next/navigation";
+import { validateRedirectUrl } from "../../utils/redirectvalidation";
 
 const SignIn = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   if (!AuthContext) {
     throw new Error("AuthContext must be used within AuthProvider");
@@ -30,9 +33,15 @@ const SignIn = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle Google Sign-In
+  // ✅ Get the redirect URL from query params (if protected route sent them here)
+  // ✅ Validate the redirect URL
+  const redirectTo = validateRedirectUrl(
+    searchParams.get("redirect") || "/timeline"
+  );
+
   const handleGoogleClick = () => {
-    handleGoogleSignIn();
+    // ✅ Pass the redirect URL to Google OAuth
+    handleGoogleSignIn(redirectTo);
   };
 
   // (auth)/login/page.tsx
@@ -63,7 +72,9 @@ const SignIn = () => {
         toast.success("Login successful!");
 
         // ✅ Then navigate
-        router.replace("/timeline");
+        // ✅ Redirect to intended page or default timeline
+        console.log("Redirecting to:", redirectTo);
+        router.replace(redirectTo);
       } else {
         toast.error("Login succeeded but user data is missing");
       }
@@ -144,7 +155,11 @@ const SignIn = () => {
         <p className="text-center text-sm text-[#757575] mt-4">
           Don&apos;t have an account?
           <Link
-            href="/register"
+            href={`/register${
+              searchParams.get("redirect")
+                ? `?redirect=${searchParams.get("redirect")}`
+                : ""
+            }`}
             className="ml-2 text-(--color-primary) font-bold"
           >
             Sign up
