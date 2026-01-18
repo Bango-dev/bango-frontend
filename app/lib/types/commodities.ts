@@ -13,5 +13,6 @@ export type Commodity = {
   sellerPhoneNumber: string;
   createdAt: string;
   viewCount?: number;
+  user: { firstName: string };
 };
 

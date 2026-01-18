@@ -142,7 +142,7 @@ View details: ${pageUrl}`;
 
         const res = await authApi.get(`/submissions/${id}`);
         const submission = res.data?.entity || res.data?.data || res.data;
-
+console.log("Fetched submission:", submission);
         if (!submission) {
           throw new Error("No submission data in response");
         }
@@ -368,8 +368,12 @@ View details: ${pageUrl}`;
 
           {/* Dates */}
           <p className="text-base text-[#757575] font-medium">
-            Submitted by {product.BuyerName} on{" "}
-            {new Date(product.createdAt).toLocaleDateString()}
+            Submitted by {product.user.firstName || "bango user"} on{" "}
+            {new Date(product.purchaseDate).toLocaleDateString("en-NG", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })}
           </p>
 
           <div className="items-center justify-between mb-4 flex w-full">
@@ -415,7 +419,7 @@ View details: ${pageUrl}`;
               <p className="submission-key">Average Price</p>
               {(() => {
                 const avgKey = `${normalize(product.commodityName)}-${normalize(
-                  product.quantity
+                  product.quantity,
                 )}`;
 
                 return (
@@ -423,8 +427,8 @@ View details: ${pageUrl}`;
                     {avgLoading
                       ? "Loading..."
                       : averagePrices[avgKey]
-                      ? `₦${averagePrices[avgKey].toLocaleString()}`
-                      : "No data"}
+                        ? `₦${averagePrices[avgKey].toLocaleString()}`
+                        : "No data"}
                   </p>
                 );
               })()}
