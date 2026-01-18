@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 type AuthContextType = {
   user: any | null;
   loading: boolean;
+  setLoading: (loading: boolean) => void;
   isAuthenticated: boolean;
   logout: () => Promise<void>;
   // refreshUser: () => Promise<void>;
@@ -90,6 +91,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     () => ({
       user,
       loading,
+      setLoading,
       isAuthenticated: !!user,
       logout,
       setUser,

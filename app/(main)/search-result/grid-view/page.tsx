@@ -9,7 +9,7 @@ import DisplayIndicator from "../../../components/ui/DisplayIndicator";
 import Link from "next/link";
 import Image from "next/image";
 import InfoBox from "../../../components/ui/InfoBox";
-import useAveragePrices from "../../../components/utils/useAveragePrice";
+import useAveragePrices from "../../../utils/useAveragePrice";
 import { Commodity } from "../../../lib/types/commodities";
 
 function GridViewContent() {

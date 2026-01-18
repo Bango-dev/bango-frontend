@@ -7,7 +7,7 @@ import InfoBox from "../../../../components/ui/InfoBox";
 import Link from "next/link";
 import authApi from "../../../../utils/api";
 import { Commodity } from "../../../../lib/types/commodities";
-import useAveragePrices from "../../../../components/utils/useAveragePrice";
+import useAveragePrices from "../../../../utils/useAveragePrice";
 import { IoShareSocialSharp } from "react-icons/io5";
 import PrimaryButton from "../../../../components/ui/PrimaryButton";
 
@@ -51,14 +51,14 @@ ${pageUrl}`;
 
       window.open(
         `https://wa.me/?text=${encodeURIComponent(message)}`,
-        "_blank"
+        "_blank",
       );
     },
 
     facebook: () => {
       window.open(
         `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`,
-        "_blank"
+        "_blank",
       );
     },
 
@@ -69,7 +69,7 @@ ${pageUrl}`;
 
       window.open(
         `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(pageUrl)}`,
-        "_blank"
+        "_blank",
       );
     },
 
@@ -90,7 +90,7 @@ View details: ${pageUrl}`;
 
       window.open(
         `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
-        "_blank"
+        "_blank",
       );
     },
   };
@@ -120,13 +120,13 @@ View details: ${pageUrl}`;
 
   const memoizedProductArray = useMemo(
     () => (product ? [product] : []),
-    [product]
+    [product],
   );
 
   const { averagePrices, isLoading: avgLoading } = useAveragePrices(
     memoizedProductArray,
     product?.location || "",
-    product?.market || ""
+    product?.market || "",
   );
 
   useEffect(() => {
@@ -142,7 +142,7 @@ View details: ${pageUrl}`;
 
         const res = await authApi.get(`/submissions/${id}`);
         const submission = res.data?.entity || res.data?.data || res.data;
-console.log("Fetched submission:", submission);
+        console.log("Fetched submission:", submission);
         if (!submission) {
           throw new Error("No submission data in response");
         }

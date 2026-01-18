@@ -8,7 +8,7 @@ import InfoBox from "../../../components/ui/InfoBox";
 import Link from "next/link";
 import authApi from "../../../utils/api"; // ✅ Changed from api
 import { Commodity } from "../../../lib/types/commodities";
-import useAveragePrices from "../../../components/utils/useAveragePrice";
+import useAveragePrices from "../../../utils/useAveragePrice";
 import { IoShareSocialSharp } from "react-icons/io5";
 import PrimaryButton from "../../../components/ui/PrimaryButton";
 import toast from "react-hot-toast";
@@ -45,14 +45,14 @@ ${pageUrl}`;
 
       window.open(
         `https://wa.me/?text=${encodeURIComponent(message)}`,
-        "_blank"
+        "_blank",
       );
     },
 
     facebook: () => {
       window.open(
         `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`,
-        "_blank"
+        "_blank",
       );
     },
 
@@ -63,7 +63,7 @@ ${pageUrl}`;
 
       window.open(
         `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(pageUrl)}`,
-        "_blank"
+        "_blank",
       );
     },
 
@@ -86,7 +86,7 @@ Shared via Bango - Crowdsourced prices from across Nigeria`;
 
       window.open(
         `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
-        "_blank"
+        "_blank",
       );
     },
   };
@@ -116,13 +116,13 @@ Shared via Bango - Crowdsourced prices from across Nigeria`;
 
   const memoizedProductArray = useMemo(
     () => (product ? [product] : []),
-    [product]
+    [product],
   );
 
   const { averagePrices, isLoading: avgLoading } = useAveragePrices(
     memoizedProductArray,
     product?.location || "",
-    product?.market || ""
+    product?.market || "",
   );
 
   useEffect(() => {
@@ -185,7 +185,7 @@ Shared via Bango - Crowdsourced prices from across Nigeria`;
     if (!product) return;
 
     const avgKey = `${normalize(product.commodityName)}-${normalize(
-      product.quantity
+      product.quantity,
     )}`;
     const avgPrice = averagePrices[avgKey]
       ? `₦${averagePrices[avgKey].toLocaleString()}`
@@ -456,7 +456,7 @@ Link: ${pageUrl}
               <p className="submission-key">Average Price</p>
               {(() => {
                 const avgKey = `${normalize(product.commodityName)}-${normalize(
-                  product.quantity
+                  product.quantity,
                 )}`;
 
                 return (
@@ -464,8 +464,8 @@ Link: ${pageUrl}
                     {avgLoading
                       ? "Loading..."
                       : averagePrices[avgKey]
-                      ? `₦${averagePrices[avgKey].toLocaleString()}`
-                      : "No data"}
+                        ? `₦${averagePrices[avgKey].toLocaleString()}`
+                        : "No data"}
                   </p>
                 );
               })()}

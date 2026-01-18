@@ -7,7 +7,7 @@ import InfoBox from "../../../../components/ui/InfoBox";
 import Link from "next/link";
 import authApi from "../../../../utils/api"; // ✅ Changed from api
 import { Commodity } from "../../../../lib/types/commodities";
-import useAveragePrices from "../../../../components/utils/useAveragePrice";
+import useAveragePrices from "../../../../utils/useAveragePrice";
 import { IoShareSocialSharp } from "react-icons/io5";
 import PrimaryButton from "../../../../components/ui/PrimaryButton";
 
@@ -30,7 +30,7 @@ const MobileFullDetails = () => {
   };
 
   const SHARE_MESSAGE = encodeURIComponent(
-    `Hey! Check out this price on Bango 👇\n${pageUrl}`
+    `Hey! Check out this price on Bango 👇\n${pageUrl}`,
   );
 
   const shareHandlers = {
@@ -40,25 +40,25 @@ const MobileFullDetails = () => {
     facebook: () => {
       window.open(
         `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`,
-        "_blank"
+        "_blank",
       );
     },
     x: () => {
       window.open(
         `https://twitter.com/messages/compose?text=${SHARE_MESSAGE}`,
-        "_blank"
+        "_blank",
       );
     },
     email: () => {
       const subject = encodeURIComponent(
-        "Check prices of commodities on Bango"
+        "Check prices of commodities on Bango",
       );
       const body = encodeURIComponent(
-        `Hey! Check out this price on Bango, \n${pageUrl}`
+        `Hey! Check out this price on Bango, \n${pageUrl}`,
       );
       window.open(
         `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`,
-        "_blank"
+        "_blank",
       );
     },
   };
@@ -94,13 +94,13 @@ const MobileFullDetails = () => {
 
   const memoizedProductArray = useMemo(
     () => (product ? [product] : []),
-    [product]
+    [product],
   );
 
   const { averagePrices, isLoading: avgLoading } = useAveragePrices(
     memoizedProductArray,
     product?.location || "",
-    product?.market || ""
+    product?.market || "",
   );
 
   useEffect(() => {
@@ -398,7 +398,7 @@ const MobileFullDetails = () => {
               <p className="submission-key">Average Price</p>
               {(() => {
                 const avgKey = `${normalize(product.commodityName)}-${normalize(
-                  product.quantity
+                  product.quantity,
                 )}`;
 
                 return (
@@ -406,8 +406,8 @@ const MobileFullDetails = () => {
                     {avgLoading
                       ? "Loading..."
                       : averagePrices[avgKey]
-                      ? `₦${averagePrices[avgKey].toLocaleString()}`
-                      : "No data"}
+                        ? `₦${averagePrices[avgKey].toLocaleString()}`
+                        : "No data"}
                   </p>
                 );
               })()}

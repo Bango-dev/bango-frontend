@@ -8,7 +8,7 @@ import DisplayIndicator from "../../../components/ui/DisplayIndicator";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import useAveragePrices from "../../../components/utils/useAveragePrice";
+import useAveragePrices from "../../../utils/useAveragePrice";
 import authApi from "../../../utils/api";
 
 const ITEMS_PER_PAGE = 10;
@@ -85,7 +85,7 @@ function ListViewContent() {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedResults = results.slice(
     startIndex,
-    startIndex + ITEMS_PER_PAGE
+    startIndex + ITEMS_PER_PAGE,
   );
 
   const handlePageChange = (page: number) => {
@@ -158,7 +158,7 @@ function ListViewContent() {
       {/* Desktop Rows */}
       {paginatedResults.map((item, id) => {
         const avgKey = `${normalize(item.commodityName)}-${normalize(
-          item.quantity
+          item.quantity,
         )}`;
         const avgPrice = averagePrices[avgKey];
         return (
@@ -193,7 +193,7 @@ function ListViewContent() {
       {/* Mobile Cards */}
       {paginatedResults.map((item, id) => {
         const avgKey = `${normalize(item.commodityName)}-${normalize(
-          item.quantity
+          item.quantity,
         )}`;
         const avgPrice = averagePrices[avgKey];
         return (

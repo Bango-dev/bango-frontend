@@ -1,7 +1,6 @@
 "use client";
-
-import { useContext, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useContext, useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Input from "../../(main)/form/Input";
 import PrimaryButton from "../../components/ui/PrimaryButton";
 import SecondaryButton from "../../components/ui/SecondaryButton";
@@ -10,17 +9,16 @@ import authApi from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import { handleGoogleSignIn } from "../../utils/googleAuth";
-import { useSearchParams } from "next/navigation";
 import { validateRedirectUrl } from "../../utils/redirectvalidation";
+import { useAuthCheck } from "../../hooks/useAuthCheck"; // ✅ Add this
 
 const SignIn = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { setUser, user } = useContext(AuthContext);
 
-  if (!AuthContext) {
-    throw new Error("AuthContext must be used within AuthProvider");
-  }
-  const { setUser } = useContext(AuthContext);
+  // ✅ Check if user is already authenticated
+  useAuthCheck();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -28,23 +26,29 @@ const SignIn = () => {
   });
   const [loading, setLoading] = useState(false);
 
+  // ✅ If user is already logged in, redirect them
+  useEffect(() => {
+    if (user) {
+      const redirectTo = validateRedirectUrl(
+        searchParams.get("redirect") || "/timeline",
+      );
+      router.replace(redirectTo);
+    }
+  }, [user, router, searchParams]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Get the redirect URL from query params (if protected route sent them here)
-  // ✅ Validate the redirect URL
   const redirectTo = validateRedirectUrl(
-    searchParams.get("redirect") || "/timeline"
+    searchParams.get("redirect") || "/timeline",
   );
 
   const handleGoogleClick = () => {
-    // ✅ Pass the redirect URL to Google OAuth
     handleGoogleSignIn(redirectTo);
   };
 
-  // (auth)/login/page.tsx
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -57,22 +61,14 @@ const SignIn = () => {
 
     try {
       const response = await authApi.post("/auth/login", formData);
-      console.log("Login response:", response.data);
-      console.log("Login headers:", response.headers);
-      console.log("Cookies after login:", document.cookie); // ✅ Check cookies
-      if (response.data.entity) {
-        console.log("Setting user:", response.data.entity.user);
 
-        // ✅ Set user first
+      if (response.data.entity) {
         setUser(response.data.entity);
 
-        // ✅ Wait for React to process the state update
         await new Promise((resolve) => setTimeout(resolve, 0));
 
         toast.success("Login successful!");
 
-        // ✅ Then navigate
-        // ✅ Redirect to intended page or default timeline
         console.log("Redirecting to:", redirectTo);
         router.replace(redirectTo);
       } else {
@@ -83,7 +79,7 @@ const SignIn = () => {
       toast.error(
         err.response?.data?.message ||
           err.message ||
-          "Login failed. Please check your credentials."
+          "Login failed. Please check your credentials.",
       );
     } finally {
       setLoading(false);

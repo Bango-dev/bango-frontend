@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import api from "../../utils/api";
-import { Commodity } from "../../lib/types/commodities";
+import api from "./api";
+import { Commodity } from "../lib/types/commodities";
 
 const useAveragePrices = (
   data: Commodity[],
   location: string,
-  market: string
+  market: string,
 ) => {
   const [averagePrices, setAveragePrices] = useState<Record<string, number>>(
-    {}
+    {},
   );
   const [isLoading, setIsLoading] = useState(true);
 
@@ -70,7 +70,7 @@ const useAveragePrices = (
           if (filtered.length > 0) {
             const total = filtered.reduce(
               (sum, c) => sum + parsePrice(c.price),
-              0
+              0,
             );
             averages[key] = Math.round(total / filtered.length);
           }
