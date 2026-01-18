@@ -11,7 +11,7 @@ export default function ShortLinkRedirect() {
   useEffect(() => {
     if (id) {
       // Redirect to the full detail page
-      router.replace(`timeline/${id}`);
+      router.replace(`/timeline/${id}`);
     }
   }, [id, router]);
 

@@ -38,7 +38,7 @@ const SubmissionDetails = () => {
 
 *${product.commodityName}*
 💰 ₦${Number(product.price).toLocaleString()}
-📍 ${product.market}, ${product.location}
+📍 ${product.location}
 📦 ${product.quantity}
 
 ${pageUrl}`;
@@ -77,7 +77,7 @@ I found this price on Bango:
 
 Product: ${product.commodityName}
 Price: ₦${Number(product.price).toLocaleString()}
-Location: ${product.market}, ${product.location}
+Location: ${product.location}
 Quantity: ${product.quantity}
 
 View details: ${pageUrl}
@@ -324,7 +324,7 @@ Link: ${pageUrl}
                 ₦{Number(product.price).toLocaleString()}
               </p>
               <p className="text-sm text-gray-600">
-                {product.market}, {product.location}
+                 {product.location}
               </p>
             </div>
 

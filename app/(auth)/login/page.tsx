@@ -10,7 +10,7 @@ import { AuthContext } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import { handleGoogleSignIn } from "../../utils/googleAuth";
 import { validateRedirectUrl } from "../../utils/redirectvalidation";
-import { useAuthCheck } from "../../hooks/useAuthCheck"; // ✅ Add this
+// import { useAuthCheck } from "../../hooks/useAuthCheck"; 
 
 const SignIn = () => {
   const router = useRouter();
@@ -18,7 +18,7 @@ const SignIn = () => {
   const { setUser, user } = useContext(AuthContext);
 
   // ✅ Check if user is already authenticated
-  useAuthCheck();
+  // useAuthCheck();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -27,14 +27,14 @@ const SignIn = () => {
   const [loading, setLoading] = useState(false);
 
   // ✅ If user is already logged in, redirect them
-  useEffect(() => {
-    if (user) {
-      const redirectTo = validateRedirectUrl(
-        searchParams.get("redirect") || "/timeline",
-      );
-      router.replace(redirectTo);
-    }
-  }, [user, router, searchParams]);
+  // useEffect(() => {
+  //   if (user) {
+  //     const redirectTo = validateRedirectUrl(
+  //       searchParams.get("redirect") || "/timeline",
+  //     );
+  //     router.replace(redirectTo);
+  //   }
+  // }, [user, router, searchParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

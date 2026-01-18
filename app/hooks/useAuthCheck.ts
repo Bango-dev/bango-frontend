@@ -19,7 +19,8 @@ export const useAuthCheck = () => {
         if (response.data?.entity || response.data?.data) {
           const userData = response.data.entity || response.data.data;
           console.log("User authenticated:", userData);
-          setUser(userData);
+            setUser(userData);
+            
         }
       } catch (error: any) {
         console.log("Not authenticated:", error.message);

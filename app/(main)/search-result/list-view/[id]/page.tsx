@@ -5,7 +5,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import InfoBox from "../../../../components/ui/InfoBox";
 import Link from "next/link";
-import authApi from "../../../../utils/api"; // ✅ Changed from api
+import authApi from "../../../../utils/api";
 import { Commodity } from "../../../../lib/types/commodities";
 import useAveragePrices from "../../../../utils/useAveragePrice";
 import { IoShareSocialSharp } from "react-icons/io5";
@@ -15,49 +15,93 @@ const MobileFullDetails = () => {
   const [pageUrl, setPageUrl] = useState("");
   const { id } = useParams();
   const searchParams = useSearchParams();
-  const [product, setProduct] = useState<Commodity | null>(null); // ✅ Added null type
+  const [product, setProduct] = useState<Commodity | null>(null);
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
-  const [error, setError] = useState<string | null>(null); // ✅ Added error state
+  const [error, setError] = useState<string | null>(null);
   const linkRef = useRef<HTMLParagraphElement>(null);
+  const [backUrl, setBackUrl] = useState("/find-price");
 
-  // Build back URL based on search params
-  const getBackUrl = () => {
+  // ✅ Determine back URL based on search context
+  useEffect(() => {
     const queryString = searchParams.toString();
-    const querySuffix = queryString ? `?${queryString}` : "";
-    const viewType = searchParams.get("viewType") || "grid-view";
-    return `/search-result/${viewType}${querySuffix}`;
-  };
+    const viewType = searchParams.get("viewType");
+    const searchQuery = searchParams.get("query");
 
-  const SHARE_MESSAGE = encodeURIComponent(
-    `Hey! Check out this price on Bango 👇\n${pageUrl}`,
-  );
+    if (searchQuery || viewType) {
+      // User came from search/browse - go back to search result
+      const querySuffix = queryString ? `?${queryString}` : "";
+      setBackUrl(`/search-result/${viewType || "grid-view"}${querySuffix}`);
+      console.log("Back URL (from search):", backUrl);
+    } else {
+      // User came from shared link - go to find-price
+      setBackUrl("/find-price");
+      console.log("Back URL (from shared link):", "/find-price");
+    }
+  }, [searchParams]);
 
+  // ✅ Generate short URL
+  useEffect(() => {
+    if (!id || typeof window === "undefined") return;
+    const shortUrl = `${window.location.origin}/p/${id}`;
+    setPageUrl(shortUrl);
+  }, [id]);
+
+  // ✅ Enhanced share handlers with product info
   const shareHandlers = {
     whatsapp: () => {
-      window.open(`https://wa.me/?text=${SHARE_MESSAGE}`, "_blank");
+      if (!product) return;
+
+      const message = `Check out this price! 🛒
+
+*${product.commodityName}*
+ ₦${Number(product.price).toLocaleString()}
+ ${product.location}
+ ${product.quantity}
+
+${pageUrl}`;
+
+      window.open(
+        `https://wa.me/?text=${encodeURIComponent(message)}`,
+        "_blank",
+      );
     },
+
     facebook: () => {
       window.open(
-        `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`,
+        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`,
         "_blank",
       );
     },
+
     x: () => {
+      if (!product) return;
+
+      const tweetText = `Check out ${product.commodityName} at ₦${Number(product.price).toLocaleString()} in ${product.location}! 🛒`;
+
       window.open(
-        `https://twitter.com/messages/compose?text=${SHARE_MESSAGE}`,
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(pageUrl)}`,
         "_blank",
       );
     },
+
     email: () => {
-      const subject = encodeURIComponent(
-        "Check prices of commodities on Bango",
-      );
-      const body = encodeURIComponent(
-        `Hey! Check out this price on Bango, \n${pageUrl}`,
-      );
+      if (!product) return;
+
+      const subject = `Check out this price: ${product.commodityName}`;
+      const body = `Hey!
+
+I found this price on Bango:
+
+Product: ${product.commodityName}
+Price: ₦${Number(product.price).toLocaleString()}
+Location:  ${product.location}
+Quantity: ${product.quantity}
+
+View details: ${pageUrl}`;
+
       window.open(
-        `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`,
+        `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
         "_blank",
       );
     },
@@ -86,12 +130,6 @@ const MobileFullDetails = () => {
     },
   ];
 
-  useEffect(() => {
-    if (!id || typeof window === "undefined") return;
-    const shortUrl = `${window.location.origin}/p/${id}`;
-    setPageUrl(shortUrl);
-  }, [id]);
-
   const memoizedProductArray = useMemo(
     () => (product ? [product] : []),
     [product],
@@ -107,41 +145,27 @@ const MobileFullDetails = () => {
     const fetchData = async () => {
       try {
         if (!id) {
-          console.error("No ID provided");
           setError("No submission ID provided");
           return;
         }
 
-        console.log("=== FETCHING SUBMISSION ===");
-        console.log("ID:", id);
         setLoading(true);
         setError(null);
 
-        // ✅ Using authApi instead of api
         const res = await authApi.get(`/submissions/${id}`);
-
-        console.log("Full response:", res);
-        console.log("Response data:", res.data);
-        console.log("Response entity:", res.data?.entity);
-
-        // ✅ Try different response structures
         const submission = res.data?.entity || res.data?.data || res.data;
-
-        console.log("Extracted submission:", submission);
-
+        console.log("Fetched submission:", submission);
         if (!submission) {
           throw new Error("No submission data in response");
         }
 
         setProduct(submission);
       } catch (err: any) {
-        console.error("=== FETCH ERROR ===");
-        console.error("Error:", err);
-        console.error("Response status:", err.response?.status);
-        console.error("Response data:", err.response?.data);
+        console.error("Fetch error:", err);
 
-        // ✅ Set user-friendly error message
-        if (err.response?.status === 401) {
+        if (err.response?.status === 429) {
+          setError("Too many requests. Please wait and try again.");
+        } else if (err.response?.status === 401) {
           setError("Please log in to view this submission");
         } else if (err.response?.status === 404) {
           setError("Submission not found");
@@ -159,23 +183,19 @@ const MobileFullDetails = () => {
   }, [id]);
 
   const handleCopyLink = () => {
-    if (linkRef.current) {
-      const textToCopy = linkRef.current.textContent || "";
-      navigator.clipboard
-        .writeText(textToCopy)
-        .then(() => {
-          alert("Link copied!");
-        })
-        .catch((err) => {
-          console.error("Failed to copy link: ", err);
-        });
-    }
+    navigator.clipboard
+      .writeText(pageUrl)
+      .then(() => {
+        alert("Link copied!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy link:", err);
+      });
   };
 
   const normalize = (val: string) =>
     val.trim().toLowerCase().replace(/\s+/g, " ");
 
-  // ✅ Loading state
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
@@ -203,24 +223,22 @@ const MobileFullDetails = () => {
     );
   }
 
-  // ✅ Error state
   if (error) {
     return (
       <div className="p-6 text-center">
         <p className="text-xl text-red-600 mb-4">{error}</p>
-        <Link href={getBackUrl()} className="text-(--color-primary) underline">
+        <Link href={backUrl} className="text-(--color-primary) underline">
           Go Back
         </Link>
       </div>
     );
   }
 
-  // ✅ No product state
   if (!product) {
     return (
       <div className="p-6 text-center">
         <p className="text-xl text-gray-600 mb-4">Submission not found</p>
-        <Link href={getBackUrl()} className="text-(--color-primary) underline">
+        <Link href={backUrl} className="text-(--color-primary) underline">
           Go Back
         </Link>
       </div>
@@ -230,7 +248,7 @@ const MobileFullDetails = () => {
   return (
     <div className="flex flex-col  sm:shadow-none shadow-md p-5 w-full ">
       <div className=" w-full flex justify-between items-center mb-5 ">
-        <Link href={getBackUrl()}>
+        <Link href={backUrl}>
           <div className="flex justify-start items-center  cursor-pointer gap-2 w-fit">
             <Image
               src="/images/form/arrow-left.svg"
@@ -249,13 +267,13 @@ const MobileFullDetails = () => {
         />
       </div>
 
-      {/* dialog box */}
+      {/* Share dialog */}
       {showDialog && (
-        <div className=" fixed inset-0 flex justify-center items-center bg-black/40  z-50">
-          <div className="flex flex-col  justify-center items-center form border border-(--color-primary)  rounded-md p-6  bg-[#FAFAFE]   sm:w-xl w-[90%]  ">
-            <div className="flex items-center justify-center w-full relative ">
-              <h3 className=" text-(--color-primary) sm:text-2xl text-lg font-bold ">
-                Invite your friends
+        <div className="fixed inset-0 flex justify-center items-center bg-black/40 z-50">
+          <div className="flex flex-col justify-center items-center form border border-(--color-primary) rounded-md p-6 bg-[#FAFAFE] sm:w-xl w-[90%]">
+            <div className="flex items-center justify-center w-full relative">
+              <h3 className="text-(--color-primary) sm:text-2xl text-lg font-bold">
+                Share this price
               </h3>
 
               <Image
@@ -263,19 +281,30 @@ const MobileFullDetails = () => {
                 alt="cancel icon"
                 width={14}
                 height={14}
-                className=" absolute right-1 enable-hover-cursor cursor-pointer  "
+                className="absolute right-1 cursor-pointer"
                 onClick={() => setShowDialog(!showDialog)}
               />
             </div>
-            <hr className="w-full text-(--color-primary) " />
+            <hr className="w-full text-(--color-primary)" />
+
+            {/* ✅ Show product info in share dialog */}
+            <div className="my-4 text-center">
+              <p className="font-semibold text-lg">{product.commodityName}</p>
+              <p className="text-2xl font-bold text-(--color-primary)">
+                ₦{Number(product.price).toLocaleString()}
+              </p>
+              <p className="text-sm text-gray-600">
+                 {product.location}
+              </p>
+            </div>
 
             <div className="flex w-full justify-center">
               {SOCIALS_ICONS.map((social, index) => (
                 <div
                   key={index}
-                  className=" justify-evenly mx-2  w-full flex flex-col "
+                  className="justify-evenly mx-2 w-full flex flex-col"
                 >
-                  <div className="flex  items-center justify-evenly  my-3 cursor-pointer w-full  ">
+                  <div className="flex items-center justify-evenly my-3 cursor-pointer w-full">
                     <div
                       className="relative aspect-square w-[clamp(2.5rem,6vw,5.5rem)]"
                       onClick={social.onClick}
@@ -288,7 +317,7 @@ const MobileFullDetails = () => {
                       />
                     </div>
                   </div>
-                  <p className="flex text-xs sm:text-sm md:text-base items-center justify-evenly  my-3 cursor-pointer w-full">
+                  <p className="flex text-xs sm:text-sm md:text-base items-center justify-evenly my-3 cursor-pointer w-full">
                     {social.label}
                   </p>
                 </div>
@@ -297,7 +326,7 @@ const MobileFullDetails = () => {
 
             <div className="border flex rounded-md items-center p-2 justify-between w-full border-[#757575] bg-[#F5F5F5]">
               <p
-                className="text-[#B3B3B3] sm:text-base text-[0.55rem]"
+                className="text-[#B3B3B3] sm:text-base text-xs flex-1 truncate px-2"
                 ref={linkRef}
               >
                 {pageUrl}
@@ -351,8 +380,12 @@ const MobileFullDetails = () => {
 
           {/* Dates */}
           <p className="text-base text-[#757575] font-medium">
-            Submitted by {product.BuyerName} on{" "}
-            {new Date(product.createdAt).toLocaleDateString()}
+            Submitted by {product.user.firstName || "bango user"} on{" "}
+            {new Date(product.purchaseDate).toLocaleDateString("en-NG", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })}
           </p>
 
           <div className="items-center justify-between mb-4 flex w-full">

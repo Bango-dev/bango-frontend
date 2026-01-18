@@ -20,13 +20,25 @@ const MobileFullDetails = () => {
   const [showDialog, setShowDialog] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const linkRef = useRef<HTMLParagraphElement>(null);
+  const [backUrl, setBackUrl] = useState("/find-price");
 
-  const getBackUrl = () => {
+  // ✅ Determine back URL based on search context
+  useEffect(() => {
     const queryString = searchParams.toString();
-    const querySuffix = queryString ? `?${queryString}` : "";
-    const viewType = searchParams.get("viewType") || "grid-view";
-    return `/search-result/${viewType}${querySuffix}`;
-  };
+    const viewType = searchParams.get("viewType");
+    const searchQuery = searchParams.get("query");
+
+    if (searchQuery || viewType) {
+      // User came from search/browse - go back to search result
+      const querySuffix = queryString ? `?${queryString}` : "";
+      setBackUrl(`/search-result/${viewType || "grid-view"}${querySuffix}`);
+      console.log("Back URL (from search):", backUrl);
+    } else {
+      // User came from shared link - go to find-price
+      setBackUrl("/find-price");
+      console.log("Back URL (from shared link):", "/find-price");
+    }
+  }, [searchParams]);
 
   // ✅ Generate short URL
   useEffect(() => {
@@ -44,7 +56,7 @@ const MobileFullDetails = () => {
 
 *${product.commodityName}*
  ₦${Number(product.price).toLocaleString()}
- ${product.market}, ${product.location}
+ ${product.location}
  ${product.quantity}
 
 ${pageUrl}`;
@@ -83,7 +95,7 @@ I found this price on Bango:
 
 Product: ${product.commodityName}
 Price: ₦${Number(product.price).toLocaleString()}
-Location: ${product.market}, ${product.location}
+Location:  ${product.location}
 Quantity: ${product.quantity}
 
 View details: ${pageUrl}`;
@@ -215,7 +227,7 @@ View details: ${pageUrl}`;
     return (
       <div className="p-6 text-center">
         <p className="text-xl text-red-600 mb-4">{error}</p>
-        <Link href={getBackUrl()} className="text-(--color-primary) underline">
+        <Link href={backUrl} className="text-(--color-primary) underline">
           Go Back
         </Link>
       </div>
@@ -226,7 +238,7 @@ View details: ${pageUrl}`;
     return (
       <div className="p-6 text-center">
         <p className="text-xl text-gray-600 mb-4">Submission not found</p>
-        <Link href={getBackUrl()} className="text-(--color-primary) underline">
+        <Link href={backUrl} className="text-(--color-primary) underline">
           Go Back
         </Link>
       </div>
@@ -236,7 +248,7 @@ View details: ${pageUrl}`;
   return (
     <div className="flex flex-col  sm:shadow-none shadow-md p-5 w-full ">
       <div className=" w-full flex justify-between items-center mb-5 ">
-        <Link href={getBackUrl()}>
+        <Link href={backUrl}>
           <div className="flex justify-start items-center  cursor-pointer gap-2 w-fit">
             <Image
               src="/images/form/arrow-left.svg"
@@ -281,9 +293,7 @@ View details: ${pageUrl}`;
               <p className="text-2xl font-bold text-(--color-primary)">
                 ₦{Number(product.price).toLocaleString()}
               </p>
-              <p className="text-sm text-gray-600">
-                {product.market}, {product.location}
-              </p>
+              <p className="text-sm text-gray-600">{product.location}</p>
             </div>
 
             <div className="flex w-full justify-center">
